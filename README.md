@@ -5,7 +5,7 @@
 | 플랫폼 | 연산 보드 | 구동부 | 센서 |
 |---|---|---|---|
 | TurtleBot3 Waffle Pi | Raspberry Pi + OpenCR | DYNAMIXEL XM430-W210 ×2 (엔코더 내장) | LiDAR, 카메라(IMX219), IMU |
-| Yahboom JetBot Mini | NVIDIA Jetson Nano | TT DC 기어모터 ×2 (엔코더 없음) | 카메라(IMX219) |
+| Yahboom JetBot Mini | NVIDIA Jetson Nano 4GB | TT DC 기어모터 ×2 (엔코더 없음) | 카메라(IMX219) |
 
 ---
 
@@ -50,7 +50,11 @@
 |---|---|
 | 조립 크기 | 170.5 × 126.5 × 146.5 mm |
 | 조립 무게 | 708 g |
-| 연산 보드 | NVIDIA Jetson Nano (2GB / 4GB 중 보유 모델 확인 필요) |
+| 연산 보드 | NVIDIA Jetson Nano 4GB |
+| ├ CPU | Quad-core ARM Cortex-A57 @ 1.43 GHz |
+| ├ GPU | 128-core NVIDIA Maxwell (472 GFLOPS) |
+| ├ 메모리 | 4 GB 64-bit LPDDR4, 25.6 GB/s |
+| └ 전력 모드 | 5 W / 10 W |
 | 확장 보드 | Yahboom 전용 확장 보드 (듀얼 모터 드라이버, PWM 서보, OLED, 온보드 MCU) |
 | 구동 모터 | TT DC 기어모터 ×2, 감속비 1:48, **엔코더 없음** (개루프 제어) |
 | 바퀴 | 구동 바퀴 ×2 + 캐스터(유니버설 휠) ×1 |
