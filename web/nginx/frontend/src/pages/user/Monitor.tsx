@@ -206,11 +206,58 @@ function CameraView({ robotId, s, iHold, canAcquire, onAcquire }: {
 
 // ------------------------------------------------------------------ 지도 모드
 type Target = { x: number; y: number; yaw: number | null };
+type Pose = { x: number; y: number; yaw: number };
+const POSE_MS = 200;
+
+/**
+ * TurtleBot3 Waffle Pi 를 위에서 본 모양으로, 지도 축척 그대로 그린다.
+ * 치수는 URDF(turtlebot3_waffle_pi.urdf)에서 가져왔다. 원점 = base_footprint(바퀴 축 가운데), +x = 앞.
+ */
+const WAFFLE = {
+  body: { x: -0.064, y: 0, w: 0.266, h: 0.266 },                       // base_link 충돌 상자
+  wheels: [{ x: 0, y: 0.144 }, { x: 0, y: -0.144 }], wheelR: 0.033, wheelW: 0.018,
+  casters: [{ x: -0.177, y: 0.064 }, { x: -0.177, y: -0.064 }],       // 뒤쪽 볼 캐스터
+  lidar: { x: -0.049, y: 0, r: 0.055 },                                // LDS-01
+  camera: { x: 0.078, y: 0, w: 0.015, h: 0.03 },                       // Raspberry Pi 카메라
+};
+
+function drawRobot(g: CanvasRenderingContext2D, cx: number, cy: number, yaw: number, ppm: number) {
+  const W = WAFFLE;
+  g.save();
+  g.translate(cx, cy);
+  g.rotate(-yaw);
+  g.scale(ppm, -ppm);                      // 이제 단위 = m, y 위쪽
+  const px = 1 / ppm;                      // 화면 1px
+  const rect = (x: number, y: number, w: number, h: number) => g.rect(x - w / 2, y - h / 2, w, h);
+  // 바퀴
+  g.fillStyle = '#1c1c1e';
+  W.wheels.forEach((w) => { g.beginPath(); rect(w.x, w.y, W.wheelR * 2, W.wheelW); g.fill(); });
+  // 몸체
+  g.fillStyle = 'rgba(0, 122, 255, 0.9)'; g.strokeStyle = '#fff'; g.lineWidth = 1.5 * px;
+  g.beginPath(); g.roundRect(W.body.x - W.body.w / 2, W.body.y - W.body.h / 2, W.body.w, W.body.h, 0.02); g.fill(); g.stroke();
+  // 캐스터
+  g.fillStyle = 'rgba(255, 255, 255, 0.55)';
+  W.casters.forEach((c) => { g.beginPath(); g.arc(c.x, c.y, 0.012, 0, Math.PI * 2); g.fill(); });
+  // 라이다
+  g.fillStyle = '#2c2c2e'; g.strokeStyle = 'rgba(255, 255, 255, 0.8)'; g.lineWidth = 1 * px;
+  g.beginPath(); g.arc(W.lidar.x, W.lidar.y, W.lidar.r, 0, Math.PI * 2); g.fill(); g.stroke();
+  // 카메라(앞)
+  g.fillStyle = '#fff';
+  g.beginPath(); rect(W.camera.x, W.camera.y, W.camera.w, W.camera.h); g.fill();
+  // 앞 방향 표시
+  g.strokeStyle = '#fff'; g.lineWidth = 1.5 * px; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(0.02, 0.05); g.lineTo(0.055, 0); g.lineTo(0.02, -0.05); g.stroke();
+  g.restore();
+}
 
 function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
   const api = useApi();
   const info = usePoll<MapInfo | null>(() => api.mapInfo(robotId).catch(() => null), 10000, [robotId]);
-  const view = usePoll<MapView | null>(() => api.mapView(robotId), 500, [robotId]);
+  // 로봇 위치 토픽(/inspection/map_pose)이 5Hz 이므로 같은 주기로 받는다. 사이 프레임은 아래에서 보간해 그린다.
+  const view = usePoll<MapView | null>(() => api.mapView(robotId), POSE_MS, [robotId]);
+  const robotLayer = useRef<HTMLCanvasElement>(null);
+  const anim = useRef<{ from: Pose | null; to: Pose | null; t0: number }>({ from: null, to: null, t0: 0 });
+  const shown = useRef<Pose | null>(null);
   const points = usePoll<Point[]>(() => api.points(), 0);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [target, setTarget] = useState<Target | null>(null);
@@ -265,11 +312,14 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     g.imageSmoothingEnabled = true;            // 지도 그림은 4배 해상도로 다듬어 오므로 부드럽게 축소
     g.drawImage(img, 0, 0, cw, ch);
     const v = view.data;
-    // 계획 경로
+    // 계획 경로: 점선
     if (v?.path?.length) {
-      g.strokeStyle = '#007aff'; g.lineWidth = 2; g.lineJoin = 'round'; g.beginPath();
+      g.strokeStyle = '#007aff'; g.lineWidth = 2.5; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.setLineDash([0.1, 6]);             // 길이 0 에 가까운 선 + 둥근 끝 = 점
+      g.beginPath();
       v.path.forEach(([x, y], i) => (i ? g.lineTo(toPx(x), toPy(y)) : g.moveTo(toPx(x), toPy(y))));
       g.stroke();
+      g.setLineDash([]);
     }
     // 라이다: 이웃한 점(0.25m 이내)을 이어 하나의 선으로 그린다
     if (v?.scan?.length) {
@@ -309,18 +359,46 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
         g.closePath(); g.fillStyle = '#af52de'; g.fill();
       }
     }
-    // 로봇
-    if (v?.pose) {
-      const { x, y, yaw } = v.pose;
-      const cx = toPx(x), cy = toPy(y), r = Math.max(7, (0.16 / m.resolution) * cssScale);
-      g.fillStyle = '#007aff'; g.strokeStyle = '#fff'; g.lineWidth = 2;
-      g.beginPath();
-      g.moveTo(cx + r * 1.4 * Math.cos(-yaw), cy + r * 1.4 * Math.sin(-yaw));
-      g.lineTo(cx + r * Math.cos(-yaw + 2.5), cy + r * Math.sin(-yaw + 2.5));
-      g.lineTo(cx + r * Math.cos(-yaw - 2.5), cy + r * Math.sin(-yaw - 2.5));
-      g.closePath(); g.fill(); g.stroke();
-    }
   }, [m, img, view.data, points.data, target, cssScale]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 새 위치가 오면 지금 그려진 위치에서 새 위치로 POSE_MS 동안 옮겨 간다
+  useEffect(() => {
+    const p = view.data?.pose ?? null;
+    anim.current = { from: shown.current ?? p, to: p, t0: performance.now() };
+  }, [view.data]);
+
+  // 로봇은 위 겹 캔버스에 화면 주사율(보통 60fps)로 그린다 — 지도·경로를 매 프레임 다시 그리지 않는다
+  useEffect(() => {
+    const c = robotLayer.current;
+    if (!c || !m) return;
+    const dpr = window.devicePixelRatio || 1;
+    const cw = m.width * cssScale, ch = m.height * cssScale;
+    c.style.width = `${cw}px`;
+    c.style.height = `${ch}px`;
+    c.width = Math.round(cw * dpr);
+    c.height = Math.round(ch * dpr);
+    const g = c.getContext('2d')!;
+    let raf = 0;
+    const frame = (now: number) => {
+      const { from, to, t0 } = anim.current;
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, c.width, c.height);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (from && to) {
+        const k = Math.min(1, (now - t0) / POSE_MS);
+        let dy = to.yaw - from.yaw;
+        dy = Math.atan2(Math.sin(dy), Math.cos(dy));        // -180°↔180° 경계에서 반대로 돌지 않게
+        const p = { x: from.x + (to.x - from.x) * k, y: from.y + (to.y - from.y) * k, yaw: from.yaw + dy * k };
+        shown.current = p;
+        drawRobot(g, toPx(p.x), toPy(p.y), p.yaw, cssScale / m.resolution);
+      } else {
+        shown.current = null;
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [m, cssScale]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 누른 곳 = 목적지, 누른 채 끌면 = 도착했을 때 로봇이 바라볼 방향
   const local = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -360,6 +438,7 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
       <div className="map-canvas">
         <canvas ref={canvas} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
           className={iHold ? 'clickable' : ''} />
+        <canvas ref={robotLayer} className="robot-layer" aria-hidden />
       </div>
       <div className="map-legend small">
         <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로</span>

@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 관제 화면용 지도 그림 — 설계도처럼 보이게 만든다(화면 표시용, 로봇이 주행에 쓰는 지도는 그대로).
+ * 관제 화면용 지도 그림 — 설계도처럼 보이게 만든다.
+ * 실제 지도(ros/maps/site.pgm, 로봇의 map_server·AMCL·Nav2 가 사용)와 별개로, 웹에 보낼 PNG 만 메모리에서 새로 그린다.
+ * 그래서 아래 정리는 모두 표시용이며 주행·위치 추정에는 영향이 없다.
  *
  * SLAM 지도는 라이다 스캔이 쌓인 것이라 벽이 점선처럼 끊기고 잡음이 많다. 그래서 벽을 직접 그리지 않고
  * "로봇이 실제로 다닐 수 있는 바닥"을 먼저 구한 뒤, 그 경계를 직선 벽으로 그린다.
@@ -25,6 +27,7 @@ import java.util.List;
  *  4) 바닥 안에 떠 있는 장애물(설비·랙·책상 등, 건물 바깥과 이어지지 않은 덩어리)은 감싸는 직사각형 하나로 바꾼다.
  *     한쪽이 열린 상자도 닫히고, 윤곽의 작은 요철이 사라진다(운영에는 영향 없음: 표시용)
  *     이어서 1칸 폭의 벽 돌기·바닥 홈을 없애 벽을 곧게 편다(두께 2칸 이상인 실제 벽 끝은 그대로)
+ *     SLAM 이 긴 벽을 따라가며 조금 기울어 생긴 1~2칸 계단도, 짧은 구간을 이웃한 긴 구간 높이에 맞춰 편다
  *  5) 그리기: 바닥 흰색, 다닐 수 없는 곳(설비 안쪽·벽 너머) 회색, 바닥 경계는 가로·세로 직선 구간으로 합쳐
  *     정해진 굵기의 벽선으로 그린다
  * 출력은 SCALE 배 해상도 PNG(위쪽이 지도의 +y).
@@ -33,7 +36,7 @@ public final class MapRenderer {
 
     private static final int SCALE = 4;
     private static final float WALL_PX = 3.2f;          // SCALE 배 이미지 기준 벽선 굵기(px)
-    private static final int ROBOT_RADIUS_CELLS = 3;    // 0.05m 칸 × 3 = 0.15m (TurtleBot3 Waffle 폭 0.31m 의 절반)
+    private static final int ROBOT_RADIUS_CELLS = 4;    // 0.05m × 4 = 0.2m: Waffle 반폭 0.155m + 여유. 폭 0.4m 미만 틈은 닫힌 공간
     private static final int MIN_NOISE_BLOB = 6;
     private static final int MAX_UNKNOWN_SPECK = 40;
     private static final double MAX_BOX_SIDE_M = 2.5;   // 이보다 긴 덩어리는 벽으로 보고 직사각형으로 바꾸지 않는다
@@ -80,8 +83,12 @@ public final class MapRenderer {
         floor = and(erode(dilate(floor, w, h), w, h), free);
         floor = dilate(erode(floor, w, h), w, h);
         // 4) 떠 있는 장애물 → 직사각형
-        floor = boxIslands(floor, w, h, (int) Math.round(MAX_BOX_SIDE_M / resolution));
+        int boxSide = (int) Math.round(MAX_BOX_SIDE_M / resolution);
+        floor = boxIslands(floor, w, h, boxSide);   // 먼저 상자를 반듯하게(들쭉날쭉한 면이 좁은 틈을 메우지 않도록)
         floor = straighten(floor, w, h);
+        floor = removeJogs(floor, w, h);                                   // 가로 벽 계단
+        floor = transpose(removeJogs(transpose(floor, w, h), h, w), h, w);  // 세로 벽 계단
+        floor = boxIslands(floor, w, h, boxSide);                          // 상자를 다시 반듯하게
 
         // 5) 그리기
         BufferedImage img = new BufferedImage(w * SCALE, h * SCALE, BufferedImage.TYPE_INT_RGB);
@@ -219,6 +226,98 @@ public final class MapRenderer {
             }
         }
         return f;
+    }
+
+    private static final int MAX_JOG = 2;          // 이 칸 수 이하로 어긋난 이웃 구간은 한 직선으로 맞춘다
+    private static final int MAX_JOG_RUN = 200;    // 옮길 수 있는 구간 길이(칸) 상한
+
+    /** 가로 경계 구간: line p 는 칸 행 p 와 p+1 사이, 칸 열 [c0, c1), above = 바닥이 위쪽. */
+    private record Run(int p, int c0, int c1, boolean above) {
+        int len() {
+            return c1 - c0;
+        }
+    }
+
+    /**
+     * 바로 이어진 두 가로 경계 구간의 높이가 1~2칸 다르면 한쪽을 다른 쪽 높이로 옮긴다.
+     * 바닥을 넓히는 쪽으로만 옮겨 통로가 막히지 않게 한다(벽은 최소 1칸 남도록 moveRun 이 확인).
+     */
+    private static boolean[] removeJogs(boolean[] src, int w, int h) {
+        boolean[] f = src.clone();
+        for (int pass = 0; pass < 40; pass++) {
+            List<Run> runs = new ArrayList<>();
+            for (int p = 0; p < h - 1; p++) {
+                int c = 0;
+                while (c < w) {
+                    boolean lo = f[p * w + c], hi = f[(p + 1) * w + c];
+                    if (lo == hi) {
+                        c++;
+                        continue;
+                    }
+                    int c0 = c;
+                    while (c < w && f[p * w + c] == lo && f[(p + 1) * w + c] == hi) {
+                        c++;
+                    }
+                    runs.add(new Run(p, c0, c, hi));
+                }
+            }
+            boolean changed = false;
+            outer:
+            for (Run a : runs) {
+                for (Run b : runs) {
+                    int d = Math.abs(b.p() - a.p());
+                    boolean touching = b.c0() == a.c1() || b.c1() == a.c0();
+                    if (b == a || d < 1 || d > MAX_JOG || b.above() != a.above() || !touching) {
+                        continue;
+                    }
+                    // 바닥이 위쪽이면 경계를 내릴 때, 아래쪽이면 올릴 때 바닥이 넓어진다
+                    boolean expands = a.above() ? b.p() < a.p() : b.p() > a.p();
+                    if (expands && a.len() <= MAX_JOG_RUN && moveRun(f, w, h, a, b.p())) {
+                        changed = true;
+                        break outer;    // 마스크가 바뀌었으니 구간을 다시 구한다
+                    }
+                }
+            }
+            if (!changed) {
+                break;
+            }
+        }
+        return f;
+    }
+
+    /** 구간 a 의 경계를 line q 로 옮긴다. 옮긴 뒤에도 경계가 성립할 때만(바깥 칸 확인). */
+    private static boolean moveRun(boolean[] f, int w, int h, Run a, int q) {
+        int p = a.p();
+        boolean floorAbove = a.above();
+        int lo = Math.min(p, q) + 1, hi = Math.max(p, q);      // 바뀌는 칸 행 [lo, hi]
+        int outside = q < p ? q : q + 1;                       // 새 경계 바깥쪽 행
+        if (outside < 0 || outside >= h) {
+            return false;
+        }
+        // 새 경계 아래(q 행)는 경계 아래쪽 상태, 위(q+1 행)는 경계 위쪽 상태여야 한다
+        boolean value = q < p ? floorAbove : !floorAbove;      // 바뀌는 칸에 넣을 값
+        boolean need = q < p ? !floorAbove : floorAbove;       // 바깥 행이 이미 가져야 할 값
+        for (int c = a.c0(); c < a.c1(); c++) {
+            if (f[outside * w + c] != need) {
+                return false;
+            }
+        }
+        for (int r = lo; r <= hi; r++) {
+            for (int c = a.c0(); c < a.c1(); c++) {
+                f[r * w + c] = value;
+            }
+        }
+        return true;
+    }
+
+    private static boolean[] transpose(boolean[] g, int w, int h) {
+        boolean[] t = new boolean[g.length];
+        for (int r = 0; r < h; r++) {
+            for (int c = 0; c < w; c++) {
+                t[c * h + r] = g[r * w + c];
+            }
+        }
+        return t;
     }
 
     private static boolean at(boolean[] f, int w, int h, int r, int c) {

@@ -7,6 +7,8 @@
                                "detoured", "recoveries", "plannedLength", "traveled"}
   /inspection/bridge_status → {"navReady": bool, "localized": bool}  (1초마다, 출발 전 검사용)
   /inspection/map_pose      → geometry_msgs/PoseStamped (frame map, 5Hz) — 지도 위 로봇 위치(관제 화면 지도 모드)
+  /inspection/scan_map      → std_msgs/String JSON {"pts": [[x, y], ...]} — 라이다 점을 스캔이 찍힌 시각의 TF 로
+                              지도 좌표로 바꾼 것(관제 지도 모드). 위치와 스캔을 따로 보내면 회전 중 시간차만큼 어긋난다
   /inspection/map           → nav_msgs/OccupancyGrid (5초마다) — /map 은 처음 한 번만 발행(latched)되어 rosbridge 로는
                               놓치기 쉬우므로 같은 지도를 주기적으로 다시 발행한다
 
@@ -35,6 +37,9 @@ from rclpy.time import Time
 from rclpy.action import ActionClient
 from rclpy.node import Node
 from std_msgs.msg import String
+from sensor_msgs.msg import LaserScan
+from rclpy.qos import qos_profile_sensor_data
+from rclpy.duration import Duration
 from action_msgs.msg import GoalStatus
 
 NO_PROGRESS_SEC = 90.0
@@ -75,6 +80,8 @@ class Bridge(Node):
         self.create_subscription(OccupancyGrid, '/map', lambda m: setattr(self, 'map_msg', m), latched)
         self.map_pub = self.create_publisher(OccupancyGrid, '/inspection/map', 1)
         self.create_timer(5.0, lambda: self.map_msg is not None and self.map_pub.publish(self.map_msg))
+        self.scan_map_pub = self.create_publisher(String, '/inspection/scan_map', 5)
+        self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data)
         self.get_logger().info(f'goal bridge ready (mode={MODE})')
 
     # ------------------------------------------------------------ 상태
@@ -120,6 +127,27 @@ class Bridge(Node):
         p.pose.position.y = t.transform.translation.y
         p.pose.orientation = t.transform.rotation
         self.map_pose_pub.publish(p)
+
+    def on_scan(self, scan):
+        """스캔이 찍힌 시각의 TF(map → 라이다)로 점을 지도 좌표로 바꿔 보낸다."""
+        try:
+            t = self.tf_buffer.lookup_transform('map', scan.header.frame_id, Time.from_msg(scan.header.stamp),
+                                                timeout=Duration(seconds=0.1))
+        except Exception:
+            return
+        tx, ty = t.transform.translation.x, t.transform.translation.y
+        q = t.transform.rotation
+        yaw = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
+        c, s = math.cos(yaw), math.sin(yaw)
+        pts = []
+        for i in range(0, len(scan.ranges), 2):
+            r = scan.ranges[i]
+            if not (scan.range_min < r < scan.range_max):
+                continue
+            a = scan.angle_min + i * scan.angle_increment
+            lx, ly = r * math.cos(a), r * math.sin(a)
+            pts.append([round(tx + c * lx - s * ly, 3), round(ty + s * lx + c * ly, 3)])
+        self.scan_map_pub.publish(String(data=json.dumps({'pts': pts})))
 
     def report(self, g, state, code='', reason='', **extra):
         body = {'goalId': g['goalId'], 'state': state, 'code': code, 'reason': reason}

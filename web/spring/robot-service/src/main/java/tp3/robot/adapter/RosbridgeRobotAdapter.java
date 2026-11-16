@@ -74,7 +74,11 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     private volatile double[] scanRanges;
     private volatile double scanAngleMin;
     private volatile double scanAngleInc;
+    private volatile double scanRangeMin = 0.12;
+    private volatile double scanRangeMax = 8.0;   // 라이다가 보내는 range_min·range_max 로 덮어쓴다
     private volatile java.util.List<double[]> plan = java.util.List.of();
+    private volatile java.util.List<double[]> scanMap = java.util.List.of();
+    private volatile long scanMapAt;
     private volatile long planAt;
     private volatile MapInfo mapInfo;
     private volatile byte[] mapPng;
@@ -101,6 +105,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         defaults.put("map", "/inspection/map");       // 로봇 측 브리지가 /map 을 주기적으로 다시 발행
         defaults.put("plan", "/plan");
         defaults.put("mapPose", "/inspection/map_pose");
+        defaults.put("scanMap", "/inspection/scan_map");   // 로봇 측에서 스캔 시각의 TF 로 지도 좌표로 바꾼 라이다 점
         topics.putAll(defaults);
         config.path("topics").fields().forEachRemaining(e -> topics.put(e.getKey(), e.getValue().asText()));
     }
@@ -153,6 +158,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             subscribe("bridge", "std_msgs/msg/String", 1000);
             subscribe("mapPose", "geometry_msgs/msg/PoseStamped", 200);
             subscribe("plan", "nav_msgs/msg/Path", 1000);
+            subscribe("scanMap", "std_msgs/msg/String", 0);
             subscribe("map", "nav_msgs/msg/OccupancyGrid", 0);
             advertise("teleop", "geometry_msgs/msg/Twist");
             advertise("goal", "std_msgs/msg/String");
@@ -266,6 +272,18 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             mapPoseAt = System.currentTimeMillis();
             return;
         }
+        if (topic.equals(topics.get("scanMap"))) {
+            try {
+                JsonNode pts = om.readTree(msg.path("data").asText()).path("pts");
+                java.util.List<double[]> list = new java.util.ArrayList<>(pts.size());
+                pts.forEach(p -> list.add(new double[]{p.get(0).asDouble(), p.get(1).asDouble()}));
+                scanMap = list;
+                scanMapAt = System.currentTimeMillis();
+            } catch (Exception e) {
+                log.debug("[{}] bad scan_map", code);
+            }
+            return;
+        }
         if (topic.equals(topics.get("plan"))) {
             java.util.List<double[]> pts = new java.util.ArrayList<>();
             JsonNode poses = msg.path("poses");
@@ -303,6 +321,8 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
                 }
                 scanAngleMin = msg.path("angle_min").asDouble();
                 scanAngleInc = msg.path("angle_increment").asDouble();
+                scanRangeMin = msg.path("range_min").asDouble(scanRangeMin);
+                scanRangeMax = msg.path("range_max").asDouble(scanRangeMax);
                 scanRanges = arr;
             }
             case "battery" -> {
@@ -382,10 +402,12 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         Pose p = now - mapPoseAt < 3000 ? mapPose : null;
         java.util.List<double[]> scanPts = new java.util.ArrayList<>();
         double[] rs = scanRanges;
-        if (p != null && rs != null) {
+        if (now - scanMapAt < 1500) {
+            scanPts = scanMap;                 // 로봇 측에서 시각을 맞춰 바꾼 점(정확)
+        } else if (p != null && rs != null) {  // 없으면 서버에서 최근 위치로 근사
             for (int i = 0; i < rs.length; i += 2) {
                 double r = rs[i];
-                if (Double.isNaN(r) || Double.isInfinite(r) || r < 0.12 || r > 3.5) {
+                if (Double.isNaN(r) || Double.isInfinite(r) || r <= scanRangeMin || r >= scanRangeMax) {
                     continue;
                 }
                 double a = p.yaw() + scanAngleMin + i * scanAngleInc;

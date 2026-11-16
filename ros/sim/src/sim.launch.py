@@ -5,6 +5,7 @@ SIM_MODE=slam        : slam_toolbox 로 지도를 만들면서 Nav2 로 이동 �
 공통: Gazebo 서버(헤드리스) + TurtleBot3 + rosbridge + rosapi + 영상 서버 + 로봇 측 노드(목표 브리지, 워치독)
 """
 import os
+import re
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -14,8 +15,33 @@ from launch_ros.actions import Node
 from nav2_common.launch import RewrittenYaml
 
 
+LIDAR_MIN = float(os.environ.get('LIDAR_MIN_RANGE', '0.16'))
+LIDAR_MAX = float(os.environ.get('LIDAR_MAX_RANGE', '8.0'))
+
+
+def robot_sdf(tb3_gazebo, model):
+    """TurtleBot3 Gazebo 모델에서 라이다 측정 거리만 실물에 맞게 바꾼 사본을 만든다.
+
+    패키지 기본 모델은 LDS-01(0.12~3.5m)이다. 실물 라이다는 8m 이상 재므로(LDS-02: 0.16~8m)
+    LIDAR_MIN_RANGE·LIDAR_MAX_RANGE 로 바꾼다. 나머지(모양·바퀴·카메라·5Hz·360점)는 그대로다.
+    """
+    src = os.path.join(tb3_gazebo, 'models', f'turtlebot3_{model}', 'model.sdf')
+    sdf = open(src, encoding='utf-8').read()
+    i = sdf.index('<sensor name="hls_lfcd_lds"')
+    j = sdf.index('</sensor>', i)
+    lidar = re.sub(r'<range>\s*<min>[^<]*</min>\s*<max>[^<]*</max>',
+                   f'<range>\n            <min>{LIDAR_MIN}</min>\n            <max>{LIDAR_MAX}</max>', sdf[i:j], count=1)
+    if lidar == sdf[i:j]:
+        raise RuntimeError(f'lidar range block not found in {src}')
+    out = f'/tmp/turtlebot3_{model}.sdf'
+    with open(out, 'w', encoding='utf-8') as f:
+        f.write(sdf[:i] + lidar + sdf[j:])
+    return out
+
+
 def generate_launch_description():
     mode = os.environ.get('SIM_MODE', 'nav')
+    model = os.environ.get('TURTLEBOT3_MODEL', 'waffle_pi')
     gazebo_ros = get_package_share_directory('gazebo_ros')
     tb3_gazebo = get_package_share_directory('turtlebot3_gazebo')
     nav2_bringup = get_package_share_directory('nav2_bringup')
@@ -34,9 +60,8 @@ def generate_launch_description():
     state_publisher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(tb3_gazebo, 'launch', 'robot_state_publisher.launch.py')),
         launch_arguments={'use_sim_time': 'true'}.items())
-    spawn = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(tb3_gazebo, 'launch', 'spawn_turtlebot3.launch.py')),
-        launch_arguments={'x_pose': '0.0', 'y_pose': '0.0'}.items())
+    spawn = Node(package='gazebo_ros', executable='spawn_entity.py', output='screen',
+                 arguments=['-entity', model, '-file', robot_sdf(tb3_gazebo, model), '-x', '0.0', '-y', '0.0', '-z', '0.01'])
     nav = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(nav2_bringup, 'launch', 'bringup_launch.py')),
         launch_arguments={'slam': 'True' if mode == 'slam' else 'False', 'map': map_yaml,

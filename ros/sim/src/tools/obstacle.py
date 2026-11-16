@@ -26,7 +26,10 @@ def call(node, cli, req):
     if not cli.wait_for_service(timeout_sec=10):
         raise SystemExit('gazebo service not available')
     fut = cli.call_async(req)
-    rclpy.spin_until_future_complete(node, fut, timeout_sec=15)
+    # 로봇이 달리는 중에는 에뮬레이션 Gazebo 응답이 15초를 넘기기도 했다 → 넉넉히 기다린다
+    rclpy.spin_until_future_complete(node, fut, timeout_sec=60)
+    if fut.result() is None:
+        raise SystemExit('gazebo service timed out')
     return fut.result()
 
 
@@ -46,7 +49,8 @@ def main():
             req = SpawnEntity.Request(name=f'obstacle_{n}', xml=sdf(f'obstacle_{n}', sx, sy))
             req.initial_pose.position.x, req.initial_pose.position.y, req.initial_pose.position.z = x, y, 0.3
             r = call(node, spawn, req)
-            print(f'place {n}: {r.success} {r.status_message}')
+            ok = r.success or 'already exists' in r.status_message     # 이미 놓여 있으면 그대로 둔다
+            print(f'place {n}: {ok} {r.status_message}')
         else:
             r = call(node, delete, DeleteEntity.Request(name=f'obstacle_{n}'))
             print(f'clear {n}: {r.success}')

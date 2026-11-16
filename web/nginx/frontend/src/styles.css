@@ -183,13 +183,14 @@ section.narrow { max-width: 600px; }
 .pad button { height: 48px; padding: 0; border-radius: 12px; background: var(--bg-grouped); color: var(--label); touch-action: none; }
 .pad button.pressed { background: var(--blue); color: #fff; }
 .map-view { background: var(--bg-grouped); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-.map-canvas { width: 100%; }
+.map-canvas { width: 100%; position: relative; }
+.map-view canvas.robot-layer { position: absolute; left: 0; top: 0; background: transparent; pointer-events: none; }
 .map-view canvas { display: block; border-radius: 8px; background: #e5e5ea; touch-action: none; }
 .map-view canvas.clickable { cursor: crosshair; }
 .map-empty { min-height: 300px; }
 .map-legend { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; color: var(--label2); }
 .lg { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -2px; border-radius: 3px; }
-.lg.robot { background: #007aff; } .lg.path { background: #007aff; height: 3px; vertical-align: 3px; }
+.lg.robot { background: #007aff; } .lg.path { background: none; height: 0; border-top: 3px dotted #007aff; vertical-align: 4px; } .lg.robot { border-radius: 2px; }
 .lg.scan { background: #ff3b30; height: 3px; vertical-align: 3px; } .lg.point { border: 2px solid #30b0c7; border-radius: 6px; }
 .lg.goal { border: 2px solid #af52de; border-radius: 6px; }
 
