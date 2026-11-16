@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1902" height="1972" viewBox="0 0 1902 1972" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a007aff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#007aff"/></marker><marker id="a248a3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#248a3d"/></marker><marker id="a5856d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5856d6"/></marker><marker id="a8944ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8944ab"/></marker><marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker><marker id="ac93400" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c93400"/></marker></defs>
+<rect width="1902" height="1972" fill="#f2f2f7"/>
+<text x="24.0" y="44.0" font-size="24" font-weight="700" fill="#1c1c1e" text-anchor="start">화재 점검 로봇 서비스 — 시스템 사이클</text>
+<text x="24.0" y="70.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">세로 줄 = 컨테이너, 화살표 = 호출 · 메시지(번호 순서), 동그라미 = 그 컨테이너 안에서 하는 일. 주기 · 시간 값은 코드 기준이다.</text>
+<rect x="200.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="1.6"/>
+<text x="300.0" y="119.0" font-size="14" font-weight="700" fill="#007aff" text-anchor="middle">브라우저</text>
+<text x="300.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">React SPA</text>
+<line x1="300" y1="150" x2="300" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="432.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="532.0" y="119.0" font-size="14" font-weight="700" fill="#5856d6" text-anchor="middle">web · gateway</text>
+<text x="532.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">nginx · 인증 · 권한</text>
+<line x1="532" y1="150" x2="532" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="664.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="764.0" y="119.0" font-size="14" font-weight="700" fill="#248a3d" text-anchor="middle">user-service</text>
+<text x="764.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">계정 · 세션 · 감사</text>
+<line x1="764" y1="150" x2="764" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="896.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="996.0" y="119.0" font-size="14" font-weight="700" fill="#248a3d" text-anchor="middle">inspection-service</text>
+<text x="996.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">작업 · 사건 · 관측</text>
+<line x1="996" y1="150" x2="996" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1128.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#fff4e5" stroke="#b25000" stroke-width="1.6"/>
+<text x="1228.0" y="119.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="middle">analysis-service</text>
+<text x="1228.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">Python 작업 큐</text>
+<line x1="1228" y1="150" x2="1228" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1360.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="1460.0" y="119.0" font-size="14" font-weight="700" fill="#248a3d" text-anchor="middle">robot-service</text>
+<text x="1460.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">미션 · 제어권 · 브리지</text>
+<line x1="1460" y1="150" x2="1460" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1592.0" y="96.0" width="200.0" height="54.0" rx="12" fill="#e6f5fb" stroke="#0071a4" stroke-width="1.6"/>
+<text x="1692.0" y="119.0" font-size="14" font-weight="700" fill="#0071a4" text-anchor="middle">sim (로봇)</text>
+<text x="1692.0" y="138.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">rosbridge · 브리지 · Nav2</text>
+<line x1="1692" y1="150" x2="1692" y2="1942" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="16.0" y="170.0" width="1870.0" height="286.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="170.0" width="8.0" height="286.0" rx="4" fill="#5856d6" stroke="#5856d6" stroke-width="1.0"/>
+<text x="40.0" y="198.0" font-size="16" font-weight="700" fill="#5856d6" text-anchor="start">A  인증 · 요청 처리</text>
+<text x="40.0" y="217.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">모든 /api · /ws 요청. 브라우저 → 서비스 화살표는 모두 web·gateway 를 거친다</text>
+<circle cx="54" cy="247.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="251.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A1</text>
+<circle cx="54" cy="285.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="289.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A2</text>
+<circle cx="54" cy="323.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="327.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A3</text>
+<circle cx="54" cy="361.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="365.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A4</text>
+<circle cx="54" cy="399.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="403.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A5</text>
+<circle cx="54" cy="437.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="441.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A6</text>
+<rect x="16.0" y="470.0" width="1870.0" height="476.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="470.0" width="8.0" height="476.0" rx="4" fill="#248a3d" stroke="#248a3d" stroke-width="1.0"/>
+<text x="40.0" y="498.0" font-size="16" font-weight="700" fill="#248a3d" text-anchor="start">B  점검 미션</text>
+<text x="40.0" y="517.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">작업 하나 = 미션 하나(번호 같음). 지점마다 이동 → 도착 → 촬영을 반복한다</text>
+<circle cx="54" cy="547.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="551.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B1</text>
+<circle cx="54" cy="585.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="589.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B2</text>
+<circle cx="54" cy="623.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="627.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B3</text>
+<circle cx="54" cy="661.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="665.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B4</text>
+<circle cx="54" cy="699.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="703.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B5</text>
+<circle cx="54" cy="737.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="741.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B6</text>
+<circle cx="54" cy="775.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="779.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B7</text>
+<circle cx="54" cy="813.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="817.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B8</text>
+<circle cx="54" cy="851.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="855.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B9</text>
+<circle cx="54" cy="889.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="893.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B10</text>
+<circle cx="54" cy="927.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="931.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B11</text>
+<rect x="16.0" y="960.0" width="1870.0" height="210.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="960.0" width="8.0" height="210.0" rx="4" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="40.0" y="988.0" font-size="16" font-weight="700" fill="#b25000" text-anchor="start">C  사진 분석</text>
+<text x="40.0" y="1007.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">사진마다 한 번. 분석 서비스가 멈춰도 결과가 빠지지 않는다</text>
+<circle cx="54" cy="1037.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1041.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C1</text>
+<circle cx="54" cy="1075.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1079.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C2</text>
+<circle cx="54" cy="1113.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1117.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C3</text>
+<circle cx="54" cy="1151.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1155.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C4</text>
+<rect x="16.0" y="1184.0" width="1870.0" height="134.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="1184.0" width="8.0" height="134.0" rx="4" fill="#007aff" stroke="#007aff" stroke-width="1.0"/>
+<text x="40.0" y="1212.0" font-size="16" font-weight="700" fill="#007aff" text-anchor="start">D  사람 판정 · 재점검</text>
+<text x="40.0" y="1231.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">최종 판단은 사람. 재점검은 새 작업으로 B 사이클을 다시 돈다</text>
+<circle cx="54" cy="1261.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1265.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D1</text>
+<circle cx="54" cy="1299.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1303.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D2</text>
+<rect x="16.0" y="1332.0" width="1870.0" height="324.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="1332.0" width="8.0" height="324.0" rx="4" fill="#8944ab" stroke="#8944ab" stroke-width="1.0"/>
+<text x="40.0" y="1360.0" font-size="16" font-weight="700" fill="#8944ab" text-anchor="start">E  관제 · 조종 (실시간)</text>
+<text x="40.0" y="1379.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">사람이 직접 움직이는 경로. 미션과 같은 제어권 규칙을 쓴다</text>
+<circle cx="54" cy="1409.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1413.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E1</text>
+<circle cx="54" cy="1447.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1451.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E2</text>
+<circle cx="54" cy="1485.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1489.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E3</text>
+<circle cx="54" cy="1523.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1527.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E4</text>
+<circle cx="54" cy="1561.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1565.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E5</text>
+<circle cx="54" cy="1599.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1603.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E6</text>
+<circle cx="54" cy="1637.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="1641.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E7</text>
+<rect x="16.0" y="1670.0" width="1870.0" height="248.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.55"/>
+<rect x="16.0" y="1670.0" width="8.0" height="248.0" rx="4" fill="#c93400" stroke="#c93400" stroke-width="1.0"/>
+<text x="40.0" y="1698.0" font-size="16" font-weight="700" fill="#c93400" text-anchor="start">F  예외 · 복구</text>
+<text x="40.0" y="1717.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">실패해도 기록이 남고, 같은 요청을 다시 보내도 안전하다</text>
+<circle cx="54" cy="1747.0" r="13" fill="#c93400"/>
+<text x="54.0" y="1751.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F1</text>
+<circle cx="54" cy="1785.0" r="13" fill="#c93400"/>
+<text x="54.0" y="1789.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F2</text>
+<circle cx="54" cy="1823.0" r="13" fill="#c93400"/>
+<text x="54.0" y="1827.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F3</text>
+<circle cx="54" cy="1861.0" r="13" fill="#c93400"/>
+<text x="54.0" y="1865.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F4</text>
+<circle cx="54" cy="1899.0" r="13" fill="#c93400"/>
+<text x="54.0" y="1903.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F5</text>
+<circle cx="300" cy="247.0" r="4" fill="#5856d6"/>
+<path d="M300.0 247.0 L762.0 247.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="310.0" y="241.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">로그인 POST /api/auth/login → 비밀번호(BCrypt) 확인 → JWT 발급(JwtCodec) → HttpOnly 쿠키</text>
+<circle cx="300" cy="285.0" r="4" fill="#5856d6"/>
+<path d="M300.0 285.0 L530.0 285.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="310.0" y="279.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">이후 요청마다 쿠키 전송</text>
+<circle cx="532" cy="323.0" r="7" fill="#ffffff" stroke="#5856d6" stroke-width="2.4"/>
+<text x="546.0" y="327.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">X-User-* 지움(위조 방지) → JWT 검증 → /internal · /actuator 는 막음</text>
+<circle cx="532" cy="361.0" r="4" fill="#5856d6"/>
+<path d="M532.0 361.0 L762.0 361.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="542.0" y="355.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">세션 확인 /internal/users/{id}/session — 10초 캐시, 응답 없으면 거부(정지·역할 변경 즉시 반영)</text>
+<circle cx="532" cy="399.0" r="7" fill="#ffffff" stroke="#5856d6" stroke-width="2.4"/>
+<text x="546.0" y="403.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">역할 규칙(AccessPolicy) 확인 → X-User-* 헤더 붙여 경로별 서비스로 → 서비스는 CurrentUser 로 읽음</text>
+<circle cx="532" cy="437.0" r="4" fill="#5856d6"/>
+<path d="M532.0 437.0 L762.0 437.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="542.0" y="431.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">변경 요청(POST·PUT·DELETE)은 끝난 뒤 감사 기록 /internal/audit</text>
+<circle cx="300" cy="547.0" r="4" fill="#248a3d"/>
+<path d="M300.0 547.0 L994.0 547.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="310.0" y="541.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">점검 요청 POST /api/inspections (지점 선택)</text>
+<circle cx="996" cy="585.0" r="4" fill="#248a3d"/>
+<path d="M996.0 585.0 L1458.0 585.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1006.0" y="579.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">로봇 확인 GET /internal/robots/{id} → 작업 저장 · 사건 REQUESTED</text>
+<circle cx="996" cy="623.0" r="4" fill="#248a3d"/>
+<path d="M996.0 623.0 L1458.0 623.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1006.0" y="617.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">미션 전달 POST /internal/missions — missionId = 작업 번호(같은 번호는 다시 실행하지 않음)</text>
+<circle cx="1460" cy="661.0" r="7" fill="#ffffff" stroke="#248a3d" stroke-width="2.4"/>
+<text x="1446.0" y="665.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">미션이 제어권을 가짐 → ACCEPTED → 출발 전 검사(연결 · odom 2초 · 카메라 5초 · Nav2 준비 · 위치 추정)</text>
+<circle cx="1460" cy="699.0" r="4" fill="#248a3d"/>
+<path d="M1460.0 699.0 L1690.0 699.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1470.0" y="693.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지점마다 목표 /inspection/goal (rosbridge) — 사건 MOVING</text>
+<circle cx="1692" cy="737.0" r="7" fill="#ffffff" stroke="#248a3d" stroke-width="2.4"/>
+<text x="1678.0" y="741.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">nav2_goal_bridge → Nav2 NavigateToPose: Smac A* 경로 + RPP 추종 · 실패하면 코스트맵 비우고 경로 확인 후 1회 재시도</text>
+<circle cx="1692" cy="775.0" r="4" fill="#248a3d"/>
+<path d="M1692.0 775.0 L1462.0 775.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1682.0" y="769.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">결과 /inspection/goal_status: SUCCEEDED(우회 여부) · BLOCKED_NO_PATH · NAV_FAILED · NO_PROGRESS · NAV_UNAVAILABLE</text>
+<circle cx="1460" cy="813.0" r="4" fill="#248a3d"/>
+<path d="M1460.0 813.0 L1690.0 813.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1682.0" y="807.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">도착 1.5초 뒤 스냅샷 HTTP(최대 3회) → ARRIVED · 진입 불가·실패면 촬영 불가로 남기고 다음 지점</text>
+<circle cx="1460" cy="851.0" r="7" fill="#ffffff" stroke="#248a3d" stroke-width="2.4"/>
+<text x="1446.0" y="855.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">사건 · 관측(사진)을 report_outbox 에 먼저 저장 — 모든 지점이 끝나면 COMPLETED, 제어권 반납</text>
+<circle cx="1460" cy="889.0" r="4" fill="#248a3d"/>
+<path d="M1460.0 889.0 L998.0 889.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1006.0" y="883.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">OutboxSender 1초마다 순서대로 전송 /internal/tasks/{id}/events · observations — X-Report-Id 로 중복 제거</text>
+<circle cx="996" cy="927.0" r="4" fill="#248a3d"/>
+<path d="M996.0 927.0 L302.0 927.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="310.0" y="921.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">작업 상태 · 사건 기록 · 관측 사진을 화면에서 조회</text>
+<circle cx="996" cy="1037.0" r="4" fill="#b25000"/>
+<path d="M996.0 1037.0 L1226.0 1037.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="1006.0" y="1031.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">AnalysisTrigger 5초마다: 분석 없는 사진 POST /jobs (60초 안에 결과 없으면 다시 요청)</text>
+<circle cx="1228" cy="1075.0" r="7" fill="#ffffff" stroke="#b25000" stroke-width="2.4"/>
+<text x="1242.0" y="1079.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">analysis_job 저장 + NOTIFY → 워커가 LISTEN 으로 깨어나 FOR UPDATE SKIP LOCKED 로 하나씩</text>
+<circle cx="1228" cy="1113.0" r="4" fill="#b25000"/>
+<path d="M1228.0 1113.0 L998.0 1113.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="1006.0" y="1107.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">사진 받기 GET /internal/observations/{id}/image</text>
+<circle cx="1228" cy="1151.0" r="4" fill="#b25000"/>
+<path d="M1228.0 1151.0 L998.0 1151.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="1006.0" y="1145.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">결과 보내기 POST /internal/observations/{id}/analysis — 밝기 · 선명도 → OK / RETAKE</text>
+<circle cx="300" cy="1261.0" r="4" fill="#007aff"/>
+<path d="M300.0 1261.0 L994.0 1261.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="310.0" y="1255.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">판정 POST /api/observations/{id}/reviews — 확인 불가는 사유 필수, 덮어쓰지 않고 이력으로 쌓음</text>
+<circle cx="300" cy="1299.0" r="4" fill="#007aff"/>
+<path d="M300.0 1299.0 L994.0 1299.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="310.0" y="1293.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">재점검 POST /api/observations/{id}/recheck → 원래 관측과 연결된 새 작업 → B1 부터 다시</text>
+<circle cx="300" cy="1409.0" r="4" fill="#8944ab"/>
+<path d="M300.0 1409.0 L1458.0 1409.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="310.0" y="1403.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">제어권 요청 /api/robots/{id}/control/acquire — 한 명만, 2분 조종 없으면 자동 반납</text>
+<circle cx="300" cy="1447.0" r="4" fill="#8944ab"/>
+<path d="M300.0 1447.0 L1458.0 1447.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="310.0" y="1441.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">WebSocket /ws/robots/{id}/teleop — 누르는 동안 100ms 마다 속도(서버가 속도 제한)</text>
+<circle cx="1460" cy="1485.0" r="4" fill="#8944ab"/>
+<path d="M1460.0 1485.0 L1690.0 1485.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="1682.0" y="1479.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">/cmd_vel_teleop → cmd_vel_watchdog → /cmd_vel — 명령이 0.5초 끊기면 서버와 로봇 양쪽에서 정지</text>
+<circle cx="1692" cy="1523.0" r="4" fill="#8944ab"/>
+<path d="M1692.0 1523.0 L302.0 1523.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="310.0" y="1517.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">영상: web_video_server 압축 MJPEG → robot-service 중계 → /api/robots/{id}/stream</text>
+<circle cx="1692" cy="1561.0" r="4" fill="#8944ab"/>
+<path d="M1692.0 1561.0 L1462.0 1561.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="1682.0" y="1555.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지도 · 위치: /inspection/map 5초마다 · map_pose 5Hz · scan_map(스캔 시각 TF 로 지도 좌표)</text>
+<circle cx="300" cy="1599.0" r="4" fill="#8944ab"/>
+<path d="M300.0 1599.0 L1458.0 1599.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="310.0" y="1593.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지도 화면: /mapview 0.2초마다(위치는 화면에서 보간) · map.png 는 지도 버전이 바뀔 때(MapRenderer)</text>
+<circle cx="300" cy="1637.0" r="4" fill="#8944ab"/>
+<path d="M300.0 1637.0 L1690.0 1637.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="310.0" y="1631.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지도 클릭 이동 POST /goto → /inspection/goal(manual-…) — 방향키 조종을 시작하면 취소</text>
+<circle cx="300" cy="1747.0" r="4" fill="#c93400"/>
+<path d="M300.0 1747.0 L1690.0 1747.0" fill="none" stroke="#c93400" stroke-width="2" marker-end="url(#ac93400)"/>
+<text x="310.0" y="1741.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">취소: CANCEL_REQUESTED → /internal/missions/{id}/cancel → 목표 취소 → CANCELLED (요청과 실제 취소를 따로 기록)</text>
+<circle cx="300" cy="1785.0" r="4" fill="#c93400"/>
+<path d="M300.0 1785.0 L1690.0 1785.0" fill="none" stroke="#c93400" stroke-width="2" marker-end="url(#ac93400)"/>
+<text x="310.0" y="1779.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">비상 정지: 진행 중 미션 취소 + 정지 명령 + 사용자 제어권 회수</text>
+<circle cx="1460" cy="1823.0" r="7" fill="#ffffff" stroke="#c93400" stroke-width="2.4"/>
+<text x="1446.0" y="1827.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">robot-service 재시작: 실행 중이던 미션을 INTERRUPTED 로 기록하고 정지 명령</text>
+<circle cx="1460" cy="1861.0" r="4" fill="#c93400"/>
+<path d="M1460.0 1861.0 L998.0 1861.0" fill="none" stroke="#c93400" stroke-width="2" marker-end="url(#ac93400)"/>
+<text x="1006.0" y="1855.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">보고 전송 실패: outbox 에 남아 다음 주기에 순서대로 재전송</text>
+<circle cx="996" cy="1899.0" r="4" fill="#c93400"/>
+<path d="M996.0 1899.0 L1458.0 1899.0" fill="none" stroke="#c93400" stroke-width="2" marker-end="url(#ac93400)"/>
+<text x="1006.0" y="1893.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">미션 전달 응답 없음(DISPATCH_UNKNOWN): 같은 번호로 다시 보내도 중복 실행 없이 현재 상태를 돌려줌</text>
+</svg>

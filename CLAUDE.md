@@ -54,7 +54,7 @@ python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 �
 
 - 커밋·푸시는 사용자가 요청할 때만. 작업 브랜치는 `feat/msa-sim-stack`이고, main 에는 아직 올리지 않는다(PR·병합 금지).
 - `개선초안/` 은 사용자의 커밋하지 않은 폴더다. 커밋하거나 고치지 않는다.
-- 루트에는 `README.md`(보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더(`guide/`, `storyboard/`)에 둔다.
+- 루트에는 `README.md`(보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더(`architecture/`, `guide/`, `plan/`, `storyboard/`)에 둔다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
 - `nginx.conf` 같은 단일 파일 바인드 마운트는 파일을 새로 쓰면 컨테이너가 옛 파일을 본다 → 해당 컨테이너를 `--force-recreate` 한다.
 - 화면을 다시 빌드한 뒤 결과가 안 바뀐 것처럼 보이면 먼저 브라우저 새로고침 여부를 확인한다.
 - 문서·주석·커밋 메시지는 한국어로 쓴다.

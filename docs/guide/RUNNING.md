@@ -28,7 +28,9 @@ ros/                       로봇 쪽
   robot/                   로봇 측 노드(실제 로봇에도 같은 코드)
   maps/                    지도
 docs/                      문서 (목록: docs/README.md)
+  architecture/            시스템 아키텍처 구성도 · 시스템 사이클 SVG + 생성 스크립트
   guide/                   실행 안내(이 파일)·Docker 구동 가이드
+  plan/                    향후 프로젝트 계획(ROADMAP.md)
   storyboard/              화면 스토리보드 SVG + 생성 스크립트
 scripts/                   E2E 시험
 ```
@@ -164,6 +166,8 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 제외: 6·7·8·15·19·25~27(PC 로컬 분석), 13(전환 정책 미정), 20~22(투척 미채택), 24(장애 시험 자동화, 후속).
 
 ## 알려진 한계
+
+- 분석 서비스는 사진 품질(밝기·선명도)만 본다. 소화기 비치 여부 같은 내용 판독은 사람이 한다 — AI 판독 계획은 `docs/plan/ROADMAP.md`.
 
 - 시뮬레이션은 Apple Silicon 에서 에뮬레이션으로 돌아 실제보다 느리다. 점검 작업 한 건에 수 분이 걸릴 수 있다.
 - HTTPS 는 적용하지 않았다(로컬 시험용). 배포 시 nginx 에 인증서를 넣고 `COOKIE_SECURE=true` 로 바꾼다.
