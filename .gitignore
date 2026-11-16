@@ -1,5 +1,6 @@
 .env
 **/target/
 **/node_modules/
-web/frontend/dist/
+web/nginx/frontend/dist/
 __pycache__/
+*.tsbuildinfo

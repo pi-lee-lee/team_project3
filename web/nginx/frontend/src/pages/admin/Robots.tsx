@@ -6,6 +6,7 @@ import { Capabilities } from '../user/Monitor';
 const SIM_CONFIG = {
   rosbridgeUrl: 'ws://sim:9090',
   videoUrl: 'http://sim:8080',
+  imageTransport: 'compressed', // 카메라 영상은 압축 토픽(<image>/compressed)으로 받는다. 'raw' 로 두면 원본
   topics: {
     odom: '/odom', scan: '/scan', camera: '/camera/camera_info', image: '/camera/image_raw',
     battery: '/battery_state', teleop: '/cmd_vel_teleop', goal: '/inspection/goal',
@@ -99,7 +100,7 @@ function RobotForm({ robot, onClose, onSaved }: { robot: Partial<RobotSummary>; 
           <textarea rows={14} value={config} onChange={(e) => setConfig(e.target.value)} className="mono" />
         </label>
         <label className="row"><input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} /> 사용</label>
-        <p className="muted">실제 로봇: rosbridgeUrl 을 ws://로봇IP:9090, videoUrl 을 http://로봇IP:8080 으로 바꾸고 로봇에서 rosbridge·web_video_server·목표 실행 노드를 실행합니다.</p>
+        <p className="muted">실제 로봇: rosbridgeUrl 을 ws://로봇IP:9090, videoUrl 을 http://로봇IP:8080 으로 바꾸고 로봇에서 rosbridge·web_video_server·목표 브리지를 실행합니다. 카메라는 압축 토픽(compressed_image_transport)을 발행해야 합니다.</p>
         <ErrorBox msg={act.error} />
         <div className="row end">
           <button onClick={onClose}>취소</button>

@@ -32,7 +32,10 @@ import java.util.function.Consumer;
  * 주소와 토픽 이름만 config 로 다르게 준다.
  *
  * config 예:
- * {"rosbridgeUrl":"ws://sim:9090","videoUrl":"http://sim:8080",
+ * 카메라 영상은 압축 토픽(<image>/compressed, JPEG)으로 받는다(imageTransport: "compressed", 기본값).
+ * web_video_server 가 압축 프레임을 다시 인코딩하지 않고 그대로 전달한다. "raw" 로 두면 원본 토픽을 받는다.
+ *
+ * {"rosbridgeUrl":"ws://sim:9090","videoUrl":"http://sim:8080","imageTransport":"compressed",
  *  "topics":{"odom":"/odom","scan":"/scan","camera":"/camera/camera_info","image":"/camera/image_raw",
  *            "battery":"/battery_state","teleop":"/cmd_vel_teleop","goal":"/inspection/goal",
  *            "goalCancel":"/inspection/goal_cancel","goalStatus":"/inspection/goal_status"}}
@@ -46,6 +49,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     private final String code;
     private final String url;
     private final String videoUrl;
+    private final boolean compressed;
     private final Map<String, String> topics = new HashMap<>();
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(3)).build();
     private final ScheduledExecutorService sched = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -71,6 +75,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         this.code = code;
         this.url = config.path("rosbridgeUrl").asText();
         this.videoUrl = config.path("videoUrl").asText("");
+        this.compressed = !"raw".equalsIgnoreCase(config.path("imageTransport").asText("compressed"));
         Map<String, String> defaults = Map.of(
                 "odom", "/odom", "scan", "/scan", "camera", "/camera/camera_info", "image", "/camera/image_raw",
                 "battery", "/battery_state", "teleop", "/cmd_vel_teleop", "goal", "/inspection/goal",
@@ -305,7 +310,9 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         for (String k : List.of("odom", "scan", "camera", "battery", "nav")) {
             String topicKey = k.equals("nav") ? "bridge" : k;
             Long t = lastMsg.get(topicKey);
-            if (k.equals("nav") && t != null && now - t < 5000) {
+            if (k.equals("camera") && compressed && tl != null && !tl.contains(topics.get("image") + "/compressed")) {
+                caps.put(k, "UNSUPPORTED");     // 압축 영상 토픽이 없다(로봇에 compressed_image_transport 필요)
+            } else if (k.equals("nav") && t != null && now - t < 5000) {
                 caps.put(k, Boolean.TRUE.equals(navReady) ? "VERIFIED" : "STALE");
             } else if (t != null && now - t < 5000) {
                 caps.put(k, "VERIFIED");
@@ -360,7 +367,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
 
     @Override
     public byte[] snapshot() throws IOException {
-        HttpRequest req = HttpRequest.newBuilder(URI.create(videoUrl + "/snapshot?topic=" + enc(topics.get("image"))))
+        HttpRequest req = HttpRequest.newBuilder(URI.create(videoUrl + "/snapshot?topic=" + enc(topics.get("image")) + (compressed ? "&type=ros_compressed" : "")))
                 .timeout(Duration.ofSeconds(5)).build();
         try {
             HttpResponse<byte[]> res = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -376,7 +383,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
 
     @Override
     public MjpegStream openStream() throws IOException {
-        HttpRequest req = HttpRequest.newBuilder(URI.create(videoUrl + "/stream?type=mjpeg&quality=60&topic="
+        HttpRequest req = HttpRequest.newBuilder(URI.create(videoUrl + "/stream?type=" + (compressed ? "ros_compressed" : "mjpeg&quality=60") + "&topic="
                 + enc(topics.get("image")))).build();
         try {
             HttpResponse<InputStream> res = http.send(req, HttpResponse.BodyHandlers.ofInputStream());

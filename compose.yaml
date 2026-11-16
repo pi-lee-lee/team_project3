@@ -1,11 +1,13 @@
 # 화재 점검 로봇 서비스 — 전체 구동
-#   cp .env.example .env   (비밀번호·키 수정)
+#   (선택) cp .env.example .env   — 없으면 아래에 적은 로컬 개발용 기본값으로 실행된다. 공개 서버에서는 반드시 바꾼다.
 #   docker compose up -d --build
 #   http://localhost:8080
 #
 # 폴더 구조 = 아키텍처 계층(web: 서버 쪽 / ros: 로봇 쪽) > 컨테이너(서비스)마다 폴더 하나
-#   web/<서비스>/   src + 빌드 파일 + Dockerfile — 서비스 하나가 독립적으로 빌드·구동된다
-#   web/common/     서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 — common-build 가 m2 볼륨에 설치
+#   web/nginx/             정문(nginx.conf) + React 화면(frontend/)
+#   web/spring/<서비스>/   Spring 서비스: src + 빌드 파일 + Dockerfile — 서비스 하나가 독립적으로 빌드·구동된다
+#   web/spring/common/     서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 — common-build 가 m2 볼륨에 설치
+#   web/python/            Python 서비스(analysis-service) / web/postgres/ DB 초기화
 #   ros/sim/        시뮬레이션(Gazebo·Nav2·SLAM) / ros/robot/ 로봇 측 노드(실제 로봇에도 같은 코드) / ros/maps/ 지도
 # 이미지에는 실행 환경만 있고, 코드는 각 폴더를 볼륨으로 연결해 구동한다. 코드를 고친 뒤:
 #   Spring 서비스 : docker compose restart <서비스>          (시작할 때 다시 빌드한다)
@@ -24,8 +26,8 @@ x-spring: &spring
   mem_limit: 1g                 # 시작할 때 Maven 빌드까지 하므로 여유를 둔다
   networks: [backend]
   environment: &spring-env
-    JWT_SECRET: ${JWT_SECRET}
-    DB_PASSWORD: ${SERVICE_DB_PASSWORD}
+    JWT_SECRET: ${JWT_SECRET:-tp3-local-dev-jwt-secret-change-before-deploy}
+    DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
   healthcheck:
     test: ["CMD-SHELL", "curl -fs http://localhost:$${SERVER_PORT}/actuator/health"]
     interval: 10s
@@ -44,7 +46,7 @@ services:
     working_dir: /workspace
     command: ["mvn", "-q", "-B", "install", "-DskipTests"]
     volumes:
-      - ./web/common:/workspace
+      - ./web/spring/common:/workspace
       - m2:/root/.m2
     restart: "no"
 
@@ -52,11 +54,11 @@ services:
     image: postgres:17
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SERVICE_DB_PASSWORD: ${SERVICE_DB_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tp3-postgres-local}
+      SERVICE_DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./web/db/init:/docker-entrypoint-initdb.d:ro
+      - ./web/postgres/init:/docker-entrypoint-initdb.d:ro
     networks: [backend]
     mem_limit: 512m
     healthcheck:
@@ -67,23 +69,23 @@ services:
 
   user-service:
     <<: *spring
-    build: ./web/user-service
+    build: ./web/spring/user-service
     volumes:
-      - ./web/user-service:/workspace
+      - ./web/spring/user-service:/workspace
       - m2:/root/.m2
     environment:
       <<: *spring-env
       SERVER_PORT: 8081
       INITIAL_ADMIN_LOGIN: ${INITIAL_ADMIN_LOGIN:-admin}
-      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
-      DEMO_USERS_PASSWORD: ${DEMO_USERS_PASSWORD:-}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-Admin1234!}
+      DEMO_USERS_PASSWORD: ${DEMO_USERS_PASSWORD-User1234!}   # .env 에 빈 값으로 두면 시험 계정을 만들지 않는다
     depends_on: *after-common
 
   inspection-service:
     <<: *spring
-    build: ./web/inspection-service
+    build: ./web/spring/inspection-service
     volumes:
-      - ./web/inspection-service:/workspace
+      - ./web/spring/inspection-service:/workspace
       - m2:/root/.m2
       - photos:/data/photos
     environment:
@@ -93,9 +95,9 @@ services:
 
   robot-service:
     <<: *spring
-    build: ./web/robot-service
+    build: ./web/spring/robot-service
     volumes:
-      - ./web/robot-service:/workspace
+      - ./web/spring/robot-service:/workspace
       - m2:/root/.m2
     environment:
       <<: *spring-env
@@ -107,26 +109,26 @@ services:
 
   gateway:
     <<: *spring
-    build: ./web/gateway
+    build: ./web/spring/gateway
     volumes:
-      - ./web/gateway:/workspace
+      - ./web/spring/gateway:/workspace
       - m2:/root/.m2
     environment:
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-tp3-local-dev-jwt-secret-change-before-deploy}
       SERVER_PORT: 8080
     networks: [edge, backend]
     depends_on:
       common-build: { condition: service_completed_successfully }
 
   analysis-service:
-    build: ./web/analysis-service
+    build: ./web/python/analysis-service
     restart: unless-stopped
     mem_limit: 256m
     environment:
       DB_URL: postgresql://analysis_svc@db:5432/analysisdb
-      DB_PASSWORD: ${SERVICE_DB_PASSWORD}
+      DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
     volumes:
-      - ./web/analysis-service/src:/app:ro
+      - ./web/python/analysis-service/src:/app:ro
     networks: [backend]
     depends_on:
       db: { condition: service_healthy }
@@ -137,12 +139,12 @@ services:
       start_period: 20s
       retries: 10
 
-  frontend-build:               # React 화면을 web/frontend/dist 로 빌드하고 끝난다
+  frontend-build:               # React 화면을 web/nginx/frontend/dist 로 빌드하고 끝난다
     image: node:20-alpine
     working_dir: /app
     command: ["sh", "-c", "npm install --no-audit --no-fund && npm run build"]
     volumes:
-      - ./web/frontend:/app
+      - ./web/nginx/frontend:/app
       - frontend_modules:/app/node_modules
     restart: "no"
 
@@ -152,8 +154,8 @@ services:
     ports:
       - "${WEB_PORT:-8080}:80"
     volumes:
-      - ./web/frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./web/frontend/dist:/usr/share/nginx/html:ro
+      - ./web/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/nginx/frontend/dist:/usr/share/nginx/html:ro
     networks: [edge]
     depends_on:
       frontend-build: { condition: service_completed_successfully }
@@ -171,6 +173,7 @@ services:
     mem_limit: 3500m
     environment:
       SIM_MODE: ${SIM_MODE:-nav}
+      TURTLEBOT3_MODEL: ${TURTLEBOT3_MODEL:-waffle_pi}   # waffle_pi(보유 장비, Pi 카메라) / waffle(RealSense) — 둘 다 /camera/image_raw
     volumes:
       - ./ros/sim/src:/sim:ro
       - ./ros/robot/src:/robot:ro

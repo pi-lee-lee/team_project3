@@ -43,9 +43,22 @@ Windows 에서는 줄바꿈이 바뀌지 않도록 저장소에 `.gitattributes`
 이 설정이 생기기 전에 받아 둔 사본이라면, 고친 내용이 없는 상태에서 한 번 다시 받는다(고친 내용은 사라진다):
 `git rm -r --cached . ; git reset --hard`
 
-## 3. 환경 파일(.env) 만들기
+## 3. 환경 파일(.env) — 기본값이 들어 있다
 
-비밀번호와 키를 담는 파일이다. 저장소에는 올라가지 않는다.
+로컬 개발·시험용 기본값이 `compose.yaml` 과 `.env.example` 에 이미 들어 있어서 **아무것도 고치지 않고 바로 실행할 수 있다.**
+값을 바꾸고 싶을 때만 `.env` 를 만든다(저장소에는 올라가지 않는다).
+
+| 키 | 기본값 | 내용 |
+| --- | --- | --- |
+| `WEB_PORT` | `8080` | 웹 접속 포트 |
+| `INITIAL_ADMIN_LOGIN` / `INITIAL_ADMIN_PASSWORD` | `admin` / `Admin1234!` | 웹사이트 admin 계정 |
+| `DEMO_USERS_PASSWORD` | `User1234!` | 시험 계정 sup1(1 관리자)·mgr1(2 매니저)·user1(3 사용자)의 비밀번호. 빈 값으로 두면 만들지 않는다 |
+| `JWT_SECRET` | `tp3-local-dev-jwt-secret-change-before-deploy` | 로그인 토큰 서명 키 (32자 이상) |
+| `POSTGRES_PASSWORD` / `SERVICE_DB_PASSWORD` | `tp3-postgres-local` / `tp3-service-local` | DB 비밀번호 |
+| `SIM_MODE` | `nav` | 시뮬레이터 모드 (`nav` 운영 / `slam` 지도 작성) |
+| `TURTLEBOT3_MODEL` | `waffle_pi` | 시뮬레이션 로봇: `waffle_pi`(보유 장비, 라즈베리파이 카메라) / `waffle`(RealSense 카메라). 둘 다 카메라 영상 출력 |
+
+값을 바꾸려면:
 
 macOS·Linux
 ```bash
@@ -57,15 +70,7 @@ Windows PowerShell
 Copy-Item .env.example .env
 ```
 
-`.env` 를 열어 `change-me` 로 된 값을 모두 바꾼다.
-
-| 키 | 내용 |
-| --- | --- |
-| `JWT_SECRET` | 32자 이상 임의 문자열 |
-| `POSTGRES_PASSWORD`, `SERVICE_DB_PASSWORD` | DB 비밀번호 |
-| `INITIAL_ADMIN_LOGIN`, `INITIAL_ADMIN_PASSWORD` | 첫 실행 때 만들어지는 웹 admin 계정 |
-| `DEMO_USERS_PASSWORD` | 값을 넣으면 시험 계정 sup1(1 관리자)·mgr1(2 매니저)·user1(3 사용자)을 이 비밀번호로 만든다 |
-| `WEB_PORT` | 웹 접속 포트 (기본 8080) |
+복사한 `.env` 에서 필요한 값만 고친다. 외부에 공개하는 서버에 올릴 때는 **모든 비밀번호와 `JWT_SECRET` 을 반드시 바꾼다.**
 
 임의 문자열 만들기 (선택)
 ```bash
@@ -75,7 +80,7 @@ openssl rand -base64 32
 [Convert]::ToBase64String([byte[]](1..32 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
-> 계정 비밀번호는 **DB 가 처음 만들어질 때** 한 번만 적용된다. 바꾸려면 관리자 화면에서 바꾸거나 9절의 초기화를 한다.
+> 계정·DB 비밀번호는 **DB 가 처음 만들어질 때** 한 번만 적용된다. 이미 띄운 뒤 `.env` 를 바꿨다면 9절의 초기화(`docker compose down -v`)를 하거나, 계정 비밀번호는 관리자 화면에서 바꾼다.
 
 ## 4. 실행
 
@@ -91,7 +96,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-접속: http://localhost:8080 → `.env` 의 admin 계정으로 로그인.
+접속: http://localhost:8080 → admin / `Admin1234!` (또는 `.env` 에서 바꾼 값)으로 로그인.
 
 ## 5. 확인 방법
 
@@ -134,10 +139,10 @@ docker compose up -d         # 다시 띄우기
 
 | 고친 곳 | 명령 |
 | --- | --- |
-| Spring 서비스 (`web/<서비스>`) | `docker compose restart <서비스>` — 시작할 때 다시 빌드 |
-| 공유 라이브러리 (`web/common`) | `docker compose run --rm common-build` 후 `docker compose restart gateway user-service inspection-service robot-service` |
-| 화면 (`web/frontend`) | `docker compose run --rm frontend-build` (브라우저 새로고침) |
-| 분석 서비스 (`web/analysis-service`) | `docker compose restart analysis-service` |
+| Spring 서비스 (`web/spring/<서비스>`) | `docker compose restart <서비스>` — 시작할 때 다시 빌드 |
+| 공유 라이브러리 (`web/spring/common`) | `docker compose run --rm common-build` 후 `docker compose restart gateway user-service inspection-service robot-service` |
+| 화면 (`web/nginx/frontend`) | `docker compose run --rm frontend-build` (브라우저 새로고침) |
+| 분석 서비스 (`web/python/analysis-service`) | `docker compose restart analysis-service` |
 | ROS (`ros/sim`, `ros/robot`) | `docker compose restart sim` |
 | Dockerfile·requirements 변경 | `docker compose up -d --build <서비스>` |
 
@@ -192,6 +197,7 @@ docker compose up -d --scale sim=0
 | sim 이 재시작을 반복하거나 느림 | Docker 메모리를 늘린다(8GB 이상). Apple Silicon 은 Rosetta 설정 확인 |
 | `exec /sim/entrypoint.sh: no such file` 또는 `bad interpreter` (Windows) | 줄바꿈이 CRLF 로 바뀐 것. 2절의 다시 받기 실행 |
 | 로그인 안 됨 | `.env` 비밀번호는 DB 를 처음 만들 때만 적용된다. 9절 초기화 또는 관리자 화면에서 변경 |
+| 관제 화면에 영상이 안 나옴 | `docker compose ps sim` 이 healthy 인지 확인(healthy = 위치·카메라 영상 모두 발행 중). 아니면 `docker compose logs sim` 에서 `Xvfb` 오류 확인 후 `docker compose up -d --force-recreate sim` |
 | 로봇이 "연결 안 됨" | `docker compose ps sim` 이 healthy 인지, `docker compose logs sim` 에 `Managed nodes are active` 가 있는지 확인 |
 | 점검 요청이 "주행 시스템 준비 안 됨" | 시뮬레이터 시작 후 1~2분 더 기다린다 (Nav2·위치 추정 준비) |
 | 작업이 "진입 불가"로 끝남 | 장애물을 놓아 두었는지 확인: `docker compose exec sim /sim/tools/obstacle.sh clear` |

@@ -48,7 +48,8 @@ public class RobotRegistry {
     @Order(1)
     public void init() {
         if (repo.robots().isEmpty()) {
-            String cfg = om.createObjectNode().put("rosbridgeUrl", simRosbridge).put("videoUrl", simVideo).toString();
+            String cfg = om.createObjectNode().put("rosbridgeUrl", simRosbridge).put("videoUrl", simVideo)
+                    .put("imageTransport", "compressed").toString();
             repo.insertRobot("tb3-sim", "TurtleBot3 (시뮬레이션)", "ROSBRIDGE", cfg, true);
             repo.insertRobot("mock-1", "가짜 로봇 (ROS 없이 시험)", "MOCK", "{}", false);
             log.info("초기 로봇 등록: tb3-sim({}), mock-1(비활성)", simRosbridge);

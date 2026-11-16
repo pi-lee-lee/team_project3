@@ -14,7 +14,9 @@ import urllib.request
 from pathlib import Path
 
 BASE = 'http://localhost:8080'
-ENV = dict(line.split('=', 1) for line in (Path(__file__).resolve().parent.parent / '.env').read_text().splitlines()
+ROOT = Path(__file__).resolve().parent.parent
+ENV_FILE = ROOT / '.env' if (ROOT / '.env').exists() else ROOT / '.env.example'   # .env 가 없으면 기본값
+ENV = dict(line.split('=', 1) for line in ENV_FILE.read_text().splitlines()
            if '=' in line and not line.startswith('#'))
 BASE = f"http://localhost:{ENV.get('WEB_PORT', '8080')}"
 passed = 0

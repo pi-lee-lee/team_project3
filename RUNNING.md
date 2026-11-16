@@ -11,42 +11,57 @@ cp .env.example .env        # 비밀번호·JWT 키를 바꾼다 (DEMO_USERS_PAS
 docker compose up -d --build
 ```
 
-- 접속: http://localhost:8080 — 계정과 비밀번호는 `.env` 에 있다(`INITIAL_ADMIN_LOGIN / INITIAL_ADMIN_PASSWORD`, 시험 계정은 `DEMO_USERS_PASSWORD`).
+- 접속: http://localhost:8080 — 기본 계정 admin / `Admin1234!`, 시험 계정 sup1·mgr1·user1 / `User1234!` (`.env` 로 바꿀 수 있다).
 - 첫 실행은 각 Spring 서비스가 시작할 때 Maven 빌드를 하고, 시뮬레이터가 Nav2 를 올리므로 3~5분 걸린다.
 - 종단 간 시험: `python3 scripts/e2e_test.py` (장애물 시나리오 제외: `--skip-obstacles`)
 
-## 폴더 구조: 아키텍처 계층 > 컨테이너
+## 폴더 구조: 아키텍처 계층 > 기술 > 컨테이너
+
+```
+web/                       서버 쪽
+  nginx/                   정문: nginx.conf + React 화면(frontend/)
+  spring/                  Spring 서비스: gateway, user-service, inspection-service, robot-service, common(공유 라이브러리)
+  python/                  Python 서비스: analysis-service
+  postgres/                DB 초기화(init/)
+ros/                       로봇 쪽
+  sim/                     시뮬레이션(Gazebo·SLAM·Nav2·시험 도구)
+  robot/                   로봇 측 노드(실제 로봇에도 같은 코드)
+  maps/                    지도
+```
+
+폴더 이름만 보고 무엇으로 만든 서비스인지 알 수 있게 기술별로 묶고, 그 안은 컨테이너(서비스)마다 폴더 하나다.
+
 
 | 폴더 | 컨테이너 | 내용 |
 | --- | --- | --- |
-| `web/gateway/` | gateway | Spring Cloud Gateway: JWT 쿠키 검증, 세션 유효성, 경로별 역할 정책, 감사 기록, 시스템 상태 |
-| `web/user-service/` | user-service | 로그인·사용자·역할(0 ADMIN, 1 관리자, 2 매니저, 3 사용자)·감사 로그 |
-| `web/inspection-service/` | inspection-service | 점검 지점, 작업, 사건 기록, 관측 사진, 사람 판정, 재점검, 지점 이력 |
-| `web/robot-service/` | robot-service | 로봇 연결 계층: `RobotAdapter`(rosbridge·mock), 상태·제어권·조종·비상 정지·미션 실행·결과 재전송·영상 중계 |
-| `web/analysis-service/` | analysis-service | Python: 사진 품질 배치 분석(ROI 밝기·선명도 → 재촬영 후보) |
-| `web/frontend/` | frontend-build → web | React 화면(빌드 결과를 nginx 가 제공), `nginx.conf` |
-| `web/db/` | db | PostgreSQL 17, 서비스마다 DB·계정 분리 |
-| `web/common/` | common-build | 서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 |
+| `web/spring/gateway/` | gateway | Spring Cloud Gateway: JWT 쿠키 검증, 세션 유효성, 경로별 역할 정책, 감사 기록, 시스템 상태 |
+| `web/spring/user-service/` | user-service | 로그인·사용자·역할(0 ADMIN, 1 관리자, 2 매니저, 3 사용자)·감사 로그 |
+| `web/spring/inspection-service/` | inspection-service | 점검 지점, 작업, 사건 기록, 관측 사진, 사람 판정, 재점검, 지점 이력 |
+| `web/spring/robot-service/` | robot-service | 로봇 연결 계층: `RobotAdapter`(rosbridge·mock), 상태·제어권·조종·비상 정지·미션 실행·결과 재전송·영상 중계 |
+| `web/python/analysis-service/` | analysis-service | Python: 사진 품질 배치 분석(ROI 밝기·선명도 → 재촬영 후보) |
+| `web/nginx/` | web (nginx) · frontend-build | 정문 `nginx.conf` + React 화면 `frontend/`(frontend-build 가 빌드, nginx 가 제공) |
+| `web/postgres/init/` | db | PostgreSQL 17 초기화: 서비스마다 DB·계정 분리 |
+| `web/spring/common/` | common-build | 서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 |
 | `ros/sim/` | sim | Gazebo 월드·SLAM/Nav2 실행·시험 도구 |
 | `ros/robot/` | (sim 안에서 실행) | 로봇 측 노드: Nav2 목표 브리지, cmd_vel 워치독 — 실제 로봇에도 같은 코드 |
 | `ros/maps/` | — | 지도: `site.*`(SLAM), `reference.*`(설계도 기준) |
 
 선택 이유: MSA 에서 빌드·배포·장애 격리의 단위는 컨테이너(서비스)다. 서비스마다 자기 `src`·빌드 파일·Dockerfile 을 가지면
 한 서비스만 고쳐 다시 띄울 수 있고 담당도 폴더로 나뉜다. 최상위 `web/`(서버) · `ros/`(로봇)는 배치 위치가 다른 두 계층을 구분하는 묶음이다.
-공유 코드는 `web/common` 라이브러리 하나로 최소화했다(서비스들은 버전으로 의존).
+공유 코드는 `web/spring/common` 라이브러리 하나로 최소화했다(서비스들은 버전으로 의존).
 
 이미지에는 실행 환경만 있고, 코드는 각 폴더를 볼륨으로 연결해 구동한다. 코드를 고친 뒤:
 
 | 고친 곳 | 반영 |
 | --- | --- |
 | Spring 서비스 | `docker compose restart <서비스>` (시작할 때 다시 빌드) |
-| `web/common` | `docker compose run --rm common-build` 후 Spring 서비스 재시작 |
+| `web/spring/common` | `docker compose run --rm common-build` 후 Spring 서비스 재시작 |
 | 화면 | `docker compose run --rm frontend-build` |
 | 분석 서비스 · ROS | `docker compose restart analysis-service` / `sim` |
 
 네트워크: `edge`(web ↔ gateway, 외부 포트 8080 하나) · `backend`(gateway ↔ 서비스 ↔ db) · `robot`(robot-service ↔ sim). rosbridge 는 robot-service 만 접근한다.
 
-권한: `web/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.
+권한: `web/spring/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.
 
 ## 시험 시설(시뮬레이션 월드)과 지도
 
@@ -102,6 +117,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 1. 로봇(또는 Remote PC)에서 SLAM 으로 현장 지도를 만들고 Nav2 를 띄운 뒤, rosbridge(9090)·rosapi, web_video_server(8080), `ros/robot/src/nav2_goal_bridge.py`, `ros/robot/src/cmd_vel_watchdog.py` 를 실행한다. 팀 주행 코드를 쓰려면 같은 토픽 약속(`/inspection/goal`·`goal_status`·`bridge_status`)을 지키는 노드로 바꾼다.
 2. 관리자 화면 → 로봇 → 연결 설정에서 `rosbridgeUrl`, `videoUrl`, 토픽 이름을 실제 값으로 바꾸고 저장한다(어댑터 재연결).
+   카메라 영상은 **압축 토픽**(`/camera/image_raw/compressed`, JPEG)으로 받는다. 로봇에 `ros-humble-compressed-image-transport` 를 설치하면 카메라 노드가 압축 토픽을 함께 발행한다(`imageTransport: "raw"` 로 바꾸면 원본 토픽).
 3. 시뮬레이터 없이 실행: `docker compose up -d --scale sim=0`
 
 ## 화면 문서
