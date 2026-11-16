@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import type { Me, Role } from './api/types';
 import { AuthContext, ROLE_LABEL, useApi, useAuth } from './util';
+import { Icon } from './Icon';
 import Login from './pages/Login';
 import Users from './pages/admin/Users';
 import Robots from './pages/admin/Robots';
@@ -63,12 +64,17 @@ export default function App() {
   );
 }
 
-const MENUS = {
+// [경로, 이름, 아이콘(SF Symbols 이름)]
+const MENUS: Record<'admin' | 'user', [string, string, string][]> = {
   admin: [
-    ['/admin/users', '사용자'], ['/admin/robots', '로봇'], ['/admin/points', '점검 지점'],
-    ['/admin/analysis', '분석 기준'], ['/admin/audit', '감사 로그'], ['/admin/system', '시스템'],
+    ['/admin/users', '사용자', 'person.2'], ['/admin/robots', '로봇', 'cpu'], ['/admin/points', '점검 지점', 'mappin.and.ellipse'],
+    ['/admin/analysis', '분석 기준', 'slider.horizontal.3'], ['/admin/audit', '감사 로그', 'list.bullet.clipboard'],
+    ['/admin/system', '시스템', 'server.rack'],
   ],
-  user: [['/app/monitor', '관제'], ['/app/request', '점검 요청'], ['/app/tasks', '작업 목록'], ['/app/history', '지점 이력']],
+  user: [
+    ['/app/monitor', '관제', 'video'], ['/app/request', '점검 요청', 'plus.circle'], ['/app/tasks', '작업 목록', 'checklist'],
+    ['/app/history', '지점 이력', 'clock.arrow.circlepath'],
+  ],
 };
 
 /** 역할 확인 + 상단 메뉴. 화면에서 막는 것은 편의이고, 실제 권한은 게이트웨이가 확인한다. */
@@ -85,20 +91,33 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
   };
   return (
     <div className={`shell ${area}`}>
-      <header className="topbar">
-        <span className="brand">{area === 'admin' ? '관리자' : '화재 점검'}</span>
+      {/* 사이드바(넓은 화면) */}
+      <aside className="sidebar">
+        <div className="brand">
+          <Icon name="checkmark.shield.fill" size={22} />
+          화재 점검 <span className="badge-area">{area === 'admin' ? '관리자' : '사용자'}</span>
+        </div>
         <nav>
-          {MENUS[area].map(([to, label]) => (
-            <NavLink key={to} to={to}>{label}</NavLink>
+          {MENUS[area].map(([to, label, icon]) => (
+            <NavLink key={to} to={to}><Icon name={icon} />{label}</NavLink>
           ))}
         </nav>
-        <span className="who">
-          {me.loginId} ({ROLE_LABEL[me.role]}) <button className="link light" onClick={logout}>로그아웃</button>
-        </span>
-      </header>
+        <div className="who">
+          <b>{me.name}</b>
+          <span>{me.loginId} · {ROLE_LABEL[me.role]}</span>
+          <button className="link" onClick={logout}><Icon name="rectangle.portrait.and.arrow.right" size={16} />로그아웃</button>
+        </div>
+      </aside>
       <main>
         <Outlet />
       </main>
+      {/* 하단 탭 바(좁은 화면) */}
+      <nav className="tabbar">
+        {MENUS[area].map(([to, label, icon]) => (
+          <NavLink key={to} to={to}><Icon name={icon} size={22} />{label}</NavLink>
+        ))}
+        <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}><Icon name="rectangle.portrait.and.arrow.right" size={22} />로그아웃</a>
+      </nav>
     </div>
   );
 }

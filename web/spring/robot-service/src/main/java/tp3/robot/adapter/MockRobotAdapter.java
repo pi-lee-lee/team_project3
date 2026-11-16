@@ -182,6 +182,41 @@ public class MockRobotAdapter implements RobotAdapter {
         return new MjpegStream("multipart/x-mixed-replace;boundary=frame", in);
     }
 
+    private byte[] mockMap;
+
+    @Override
+    public MapInfo mapInfo() {
+        return new MapInfo(200, 160, 0.05, -2.0, -2.0, 1);
+    }
+
+    /** 10m x 8m 빈 방(테두리 벽)으로 된 가짜 지도. */
+    @Override
+    public synchronized byte[] mapPng() {
+        if (mockMap == null) {
+            try {
+                BufferedImage img = new BufferedImage(200, 160, BufferedImage.TYPE_BYTE_GRAY);
+                Graphics2D g = img.createGraphics();
+                g.setColor(new Color(254, 254, 254));
+                g.fillRect(0, 0, 200, 160);
+                g.setColor(Color.BLACK);
+                g.drawRect(2, 2, 195, 155);
+                g.dispose();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ImageIO.write(img, "png", out);
+                mockMap = out.toByteArray();
+            } catch (IOException e) {
+                return null;
+            }
+        }
+        return mockMap;
+    }
+
+    @Override
+    public MapView mapView() {
+        double[] g = goal;
+        return new MapView(new Pose(x, y, yaw), List.of(), g == null ? List.of() : List.of(new double[]{x, y}, new double[]{g[0], g[1]}));
+    }
+
     @Override
     public void close() {
         sched.shutdownNow();

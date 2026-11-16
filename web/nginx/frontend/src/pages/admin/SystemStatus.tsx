@@ -1,4 +1,5 @@
 import { ErrorBox, useApi, usePoll } from '../../util';
+import { Icon } from '../../Icon';
 
 const age = (v: number | null | undefined) => (v === null || v === undefined ? '수신 없음' : `${(v / 1000).toFixed(1)}s`);
 
@@ -14,7 +15,7 @@ export default function SystemStatus() {
         {s.data?.services.map((x) => (
           <div key={x.name} className="card stat">
             <div className="muted">{x.name}</div>
-            <div className={x.status === 'UP' ? 'big ok' : 'big bad'}>{x.status}</div>
+            <div className={x.status === 'UP' ? 'big ok' : 'big bad'}><Icon name={x.status === 'UP' ? 'checkmark.circle.fill' : 'xmark.circle.fill'} size={22} />{x.status}</div>
           </div>
         ))}
       </div>

@@ -69,6 +69,16 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     private volatile Double front;
     private volatile Set<String> topicList;
     private volatile Boolean navReady;
+    private volatile Pose mapPose;
+    private volatile long mapPoseAt;
+    private volatile double[] scanRanges;
+    private volatile double scanAngleMin;
+    private volatile double scanAngleInc;
+    private volatile java.util.List<double[]> plan = java.util.List.of();
+    private volatile long planAt;
+    private volatile MapInfo mapInfo;
+    private volatile byte[] mapPng;
+    private long mapVersion;
     private volatile Boolean localized;
 
     public RosbridgeRobotAdapter(String code, JsonNode config) {
@@ -76,11 +86,21 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         this.url = config.path("rosbridgeUrl").asText();
         this.videoUrl = config.path("videoUrl").asText("");
         this.compressed = !"raw".equalsIgnoreCase(config.path("imageTransport").asText("compressed"));
-        Map<String, String> defaults = Map.of(
-                "odom", "/odom", "scan", "/scan", "camera", "/camera/camera_info", "image", "/camera/image_raw",
-                "battery", "/battery_state", "teleop", "/cmd_vel_teleop", "goal", "/inspection/goal",
-                "goalCancel", "/inspection/goal_cancel", "goalStatus", "/inspection/goal_status",
-                "bridge", "/inspection/bridge_status");
+        // 기본 토픽 이름. config 의 "topics" 로 로봇마다 바꿀 수 있다.
+        Map<String, String> defaults = new HashMap<>();
+        defaults.put("odom", "/odom");
+        defaults.put("scan", "/scan");
+        defaults.put("camera", "/camera/camera_info");
+        defaults.put("image", "/camera/image_raw");
+        defaults.put("battery", "/battery_state");
+        defaults.put("teleop", "/cmd_vel_teleop");
+        defaults.put("goal", "/inspection/goal");
+        defaults.put("goalCancel", "/inspection/goal_cancel");
+        defaults.put("goalStatus", "/inspection/goal_status");
+        defaults.put("bridge", "/inspection/bridge_status");
+        defaults.put("map", "/inspection/map");       // 로봇 측 브리지가 /map 을 주기적으로 다시 발행
+        defaults.put("plan", "/plan");
+        defaults.put("mapPose", "/inspection/map_pose");
         topics.putAll(defaults);
         config.path("topics").fields().forEachRemaining(e -> topics.put(e.getKey(), e.getValue().asText()));
     }
@@ -90,6 +110,8 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     public void start() {
         connect();
         sched.scheduleWithFixedDelay(this::refreshTopicList, 5, 30, TimeUnit.SECONDS);
+        // 지도는 처음 한 번만 발행(latched)되므로, 받지 못했으면 다시 구독한다
+        sched.scheduleWithFixedDelay(this::resubscribeMapIfMissing, 15, 15, TimeUnit.SECONDS);
     }
 
     private void connect() {
@@ -129,6 +151,9 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             subscribe("battery", "sensor_msgs/msg/BatteryState", 1000);
             subscribe("goalStatus", "std_msgs/msg/String", 0);
             subscribe("bridge", "std_msgs/msg/String", 1000);
+            subscribe("mapPose", "geometry_msgs/msg/PoseStamped", 200);
+            subscribe("plan", "nav_msgs/msg/Path", 1000);
+            subscribe("map", "nav_msgs/msg/OccupancyGrid", 0);
             advertise("teleop", "geometry_msgs/msg/Twist");
             advertise("goal", "std_msgs/msg/String");
             advertise("goalCancel", "std_msgs/msg/String");
@@ -149,6 +174,17 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
 
     private void advertise(String key, String type) {
         send(om.createObjectNode().put("op", "advertise").put("topic", topics.get(key)).put("type", type));
+    }
+
+    private void resubscribeMapIfMissing() {
+        if (ws != null && mapPng == null) {
+            try {
+                send(om.createObjectNode().put("op", "unsubscribe").put("topic", topics.get("map")));
+                subscribe("map", "nav_msgs/msg/OccupancyGrid", 0);
+            } catch (Exception ignored) {
+                // 다음 주기에 다시 시도
+            }
+        }
     }
 
     private void refreshTopicList() {
@@ -219,6 +255,29 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         }
         String topic = n.path("topic").asText();
         JsonNode msg = n.path("msg");
+        if (topic.equals(topics.get("map"))) {
+            onMap(msg);
+            return;
+        }
+        if (topic.equals(topics.get("mapPose"))) {
+            JsonNode p = msg.path("pose");
+            mapPose = new Pose(p.path("position").path("x").asDouble(), p.path("position").path("y").asDouble(),
+                    yawOf(p.path("orientation")));
+            mapPoseAt = System.currentTimeMillis();
+            return;
+        }
+        if (topic.equals(topics.get("plan"))) {
+            java.util.List<double[]> pts = new java.util.ArrayList<>();
+            JsonNode poses = msg.path("poses");
+            int step = Math.max(1, poses.size() / 300);
+            for (int i = 0; i < poses.size(); i += step) {
+                JsonNode q = poses.get(i).path("pose").path("position");
+                pts.add(new double[]{q.path("x").asDouble(), q.path("y").asDouble()});
+            }
+            plan = pts;
+            planAt = System.currentTimeMillis();
+            return;
+        }
         String key = topics.entrySet().stream().filter(e -> e.getValue().equals(topic)).map(Map.Entry::getKey)
                 .filter(DATA_KEYS::contains).findFirst().orElse(null);
         if (key == null) {
@@ -234,7 +293,18 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
                         1 - 2 * (Math.pow(q.path("y").asDouble(), 2) + Math.pow(q.path("z").asDouble(), 2)));
                 pose = new Pose(p.path("position").path("x").asDouble(), p.path("position").path("y").asDouble(), yaw);
             }
-            case "scan" -> front = frontMin(msg);
+            case "scan" -> {
+                front = frontMin(msg);
+                JsonNode rs = msg.path("ranges");
+                double[] arr = new double[rs.size()];
+                for (int i = 0; i < arr.length; i++) {
+                    JsonNode r = rs.get(i);
+                    arr[i] = r == null || !r.isNumber() ? Double.NaN : r.asDouble();
+                }
+                scanAngleMin = msg.path("angle_min").asDouble();
+                scanAngleInc = msg.path("angle_increment").asDouble();
+                scanRanges = arr;
+            }
             case "battery" -> {
                 double pct = msg.path("percentage").asDouble(Double.NaN);
                 battery = Double.isNaN(pct) ? null : (pct <= 1.0 ? pct * 100 : pct);
@@ -262,6 +332,68 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             default -> {
             }
         }
+    }
+
+    private static double yawOf(JsonNode q) {
+        return Math.atan2(2 * (q.path("w").asDouble() * q.path("z").asDouble() + q.path("x").asDouble() * q.path("y").asDouble()),
+                1 - 2 * (Math.pow(q.path("y").asDouble(), 2) + Math.pow(q.path("z").asDouble(), 2)));
+    }
+
+    /** OccupancyGrid → 다듬은 지도 그림(MapRenderer). 이미지 위쪽이 지도의 +y. */
+    private void onMap(JsonNode msg) {
+        try {
+            JsonNode info = msg.path("info");
+            int w = info.path("width").asInt();
+            int h = info.path("height").asInt();
+            JsonNode data = msg.path("data");
+            if (w <= 0 || h <= 0 || data.size() < w * h) {
+                return;
+            }
+            int[] cells = new int[w * h];
+            for (int i = 0; i < cells.length; i++) {
+                cells[i] = data.get(i).asInt();
+            }
+            byte[] png = MapRenderer.render(w, h, info.path("resolution").asDouble(0.05), cells);   // 화면 표시용으로 다듬은 그림
+            JsonNode o = info.path("origin").path("position");
+            synchronized (this) {
+                mapVersion++;
+                mapPng = png;
+                mapInfo = new MapInfo(w, h, info.path("resolution").asDouble(), o.path("x").asDouble(),
+                        o.path("y").asDouble(), mapVersion);
+            }
+        } catch (Exception e) {
+            log.debug("[{}] bad map: {}", code, e.toString());
+        }
+    }
+
+    @Override
+    public MapInfo mapInfo() {
+        return mapInfo;
+    }
+
+    @Override
+    public byte[] mapPng() {
+        return mapPng;
+    }
+
+    @Override
+    public MapView mapView() {
+        long now = System.currentTimeMillis();
+        Pose p = now - mapPoseAt < 3000 ? mapPose : null;
+        java.util.List<double[]> scanPts = new java.util.ArrayList<>();
+        double[] rs = scanRanges;
+        if (p != null && rs != null) {
+            for (int i = 0; i < rs.length; i += 2) {
+                double r = rs[i];
+                if (Double.isNaN(r) || Double.isInfinite(r) || r < 0.12 || r > 3.5) {
+                    continue;
+                }
+                double a = p.yaw() + scanAngleMin + i * scanAngleInc;
+                scanPts.add(new double[]{Math.round((p.x() + r * Math.cos(a)) * 100) / 100.0,
+                        Math.round((p.y() + r * Math.sin(a)) * 100) / 100.0});
+            }
+        }
+        return new MapView(p, scanPts, now - planAt < 3000 ? plan : java.util.List.of());
     }
 
     private static Double frontMin(JsonNode scan) {

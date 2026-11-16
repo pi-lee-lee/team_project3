@@ -84,6 +84,52 @@ public class RobotController {
                 .body(body);
     }
 
+    // ------------------------------------------------------------- 지도 모드
+    /** 지도 정보. 지도가 아직 없으면 404. */
+    @GetMapping("/api/robots/{id}/map")
+    public RobotAdapter.MapInfo mapInfo(@PathVariable long id) {
+        RobotAdapter.MapInfo info = registry.adapter(id).mapInfo();
+        if (info == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "지도를 아직 받지 못했습니다");
+        }
+        return info;
+    }
+
+    @GetMapping("/api/robots/{id}/map.png")
+    public ResponseEntity<byte[]> mapPng(@PathVariable long id) {
+        byte[] png = registry.adapter(id).mapPng();
+        if (png == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).header("Cache-Control", "no-cache").body(png);
+    }
+
+    /** 지도 위 실시간 표시: 로봇 위치(지도 좌표), 라이다 점, 계획 경로, 지도 이동 목적지 상태. */
+    @GetMapping("/api/robots/{id}/mapview")
+    public Map<String, Object> mapView(@PathVariable long id) {
+        RobotAdapter.MapView v = registry.adapter(id).mapView();
+        Map<String, Object> m = new HashMap<>();
+        m.put("pose", v.pose());
+        m.put("scan", v.scan());
+        m.put("path", v.path());
+        m.put("manualGoal", missions.manualGoal(id));
+        m.put("mission", missions.active(id));
+        return m;
+    }
+
+    /** body: {"x":1.0,"y":2.0,"yaw":0.0} (지도 좌표, rad). 제어권을 가진 사용자만. */
+    @PostMapping("/api/robots/{id}/goto")
+    public Map<String, Object> goTo(@PathVariable long id, @RequestBody JsonNode b, HttpServletRequest req) {
+        return missions.goTo(id, CurrentUser.from(req).id(), b.path("x").asDouble(), b.path("y").asDouble(),
+                b.path("yaw").asDouble(0));
+    }
+
+    @PostMapping("/api/robots/{id}/goto/cancel")
+    public Map<String, Object> cancelGoTo(@PathVariable long id) {
+        missions.cancelManual(id);
+        return Map.of("cancelled", true);
+    }
+
     @PostMapping("/api/robots/{id}/control/acquire")
     public Map<String, Object> acquire(@PathVariable long id, HttpServletRequest req) {
         return control.acquire(id, CurrentUser.from(req)).view();
@@ -91,6 +137,7 @@ public class RobotController {
 
     @PostMapping("/api/robots/{id}/control/release")
     public Map<String, Object> release(@PathVariable long id, HttpServletRequest req) {
+        missions.cancelManual(id);
         control.release(id, CurrentUser.from(req));
         return Map.of("released", true);
     }
@@ -139,6 +186,7 @@ public class RobotController {
 
     @PostMapping("/api/admin/robots/{id}/revoke-control")
     public Map<String, Object> revoke(@PathVariable long id) {
+        missions.cancelManual(id);
         var prev = control.revoke(id);
         return Map.of("revoked", prev != null && "USER".equals(prev.kind()),
                 "from", prev == null ? "" : prev.login());

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { RobotSummary } from '../../api/types';
 import { ErrorBox, useAction, useApi, usePoll } from '../../util';
 import { Capabilities } from '../user/Monitor';
+import { Icon } from '../../Icon';
 
 const SIM_CONFIG = {
   rosbridgeUrl: 'ws://sim:9090',
@@ -28,7 +29,7 @@ export default function Robots() {
       <div className="row between">
         <h2>로봇 관리</h2>
         <button className="primary" onClick={() => setEditing({ adapterType: 'ROSBRIDGE', enabled: true, config: SIM_CONFIG })}>
-          + 로봇 등록
+          <Icon name="plus" size={16} />로봇 등록
         </button>
       </div>
       <ErrorBox msg={act.error || robots.error} />
@@ -48,7 +49,7 @@ export default function Robots() {
               <button className="warn" disabled={!r.control || r.control.kind !== 'USER'} onClick={() => run(() => api.revokeControl(r.robotId))}>
                 제어권 회수
               </button>
-              <button className="danger" disabled={!r.enabled} onClick={() => run(() => api.estop(r.robotId))}>비상 정지</button>
+              <button className="danger" disabled={!r.enabled} onClick={() => run(() => api.estop(r.robotId))}><Icon name="exclamationmark.octagon.fill" size={16} />비상 정지</button>
             </div>
           </div>
           {r.enabled && <RobotCaps id={r.robotId} />}

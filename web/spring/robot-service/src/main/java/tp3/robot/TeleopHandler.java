@@ -32,12 +32,14 @@ public class TeleopHandler extends TextWebSocketHandler {
 
     private final ControlService control;
     private final RobotRegistry registry;
+    private final MissionService missions;
     private final ObjectMapper om = new ObjectMapper();
     private final Map<String, Ctx> sessions = new ConcurrentHashMap<>();
 
-    public TeleopHandler(ControlService control, RobotRegistry registry) {
+    public TeleopHandler(ControlService control, RobotRegistry registry, MissionService missions) {
         this.control = control;
         this.registry = registry;
+        this.missions = missions;
     }
 
     @Override
@@ -68,6 +70,9 @@ public class TeleopHandler extends TextWebSocketHandler {
         double lin = clamp(n.path("linear").asDouble(0), MAX_LINEAR);
         double ang = clamp(n.path("angular").asDouble(0), MAX_ANGULAR);
         try {
+            if (lin != 0 || ang != 0) {
+                missions.cancelManual(c.robotId());   // 직접 조종하면 지도 이동 목적지는 취소
+            }
             registry.adapter(c.robotId()).teleop(lin, ang);
             c.last()[0] = System.currentTimeMillis();
             c.moving()[0] = lin != 0 || ang != 0;

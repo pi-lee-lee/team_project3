@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { RoleInfo, UserRow } from '../../api/types';
 import { ErrorBox, fmtTime, useAction, useApi, usePoll } from '../../util';
+import { Icon } from '../../Icon';
 
 /** A1 사용자 관리 (+ A1-1 사용자 추가 모달) */
 export default function Users() {
@@ -16,7 +17,7 @@ export default function Users() {
     <section>
       <div className="row between">
         <h2>사용자 관리</h2>
-        <button className="primary" onClick={() => setAdding(true)}>+ 사용자 추가</button>
+        <button className="primary" onClick={() => setAdding(true)}><Icon name="plus" size={16} />사용자 추가</button>
       </div>
       <ErrorBox msg={act.error || users.error} />
       <table>

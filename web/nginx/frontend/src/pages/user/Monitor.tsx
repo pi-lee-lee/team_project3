@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import type { MapInfo, MapView, Point, RobotStatus } from '../../api/types';
 import { ErrorBox, useAction, useApi, useAuth, usePoll } from '../../util';
+import { Icon } from '../../Icon';
 
 const CAP_LABEL: Record<string, [string, string]> = {
   VERIFIED: ['✓', 'ok'], SUPPORTED: ['토픽 있음', 'muted'], STALE: ['멈춤', 'warn-t'],
@@ -18,16 +20,23 @@ export function Capabilities({ caps }: { caps: Record<string, string> }) {
 }
 
 const SPEED = { lin: 0.18, ang: 0.9 };
+// 방향키(카메라 모드): 위·아래 = 전진·후진, 왼쪽·오른쪽 = 제자리 회전. W·A·S·D 도 같다.
 const KEYS: Record<string, [number, number]> = {
-  w: [1, 0], s: [-1, 0], a: [0, 1], d: [0, -1], ArrowUp: [1, 0], ArrowDown: [-1, 0], ArrowLeft: [0, 1], ArrowRight: [0, -1],
+  ArrowUp: [1, 0], ArrowDown: [-1, 0], ArrowLeft: [0, 1], ArrowRight: [0, -1],
+  w: [1, 0], s: [-1, 0], a: [0, 1], d: [0, -1],
 };
+const isTyping = (t: EventTarget | null) =>
+  t instanceof HTMLInputElement || t instanceof HTMLSelectElement || t instanceof HTMLTextAreaElement;
 
-/** U1 관제·조종 */
+type Mode = 'camera' | 'map';
+
+/** U1 관제·조종: 카메라 모드(영상 + 방향키 조종) / 지도 모드(지도 위 위치·경로·라이다 + 클릭 이동) */
 export default function Monitor() {
   const api = useApi();
   const { me } = useAuth();
   const robots = usePoll(() => api.robots(), 0);
   const [robotId, setRobotId] = useState<number | null>(null);
+  const [mode, setMode] = useState<Mode>('camera');
   useEffect(() => {
     if (robotId === null && robots.data?.length) {
       setRobotId((robots.data.find((r) => r.enabled && r.connected) ?? robots.data.find((r) => r.enabled))?.robotId ?? null);
@@ -38,71 +47,90 @@ export default function Monitor() {
   const act = useAction();
   const s = st.data;
   const iHold = !!s?.control && s.control.kind === 'USER' && s.control.userId === me?.userId;
+  const canAcquire = !!s?.connected && (!s?.control || iHold);
+  const acquire = () => act.run(async () => { await api.acquireControl(robotId!); await st.reload(); });
 
   return (
     <section>
       <div className="row between">
         <h2>관제·조종</h2>
-        <select value={robotId ?? ''} onChange={(e) => setRobotId(Number(e.target.value))}>
-          {robots.data?.filter((r) => r.enabled).map((r) => <option key={r.robotId} value={r.robotId}>{r.code} · {r.name}</option>)}
-        </select>
+        <div className="row">
+          <div className="tabs compact">
+            <button className={mode === 'camera' ? 'on' : ''} onClick={() => setMode('camera')}><Icon name="camera.fill" size={16} />카메라</button>
+            <button className={mode === 'map' ? 'on' : ''} onClick={() => setMode('map')}><Icon name="map.fill" size={16} />지도</button>
+          </div>
+          <select value={robotId ?? ''} onChange={(e) => setRobotId(Number(e.target.value))}>
+            {robots.data?.filter((r) => r.enabled).map((r) => <option key={r.robotId} value={r.robotId}>{r.code} · {r.name}</option>)}
+          </select>
+        </div>
       </div>
       <ErrorBox msg={act.error || st.error} />
       {robotId && (
         <div className="monitor">
-          <div className="video">
-            {s?.connected ? <img src={api.streamUrl(robotId)} alt="실시간 영상" /> : <div className="novideo">영상 없음 (연결 끊김)</div>}
+          <div className="main-view">
+            {mode === 'camera'
+              ? <CameraView robotId={robotId} s={s} iHold={iHold} canAcquire={canAcquire} onAcquire={acquire} />
+              : <MapPanel robotId={robotId} iHold={iHold} />}
           </div>
           <div className="side">
-            <div className="card">
-              <div className={s?.connected ? 'ok' : 'bad'}>● {s?.connected ? '연결 정상' : '연결 끊김'}</div>
-              <div>위치 {s?.pose ? `x ${s.pose.x.toFixed(2)}  y ${s.pose.y.toFixed(2)}  θ ${(s.pose.yaw * 180 / Math.PI).toFixed(0)}°` : '-'}</div>
-              <div>전방 장애물 {s?.frontObstacleM != null ? `${s.frontObstacleM.toFixed(2)} m` : '-'}</div>
-              <div>배터리 {s?.batteryPercent != null ? `${s.batteryPercent.toFixed(0)}%` : '정보 없음'}</div>
-              <div className="ages">
-                {s?.ageMs && Object.entries(s.ageMs).map(([k, v]) => (
-                  <span key={k} className={v == null ? 'muted' : v > 2000 ? 'warn-t' : ''}>{k} {v == null ? '없음' : `${(v / 1000).toFixed(1)}s`}</span>
-                ))}
-              </div>
-              {s?.capabilities && <Capabilities caps={s.capabilities} />}
-            </div>
+            <StatusCard s={s} />
             <div className="card">
               <div>제어권: {s?.control ? `${s.control.login} (${s.control.kind === 'MISSION' ? '점검 작업 중' : '조종'})` : '없음'}</div>
               {iHold ? (
-                <button onClick={() => act.run(async () => { await api.releaseControl(robotId); await st.reload(); })}>제어권 반납</button>
+                <button onClick={() => act.run(async () => { await api.releaseControl(robotId); await st.reload(); })}><Icon name="hand.raised.fill" size={16} />제어권 반납</button>
               ) : (
-                <button className="primary" disabled={act.busy || !!s?.control || !s?.connected}
-                  onClick={() => act.run(async () => { await api.acquireControl(robotId); await st.reload(); })}>제어권 획득</button>
+                <button className="primary" disabled={act.busy || !canAcquire} onClick={acquire}><Icon name="hand.raised.fill" size={16} />제어권 획득</button>
               )}
-              <Teleop robotId={robotId} enabled={iHold} />
+              {mode === 'camera'
+                ? <div className="muted small">방향키로 이동 (누르는 동안만). 제어권이 없으면 방향키를 누를 때 자동으로 요청합니다.</div>
+                : <div className="muted small">지도를 클릭해 목적지를 고른 뒤 "이 위치로 이동". 이동은 로봇의 Nav2 가 장애물을 피해 수행합니다.</div>}
             </div>
           </div>
           <button className="danger estop" onClick={() => act.run(async () => { await api.estop(robotId); await st.reload(); })}>
-            비상 정지
+            <Icon name="exclamationmark.octagon.fill" size={22} />비상 정지
           </button>
         </div>
       )}
-      <p className="muted">조종은 제어권을 가진 1명만 할 수 있고, 점검 작업 중에는 제어권을 얻을 수 없습니다. 버튼을 누르고 있는 동안만 움직입니다. 연결이 끊기면 로봇이 0.5초 안에 멈춥니다.</p>
+      <p className="muted">조종은 제어권을 가진 1명만 할 수 있고, 점검 작업 중에는 제어권을 얻을 수 없습니다. 연결이 끊기면 로봇이 0.5초 안에 멈춥니다.</p>
     </section>
   );
 }
 
-/** 누르고 있는 동안 100ms 마다 최신 속도 명령을 보낸다. 떼면 0 을 보낸다. */
-function Teleop({ robotId, enabled }: { robotId: number; enabled: boolean }) {
+function StatusCard({ s }: { s: RobotStatus | null }) {
+  return (
+    <div className="card">
+      <div className={s?.connected ? 'ok' : 'bad'}><Icon name={s?.connected ? 'checkmark.circle.fill' : 'xmark.circle.fill'} size={16} /> {s?.connected ? '연결 정상' : '연결 끊김'}</div>
+      <div>전방 장애물 {s?.frontObstacleM != null ? `${s.frontObstacleM.toFixed(2)} m` : '-'}</div>
+      <div>배터리 {s?.batteryPercent != null ? `${s.batteryPercent.toFixed(0)}%` : '정보 없음'}</div>
+      <div className="ages">
+        {s?.ageMs && Object.entries(s.ageMs).map(([k, v]) => (
+          <span key={k} className={v == null ? 'muted' : v > 2000 ? 'warn-t' : ''}>{k} {v == null ? '없음' : `${(v / 1000).toFixed(1)}s`}</span>
+        ))}
+      </div>
+      {s?.capabilities && <Capabilities caps={s.capabilities} />}
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ 카메라 모드
+function CameraView({ robotId, s, iHold, canAcquire, onAcquire }: {
+  robotId: number; s: RobotStatus | null; iHold: boolean; canAcquire: boolean; onAcquire: () => void;
+}) {
   const api = useApi();
   const ws = useRef<WebSocket | null>(null);
   const cmd = useRef<[number, number]>([0, 0]);
+  const held = useRef<Set<string>>(new Set());
   const [msg, setMsg] = useState('');
   const [active, setActive] = useState<string | null>(null);
+  const acquireRef = useRef({ canAcquire, onAcquire, iHold });
+  acquireRef.current = { canAcquire, onAcquire, iHold };
 
+  // 조종 WebSocket: 제어권을 가진 동안 열어 두고, 누르고 있는 동안 100ms 마다 최신 명령을 보낸다
   useEffect(() => {
-    if (!enabled) return;
+    if (!iHold) return;
     const sock = new WebSocket(api.teleopUrl(robotId));
     ws.current = sock;
-    sock.onmessage = (e) => {
-      const m = JSON.parse(e.data);
-      if (m.type === 'error') setMsg(m.message);
-    };
+    sock.onmessage = (e) => { const m = JSON.parse(e.data); if (m.type === 'error') setMsg(m.message); };
     sock.onclose = () => setMsg('조종 연결이 닫혔습니다');
     sock.onopen = () => setMsg('');
     const timer = setInterval(() => {
@@ -111,42 +139,249 @@ function Teleop({ robotId, enabled }: { robotId: number; enabled: boolean }) {
         sock.send(JSON.stringify({ linear: l * SPEED.lin, angular: a * SPEED.ang }));
       }
     }, 100);
-    const down = (e: KeyboardEvent) => {
-      const k = KEYS[e.key];
-      if (k && !(e.target instanceof HTMLInputElement)) { e.preventDefault(); press(e.key, k); }
+    return () => { clearInterval(timer); sock.close(); ws.current = null; };
+  }, [iHold, robotId, api]);
+
+  // 방향키: 카메라 모드에 있는 동안 전역으로 받는다(입력 상자·선택 상자에 포커스가 있으면 무시)
+  useEffect(() => {
+    const recompute = () => {
+      let l = 0, a = 0;
+      held.current.forEach((k) => { const v = KEYS[k]; l += v[0]; a += v[1]; });
+      cmd.current = [Math.max(-1, Math.min(1, l)), Math.max(-1, Math.min(1, a))];
+      setActive(held.current.size ? [...held.current][0] : null);
     };
-    const up = (e: KeyboardEvent) => { if (KEYS[e.key]) release(); };
+    const down = (e: KeyboardEvent) => {
+      if (isTyping(e.target)) return;
+      if (e.key === ' ') { e.preventDefault(); stop(); return; }
+      const k = KEYS[e.key] ? e.key : KEYS[e.key.toLowerCase()] ? e.key.toLowerCase() : null;
+      if (!k) return;
+      e.preventDefault();                      // 방향키로 화면이 스크롤되지 않게
+      const { iHold: hold, canAcquire: can, onAcquire: acq } = acquireRef.current;
+      if (!hold) { if (can && !e.repeat) acq(); return; }
+      held.current.add(k);
+      recompute();
+    };
+    const up = (e: KeyboardEvent) => {
+      const k = KEYS[e.key] ? e.key : e.key.toLowerCase();
+      if (held.current.delete(k)) { recompute(); if (!held.current.size) sendStop(); }
+    };
+    const blur = () => { if (held.current.size) { held.current.clear(); recompute(); sendStop(); } };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener('keydown', down);
-      window.removeEventListener('keyup', up);
-      sock.close();
-      ws.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, robotId]);
+    window.addEventListener('blur', blur);
+    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); window.removeEventListener('blur', blur); };
+  }, []);
 
-  const press = (name: string, v: [number, number]) => { cmd.current = v; setActive(name); };
-  const release = () => {
+  const sendStop = () => {
     cmd.current = [0, 0];
-    setActive(null);
     if (ws.current?.readyState === WebSocket.OPEN) ws.current.send(JSON.stringify({ linear: 0, angular: 0 }));
   };
-  const btn = (name: string, label: string, v: [number, number]) => (
-    <button disabled={!enabled} className={active === name ? 'pressed' : ''}
-      onPointerDown={() => press(name, v)} onPointerUp={release} onPointerLeave={() => active === name && release()}>{label}</button>
+  const stop = () => { held.current.clear(); setActive(null); sendStop(); };
+  const press = (name: string) => { if (!iHold) { if (canAcquire) onAcquire(); return; } held.current = new Set([name]); cmd.current = KEYS[name]; setActive(name); };
+  const btn = (name: string, label: React.ReactNode) => (
+    <button className={active === name ? 'pressed' : ''}
+      onPointerDown={() => press(name)} onPointerUp={stop} onPointerLeave={() => active === name && stop()}>{label}</button>
   );
+
   return (
-    <div className="teleop">
-      <div className="pad">
-        <span />{btn('w', '↑', [1, 0])}<span />
-        {btn('a', '←', [0, 1])}<button disabled={!enabled} onClick={release}>■</button>{btn('d', '→', [0, -1])}
-        <span />{btn('s', '↓', [-1, 0])}<span />
+    <div className="camera-view">
+      <div className="video">
+        {s?.connected ? <img src={api.streamUrl(robotId)} alt="실시간 영상" /> : <div className="novideo">영상 없음 (연결 끊김)</div>}
+        <div className={`drive-hint ${iHold ? 'on' : ''}`}>
+          <Icon name={iHold ? 'arrow.up' : 'hand.raised.fill'} size={14} />
+          {iHold ? (active ? '이동 중' : '방향키 ↑↓ 전진·후진 · ←→ 회전 · Space 정지') : '방향키를 누르면 제어권을 요청합니다'}
+        </div>
       </div>
-      <div className="muted small">W A S D / 방향키</div>
-      {msg && <div className="bad small">{msg}</div>}
+      <div className="teleop row">
+        <div className="pad">
+          <span />{btn('ArrowUp', <Icon name="arrow.up" size={22} />)}<span />
+          {btn('ArrowLeft', <Icon name="arrow.counterclockwise" size={22} />)}<button onClick={stop}><Icon name="stop.fill" size={20} /></button>{btn('ArrowRight', <Icon name="arrow.clockwise" size={22} />)}
+          <span />{btn('ArrowDown', <Icon name="arrow.down" size={22} />)}<span />
+        </div>
+        {msg && <div className="bad small">{msg}</div>}
+      </div>
     </div>
   );
 }
+
+// ------------------------------------------------------------------ 지도 모드
+type Target = { x: number; y: number; yaw: number | null };
+
+function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
+  const api = useApi();
+  const info = usePoll<MapInfo | null>(() => api.mapInfo(robotId).catch(() => null), 10000, [robotId]);
+  const view = usePoll<MapView | null>(() => api.mapView(robotId), 500, [robotId]);
+  const points = usePoll<Point[]>(() => api.points(), 0);
+  const [img, setImg] = useState<HTMLImageElement | null>(null);
+  const [target, setTarget] = useState<Target | null>(null);
+  const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const [cssScale, setCssScale] = useState(1);     // 지도 1칸 = 화면 몇 px (CSS 기준)
+  const act = useAction();
+  const m = info.data;
+
+  // 지도 이미지: 버전이 바뀔 때만 다시 받는다(SLAM 중에는 지도가 자란다)
+  useEffect(() => {
+    if (!m) return;
+    const i = new Image();
+    i.onload = () => setImg(i);
+    i.src = api.mapImageUrl(robotId, m.version);
+  }, [m?.version, robotId, api]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 화면 크기에 맞춘 축척. 캔버스는 CSS 크기 × devicePixelRatio 로 그려 선명하게 한다.
+  useEffect(() => {
+    const c = canvas.current;
+    if (!c || !m) return;
+    const fit = () => {
+      const W = c.parentElement!.clientWidth;
+      setCssScale(Math.min(W / m.width, 560 / m.height));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(c.parentElement!);
+    return () => ro.disconnect();
+  }, [m]);
+
+  // 지도 좌표 ↔ 화면(CSS px) 좌표
+  const toPx = (x: number) => ((x - m!.originX) / m!.resolution) * cssScale;
+  const toPy = (y: number) => (m!.height - (y - m!.originY) / m!.resolution) * cssScale;
+  const toWorld = (cx: number, cy: number) => ({
+    x: m!.originX + (cx / cssScale) * m!.resolution,
+    y: m!.originY + (m!.height - cy / cssScale) * m!.resolution,
+  });
+
+  // 그리기
+  useEffect(() => {
+    const c = canvas.current;
+    if (!c || !m || !img) return;
+    const dpr = window.devicePixelRatio || 1;
+    const cw = m.width * cssScale, ch = m.height * cssScale;
+    c.style.width = `${cw}px`;
+    c.style.height = `${ch}px`;
+    c.width = Math.round(cw * dpr);
+    c.height = Math.round(ch * dpr);
+    const g = c.getContext('2d')!;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.imageSmoothingEnabled = true;            // 지도 그림은 4배 해상도로 다듬어 오므로 부드럽게 축소
+    g.drawImage(img, 0, 0, cw, ch);
+    const v = view.data;
+    // 계획 경로
+    if (v?.path?.length) {
+      g.strokeStyle = '#007aff'; g.lineWidth = 2; g.lineJoin = 'round'; g.beginPath();
+      v.path.forEach(([x, y], i) => (i ? g.lineTo(toPx(x), toPy(y)) : g.moveTo(toPx(x), toPy(y))));
+      g.stroke();
+    }
+    // 라이다: 이웃한 점(0.25m 이내)을 이어 하나의 선으로 그린다
+    if (v?.scan?.length) {
+      g.strokeStyle = 'rgba(255, 59, 48, 0.85)'; g.lineWidth = 1.5; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.beginPath();
+      let prev: [number, number] | null = null;
+      for (const pt of v.scan) {
+        if (prev && Math.hypot(pt[0] - prev[0], pt[1] - prev[1]) < 0.25) g.lineTo(toPx(pt[0]), toPy(pt[1]));
+        else g.moveTo(toPx(pt[0]), toPy(pt[1]));
+        prev = pt;
+      }
+      const first = v.scan[0];                 // 360° 스캔의 끝과 처음 잇기
+      if (prev && Math.hypot(first[0] - prev[0], first[1] - prev[1]) < 0.25) g.lineTo(toPx(first[0]), toPy(first[1]));
+      g.stroke();
+    }
+    // 점검 지점
+    points.data?.forEach((p) => {
+      g.strokeStyle = '#30b0c7'; g.lineWidth = 2; g.fillStyle = '#fff';
+      g.beginPath(); g.arc(toPx(p.x), toPy(p.y), 6, 0, Math.PI * 2); g.fill(); g.stroke();
+      g.fillStyle = '#30b0c7'; g.font = '600 11px -apple-system, system-ui, sans-serif'; g.textAlign = 'center';
+      g.fillText(p.code, toPx(p.x), toPy(p.y) - 10);
+    });
+    // 목적지와 도착 방향(드래그로 지정)
+    const goal: Target | null = target
+      ?? (v?.manualGoal && ['SENT', 'ACTIVE'].includes(v.manualGoal.state) ? v.manualGoal : null);
+    if (goal) {
+      const gx = toPx(goal.x), gy = toPy(goal.y);
+      g.strokeStyle = '#af52de'; g.fillStyle = 'rgba(175, 82, 222, 0.15)'; g.lineWidth = 2;
+      g.beginPath(); g.arc(gx, gy, 9, 0, Math.PI * 2); g.fill(); g.stroke();
+      if (goal.yaw != null) {
+        const L = 26, ex = gx + L * Math.cos(-goal.yaw), ey = gy + L * Math.sin(-goal.yaw);
+        g.beginPath(); g.moveTo(gx, gy); g.lineTo(ex, ey); g.stroke();
+        g.beginPath();
+        g.moveTo(ex, ey);
+        g.lineTo(ex - 8 * Math.cos(-goal.yaw - 0.5), ey - 8 * Math.sin(-goal.yaw - 0.5));
+        g.lineTo(ex - 8 * Math.cos(-goal.yaw + 0.5), ey - 8 * Math.sin(-goal.yaw + 0.5));
+        g.closePath(); g.fillStyle = '#af52de'; g.fill();
+      }
+    }
+    // 로봇
+    if (v?.pose) {
+      const { x, y, yaw } = v.pose;
+      const cx = toPx(x), cy = toPy(y), r = Math.max(7, (0.16 / m.resolution) * cssScale);
+      g.fillStyle = '#007aff'; g.strokeStyle = '#fff'; g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(cx + r * 1.4 * Math.cos(-yaw), cy + r * 1.4 * Math.sin(-yaw));
+      g.lineTo(cx + r * Math.cos(-yaw + 2.5), cy + r * Math.sin(-yaw + 2.5));
+      g.lineTo(cx + r * Math.cos(-yaw - 2.5), cy + r * Math.sin(-yaw - 2.5));
+      g.closePath(); g.fill(); g.stroke();
+    }
+  }, [m, img, view.data, points.data, target, cssScale]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 누른 곳 = 목적지, 누른 채 끌면 = 도착했을 때 로봇이 바라볼 방향
+  const local = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const rect = canvas.current!.getBoundingClientRect();
+    return { cx: e.clientX - rect.left, cy: e.clientY - rect.top };
+  };
+  const onDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!m) return;
+    const { cx, cy } = local(e);
+    const w = toWorld(cx, cy);
+    drag.current = { x: w.x, y: w.y, px: cx, py: cy };
+    canvas.current!.setPointerCapture(e.pointerId);
+    setTarget({ x: round2(w.x), y: round2(w.y), yaw: null });
+  };
+  const onMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    const { cx, cy } = local(e);
+    if (Math.hypot(cx - d.px, cy - d.py) < 8) return;          // 짧은 움직임은 클릭으로 본다
+    setTarget({ x: round2(d.x), y: round2(d.y), yaw: Math.atan2(-(cy - d.py), cx - d.px) });
+  };
+  const onUp = () => { drag.current = null; };
+
+  const go = () => act.run(async () => {
+    const p = view.data?.pose;
+    // 방향을 끌어 정하지 않았으면 로봇이 있는 곳에서 목적지를 바라보는 방향
+    const yaw = target!.yaw ?? (p ? Math.atan2(target!.y - p.y, target!.x - p.x) : 0);
+    await api.goTo(robotId, target!.x, target!.y, yaw);
+    setTarget(null);
+  });
+
+  const mg = view.data?.manualGoal;
+  const goalText: Record<string, string> = { SENT: '전송됨', ACTIVE: '이동 중', SUCCEEDED: '도착', ABORTED: '실패', CANCELED: '취소됨' };
+  return (
+    <div className="map-view">
+      {!m && <div className="novideo map-empty">지도를 기다리는 중… (로봇의 지도 서버·SLAM 이 실행 중이어야 합니다)</div>}
+      <div className="map-canvas">
+        <canvas ref={canvas} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
+          className={iHold ? 'clickable' : ''} />
+      </div>
+      <div className="map-legend small">
+        <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로</span>
+        <span><i className="lg scan" /> 라이다</span><span><i className="lg point" /> 점검 지점</span><span><i className="lg goal" /> 목적지·방향</span>
+        {view.data?.pose ? <span className="muted">위치 x {view.data.pose.x.toFixed(2)} · y {view.data.pose.y.toFixed(2)} · θ {(view.data.pose.yaw * 180 / Math.PI).toFixed(0)}°</span>
+          : <span className="warn-t">위치 추정 없음</span>}
+      </div>
+      <div className="row wrap">
+        {target ? (
+          <>
+            <span>목적지 ({target.x}, {target.y}){target.yaw != null ? ` · 방향 ${Math.round(target.yaw * 180 / Math.PI)}°` : ''}</span>
+            <button className="primary" disabled={!iHold || act.busy} onClick={go}><Icon name="location.fill" size={16} />이 위치로 이동</button>
+            <button onClick={() => setTarget(null)}>지우기</button>
+            {!iHold && <span className="warn-t small">제어권을 먼저 획득하세요</span>}
+          </>
+        ) : <span className="muted small">지도를 눌러 목적지를 고르고, 누른 채 끌면 도착했을 때 바라볼 방향을 정합니다</span>}
+        {mg && <span className="small">지도 이동: <b>{goalText[mg.state] ?? mg.state}</b>{mg.reason ? ` · ${mg.reason}` : ''}</span>}
+        {mg && ['SENT', 'ACTIVE'].includes(mg.state) && <button onClick={() => act.run(() => api.cancelGoTo(robotId))}>이동 취소</button>}
+      </div>
+      <ErrorBox msg={act.error} />
+    </div>
+  );
+}
+
+const round2 = (v: number) => Math.round(v * 100) / 100;

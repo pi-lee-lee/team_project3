@@ -37,6 +37,14 @@ public interface RobotAdapter extends AutoCloseable {
     record MjpegStream(String contentType, InputStream body) {
     }
 
+    /** 지도 정보(관제 화면 지도 모드). version 은 지도가 새로 들어올 때마다 증가한다. */
+    record MapInfo(int width, int height, double resolution, double originX, double originY, long version) {
+    }
+
+    /** 지도 위 실시간 표시: 지도 좌표의 로봇 위치, 라이다 점, 계획 경로(주행 중일 때). */
+    record MapView(Pose pose, java.util.List<double[]> scan, java.util.List<double[]> path) {
+    }
+
     void start();
 
     @Override
@@ -61,4 +69,12 @@ public interface RobotAdapter extends AutoCloseable {
     byte[] snapshot() throws IOException;
 
     MjpegStream openStream() throws IOException;
+
+    /** 지도가 아직 없으면 null. */
+    MapInfo mapInfo();
+
+    /** 지도 이미지(PNG, 위쪽이 +y). 없으면 null. */
+    byte[] mapPng();
+
+    MapView mapView();
 }

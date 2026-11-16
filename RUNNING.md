@@ -120,6 +120,18 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
    카메라 영상은 **압축 토픽**(`/camera/image_raw/compressed`, JPEG)으로 받는다. 로봇에 `ros-humble-compressed-image-transport` 를 설치하면 카메라 노드가 압축 토픽을 함께 발행한다(`imageTransport: "raw"` 로 바꾸면 원본 토픽).
 3. 시뮬레이터 없이 실행: `docker compose up -d --scale sim=0`
 
+## 화면
+
+- 디자인 컨셉: Apple Human Interface Guidelines — 시스템 글꼴, iOS 시스템 색(라이트·다크 모드), 사이드바(넓은 화면)·하단 탭 바(좁은 화면),
+  큰 제목, 그룹형 목록, 세그먼트 컨트롤, 캡슐형 상태 배지. 스타일은 `web/nginx/frontend/src/styles.css` 맨 위에 정리했다.
+- 아이콘: Google Material Symbols Rounded(Apache 2.0, 글꼴을 프로젝트에 포함 — 모든 OS 브라우저에서 같게 보임).
+  화면 코드는 SF Symbols 식 이름으로 부르고 `Icon.tsx` 한 곳에서 연결한다. Apple SF Symbols 는 라이선스상 Apple 플랫폼 앱에서만 쓸 수 있어 웹에는 넣지 않았다.
+- 관제(U1)는 두 모드다.
+  - **카메라 모드**: 실시간 영상 + 방향키 조종(↑↓ 전진·후진, ←→ 제자리 회전, Space 정지). 누르는 동안만 움직이고, 제어권이 없으면 방향키를 누를 때 자동으로 요청한다.
+  - **지도 모드**: 로봇의 지도 위에 로봇 위치·방향, 라이다 점, Nav2 계획 경로, 점검 지점을 표시한다. 지도를 클릭하고 "이 위치로 이동"을 누르면 Nav2 로 이동한다(제어권 필요, 방향키 조종을 시작하면 취소).
+  - 지도는 로봇 측 브리지가 `/map` 을 `/inspection/map` 으로 5초마다 다시 내보내고, 지도 좌표 위치는 TF 로 계산해 `/inspection/map_pose` 로 낸다.
+  - 화면의 지도는 robot-service 가 다듬어 그린다(`MapRenderer`): 잡음 점 제거 → 끊긴 벽 점 잇기(닫기) → 작은 덩어리 제거 → 방 안 미지 칸 메우기 → 일정한 굵기의 선. 주행에 쓰는 지도는 그대로다. 라이다는 이웃한 점을 이어 선으로 그린다.
+
 ## 화면 문서
 
 - `docs/web_storyboard.svg` 화면 구조도·흐름도·화면 설계 / `docs/web_screen_tree.svg` 화면 트리 / `docs/web_service_scenario.svg` 가상 서비스 흐름

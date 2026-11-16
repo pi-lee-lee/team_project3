@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ErrorBox, useAction, useApi, usePoll } from '../../util';
+import { Icon } from '../../Icon';
 
 /** U2 점검 요청 */
 export default function RequestPage() {
@@ -56,7 +57,7 @@ export default function RequestPage() {
           const t = await api.createTask(robotId!, order, note);
           navigate(`/app/tasks/${t.task_id}`);
         })}>
-        점검 요청
+        <Icon name="plus.circle" size={18} />점검 요청
       </button>
       <p className="muted">요청하면 작업 상세 화면으로 이동합니다. 로봇은 출발 전에 연결·위치·카메라를 검사하고, 실패하면 사유를 남깁니다.</p>
     </section>

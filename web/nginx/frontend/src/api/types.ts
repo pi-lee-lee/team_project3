@@ -135,6 +135,18 @@ export interface TaskDetail extends Omit<TaskRow, 'points' | 'observations'> {
   observations: Observation[];
 }
 
+export interface MapInfo { width: number; height: number; resolution: number; originX: number; originY: number; version: number }
+
+export interface ManualGoal { goalId: string; x: number; y: number; yaw: number; state: string; reason: string; code?: string }
+
+export interface MapView {
+  pose: Pose | null;
+  scan: [number, number][];
+  path: [number, number][];
+  manualGoal: ManualGoal | null;
+  mission: { missionId: number; currentPointId: number | null } | null;
+}
+
 export interface Criteria { minBrightness: number; maxBrightness: number; minSharpness: number; roi: number[] }
 
 export interface SystemStatus {
@@ -166,6 +178,12 @@ export interface Api {
   adminRobots(): Promise<RobotSummary[]>;
   saveRobot(r: { robotId?: number; code?: string; name: string; adapterType: string; config: unknown; enabled: boolean }): Promise<RobotSummary>;
   revokeControl(id: number): Promise<void>;
+  // 관제 지도 모드
+  mapInfo(id: number): Promise<MapInfo>;
+  mapImageUrl(id: number, version: number): string;
+  mapView(id: number): Promise<MapView>;
+  goTo(id: number, x: number, y: number, yaw: number): Promise<ManualGoal>;
+  cancelGoTo(id: number): Promise<void>;
   // 지점
   points(): Promise<Point[]>;
   adminPoints(): Promise<Point[]>;

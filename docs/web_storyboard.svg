@@ -143,16 +143,16 @@
 <path d="M1050,395 V567" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <path d="M1050,439 H1060" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <rect x="1060.0" y="426.0" width="130" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<text x="1125" y="443" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">실시간 영상</text>
+<text x="1125" y="443" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">카메라 모드(방향키 조종)</text>
 <path d="M1050,471 H1060" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <rect x="1060.0" y="458.0" width="130" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<text x="1125" y="475" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">위치·갱신 상태</text>
+<text x="1125" y="475" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">지도 모드(클릭 이동)</text>
 <path d="M1050,503 H1060" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <rect x="1060.0" y="490.0" width="130" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<text x="1125" y="507" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">제어권 획득·반납</text>
+<text x="1125" y="507" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">위치·갱신 상태</text>
 <path d="M1050,535 H1060" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <rect x="1060.0" y="522.0" width="130" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<text x="1125" y="539" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">원격 조종</text>
+<text x="1125" y="539" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">제어권 획득·반납</text>
 <path d="M1050,567 H1060" fill="none" stroke="#94a3b8" stroke-width="1"/>
 <rect x="1060.0" y="554.0" width="130" height="26" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
 <text x="1125" y="571" font-size="10.5" fill="#475569" text-anchor="middle" font-weight="normal">비상 정지</text>
@@ -1062,13 +1062,16 @@
 <text x="1544" y="2806" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">점검 작업 중에는 획득할 수 없다</text>
 <circle cx="1530" cy="2829" r="8" fill="#dc2626"/>
 <text x="1530" y="2833" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">5</text>
-<text x="1544" y="2833" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">조종: 방향 버튼 또는 W·A·S·D. 누르는</text>
-<text x="1544" y="2848" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">동안만 움직이고 속도는 서버가 제한</text>
-<circle cx="1530" cy="2871" r="8" fill="#dc2626"/>
-<text x="1530" y="2875" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">6</text>
-<text x="1544" y="2875" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">비상 정지: 모든 사용자가 사용. 작업 취소</text>
-<text x="1544" y="2890" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">+ 정지. 연결이 끊기면 로봇 측 워치독이</text>
-<text x="1544" y="2905" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">0.5초 안에 정지</text>
+<text x="1544" y="2833" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">카메라 모드: 방향키(↑↓ 전진·후진, ←→</text>
+<text x="1544" y="2848" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">회전)로 조종. 누르는 동안만 움직이고,</text>
+<text x="1544" y="2863" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">제어권이 없으면 자동 요청. 지도 모드: 지도</text>
+<text x="1544" y="2878" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">위 위치·라이다·경로, 클릭한 곳으로 Nav2</text>
+<text x="1544" y="2893" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">이동</text>
+<circle cx="1530" cy="2916" r="8" fill="#dc2626"/>
+<text x="1530" y="2920" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">6</text>
+<text x="1544" y="2920" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">비상 정지: 모든 사용자가 사용. 작업 취소</text>
+<text x="1544" y="2935" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">+ 정지. 연결이 끊기면 로봇 측 워치독이</text>
+<text x="1544" y="2950" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="normal">0.5초 안에 정지</text>
 <rect x="30" y="3028" width="880" height="440" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
 <rect x="30" y="3028" width="70" height="26" rx="0" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
 <text x="38" y="3045" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="bold">화면 ID</text>

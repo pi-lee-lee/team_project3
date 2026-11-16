@@ -6,6 +6,9 @@
   /inspection/goal_status   → {"goalId", "state": ACTIVE|SUCCEEDED|ABORTED|CANCELED, "code", "reason",
                                "detoured", "recoveries", "plannedLength", "traveled"}
   /inspection/bridge_status → {"navReady": bool, "localized": bool}  (1초마다, 출발 전 검사용)
+  /inspection/map_pose      → geometry_msgs/PoseStamped (frame map, 5Hz) — 지도 위 로봇 위치(관제 화면 지도 모드)
+  /inspection/map           → nav_msgs/OccupancyGrid (5초마다) — /map 은 처음 한 번만 발행(latched)되어 rosbridge 로는
+                              놓치기 쉬우므로 같은 지도를 주기적으로 다시 발행한다
 
 장애물 처리는 Nav2 가 한다: 일시 장애물은 기다리고, 돌아갈 수 있으면 경로를 다시 계획한다.
 Nav2 가 결국 실패하면 비용 지도의 오래된 표시를 지우고 현재 위치에서 목표까지 경로를 다시 계산한다.
@@ -23,9 +26,12 @@ import time
 
 import rclpy
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
+from tf2_ros import Buffer, TransformListener
 from nav2_msgs.action import ComputePathToPose, NavigateToPose
 from nav2_msgs.srv import ClearEntireCostmap
-from nav_msgs.msg import Odometry
+from nav_msgs.msg import OccupancyGrid, Odometry
+from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.time import Time
 from rclpy.action import ActionClient
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -59,6 +65,16 @@ class Bridge(Node):
         self.goal = None                    # 현재 목표 dict (Nav2 목표 핸들은 goal['handle'])
         self.last_xy = None
         self.create_timer(1.0, self.tick)
+        # 지도 좌표의 로봇 위치: TF(map → base_footprint)를 읽어 5Hz 로 발행한다
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+        self.map_pose_pub = self.create_publisher(PoseStamped, '/inspection/map_pose', 10)
+        self.create_timer(0.2, self.publish_map_pose)
+        latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL, reliability=ReliabilityPolicy.RELIABLE)
+        self.map_msg = None
+        self.create_subscription(OccupancyGrid, '/map', lambda m: setattr(self, 'map_msg', m), latched)
+        self.map_pub = self.create_publisher(OccupancyGrid, '/inspection/map', 1)
+        self.create_timer(5.0, lambda: self.map_msg is not None and self.map_pub.publish(self.map_msg))
         self.get_logger().info(f'goal bridge ready (mode={MODE})')
 
     # ------------------------------------------------------------ 상태
@@ -91,6 +107,19 @@ class Bridge(Node):
             g['stalled'] = True
             g['handle'].cancel_goal_async()
             g['progress_at'] = time.monotonic()
+
+    def publish_map_pose(self):
+        try:
+            t = self.tf_buffer.lookup_transform('map', 'base_footprint', Time())
+        except Exception:   # 지도·위치 추정이 아직 없음
+            return
+        p = PoseStamped()
+        p.header.frame_id = 'map'
+        p.header.stamp = t.header.stamp
+        p.pose.position.x = t.transform.translation.x
+        p.pose.position.y = t.transform.translation.y
+        p.pose.orientation = t.transform.rotation
+        self.map_pose_pub.publish(p)
 
     def report(self, g, state, code='', reason='', **extra):
         body = {'goalId': g['goalId'], 'state': state, 'code': code, 'reason': reason}

@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -59,6 +60,8 @@ public class MissionService {
     private final ControlService control;
     private final ObjectMapper om = new ObjectMapper();
     private final Map<Long, Running> runningByRobot = new ConcurrentHashMap<>();
+    /** 관제 화면 지도 모드에서 사용자가 찍은 목적지(점검 작업과 별개). 로봇별 최근 상태. */
+    private final Map<Long, Map<String, Object>> manualGoals = new ConcurrentHashMap<>();
     private final ExecutorService pool = Executors.newCachedThreadPool();
 
     public MissionService(RobotRepository repo, RobotRegistry registry, ControlService control) {
@@ -312,7 +315,50 @@ public class MissionService {
         }
     }
 
+    // ------------------------------------------------------------- 지도에서 찍은 목적지로 이동 (제어권 필요)
+    public Map<String, Object> goTo(long robotId, long userId, double x, double y, double yaw) {
+        if (runningByRobot.containsKey(robotId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "점검 작업 중에는 지도 이동을 할 수 없습니다");
+        }
+        if (!control.isHolder(robotId, userId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "제어권을 먼저 획득하세요");
+        }
+        cancelManual(robotId);
+        String goalId = "manual-" + System.currentTimeMillis();
+        Map<String, Object> g = new java.util.HashMap<>(Map.of("goalId", goalId, "x", x, "y", y, "yaw", yaw,
+                "state", "SENT", "reason", ""));
+        manualGoals.put(robotId, g);
+        registry.adapter(robotId).sendGoal(goalId, x, y, yaw);
+        control.touch(robotId, userId);
+        return g;
+    }
+
+    public void cancelManual(long robotId) {
+        Map<String, Object> g = manualGoals.get(robotId);
+        if (g != null && Set.of("SENT", "ACTIVE").contains(String.valueOf(g.get("state")))) {
+            try {
+                registry.adapter(robotId).cancelGoal(String.valueOf(g.get("goalId")));
+            } catch (Exception ignored) {
+                // 연결이 끊긴 경우
+            }
+            g.put("state", "CANCELED");
+        }
+    }
+
+    public Map<String, Object> manualGoal(long robotId) {
+        return manualGoals.get(robotId);
+    }
+
     private void onGoalStatus(long robotId, RobotAdapter.GoalStatus s) {
+        if (s.goalId() != null && s.goalId().startsWith("manual-")) {
+            Map<String, Object> g = manualGoals.get(robotId);
+            if (g != null && s.goalId().equals(g.get("goalId"))) {
+                g.put("state", s.state());
+                g.put("reason", s.reason() == null ? "" : s.reason());
+                g.put("code", s.code() == null ? "" : s.code());
+            }
+            return;
+        }
         Running run = runningByRobot.get(robotId);
         if (run == null || s.goalId() == null) {
             return;

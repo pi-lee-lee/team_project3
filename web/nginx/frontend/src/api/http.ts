@@ -64,6 +64,11 @@ export const httpApi: Api = {
       ? call('PUT', `/api/admin/robots/${r.robotId}`, r)
       : post('/api/admin/robots', r),
   revokeControl: (id) => post(`/api/admin/robots/${id}/revoke-control`),
+  mapInfo: (id) => get(`/api/robots/${id}/map`),
+  mapImageUrl: (id, version) => `/api/robots/${id}/map.png?v=${version}`,
+  mapView: (id) => get(`/api/robots/${id}/mapview`),
+  goTo: (id, x, y, yaw) => post(`/api/robots/${id}/goto`, { x, y, yaw }),
+  cancelGoTo: (id) => post(`/api/robots/${id}/goto/cancel`),
 
   points: () => get('/api/points'),
   adminPoints: () => get('/api/admin/points'),
