@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>만들고 싶은 기능 찾기 — TurtleBot3 PBL 프로젝트</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#faf9f6;color:#28323a;font:16px/1.9 'Atkinson Hyperlegible Next',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif}
+nav{position:fixed;inset:0 auto 0 0;width:255px;padding:30px 22px;overflow:auto;background:#162b3c}
+nav strong{display:block;color:#fff;font-size:17px;margin-bottom:20px}
+nav a{display:block;color:#e4efed;padding:7px 0;text-decoration:none;font-size:14px;line-height:1.65}
+nav a:hover,nav a:focus{text-decoration:underline;color:white}
+main{margin-left:255px;max-width:1450px;padding:45px 5vw 85px}
+h1{font-size:32px;line-height:1.5;color:#153348;margin:0 0 20px}
+h2{margin:48px 0 18px;padding-top:22px;border-top:2px solid #c5d7d1;color:#173b42;font-size:23px;line-height:1.55;scroll-margin-top:15px}
+h3{margin:26px 0 9px;color:#153b46;font-size:18px;line-height:1.6}
+p{max-width:90ch;margin:12px 0}
+strong{color:#143c4a}
+a{color:#13635b;text-underline-offset:3px;overflow-wrap:anywhere}
+.lead{font-size:19px;line-height:1.9}
+.meta,.small{font-size:14px;color:#5b6870}
+.note,blockquote{margin:22px 0;padding:17px 21px;background:#edf3ef;border-left:4px solid #397765}
+blockquote p{margin:8px 0}
+.table-wrap{overflow-x:auto;margin:22px 0;border:1px solid #d4dedb;background:white}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:14px;line-height:1.8}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid #dde4e1;border-right:1px solid #e4e9e7}
+th{background:#e7efea;color:#173a36}
+td:first-child{font-weight:600}
+li{margin:10px 0}
+code{font-size:.92em;background:#e9efec;padding:2px 5px;border-radius:3px}
+.question{font-size:18px;font-weight:600;color:#173b42}
+footer{margin-top:45px;padding-top:20px;border-top:1px solid #d4dedb;font-size:14px;color:#5b6870}
+a:focus-visible{outline:3px solid #c2964a;outline-offset:4px}
+@media(max-width:950px){nav{position:static;width:auto;padding:20px}nav strong{margin-bottom:8px}nav a{display:inline-block;margin-right:17px;font-size:13px}main{margin:0;padding:30px 22px 60px}h1{font-size:27px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{nav{display:none}main{margin:0;padding:0;max-width:none}body{background:white;font-size:10pt}.table-wrap{overflow:visible}table{min-width:0;font-size:8.5pt}th,td{padding:6px}h2,h3{break-after:avoid}blockquote,.note{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body>
+<nav aria-label="목차">
+<strong>만들고 싶은 기능 찾기</strong>
+<a href="#start">지금까지 드러난 관심</a>
+<a href="#research">실제 제품에서 찾은 기능</a>
+<a href="#catalog">장면으로 고르는 기능 후보</a>
+<a href="#deep">개인이 책임질 만한 기능</a>
+<a href="#choices">학습·구현 부담 비교</a>
+<a href="#jobs">수집 공고와의 연결</a>
+<a href="#ml">ML을 시도한다면</a>
+<a href="#homework">회의에 가져갈 희망 목록</a>
+<a href="#first">생각을 구체화하는 작은 활동</a>
+<a href="#sources">출처와 확인 범위</a>
+</nav>
+<main><aside><p><strong>참고용 전달 사본</strong> · 참고용 전달 사본이다. 당시 기능·책임·범위 제안과 문서상 장비 설명을 담는다. 현재 채택·담당·구현·실장비 검증 상태는 <a href="../08_DECISIONS_OPEN_QUESTIONS.md">08 문서</a>에서 확인한다. 작업공간 원본은 보존했다.</p></aside>
+<h1>“내가 뭘 만들고 싶은지 아직 잘 모르겠어요”에서 시작하기</h1>
+<p class="meta">TurtleBot3 최종 PBL 프로젝트 · 기능 탐색을 위한 조사·제안 · 2026년 11월 13일</p>
+<p class="lead"><strong>“실패한 순간의 사진과 센서 기록을 다시 보고 싶다”, “서버가 끊겨도 점검 결과가 남았으면 좋겠다”, “투척 조건을 바꾸면 명중률이 어떻게 달라지는지 보고 싶다.”</strong></p>
+<p>이 정도의 바람에서 기능 탐색을 시작할 수 있다. 개발 방법을 익히는 과정에서 관심의 깊이도 커진다. 아래 목록은 실제 로봇 운영·진단 제품과 공식 기술 문서를 조사해 만든 선택 자료다. 사용자가 이미 선택한 기능은 따로 확정되지 않았다.</p>
+<div class="note"><strong>이번에 고를 것은 직접 만들어 보고 싶은 동작이다.</strong><p>각 후보를 읽으며 ‘해 보고 싶다’, ‘설명을 더 보고 싶다’, ‘다른 팀원이 맡아도 좋다’ 정도를 표시하면 된다. 웹·독립 PC 앱·시스템 통신·로봇 상태 활용·Docker는 팀의 목표 구성으로 두고, 개인의 담당 범위는 관심과 팀 분업에 따라 정한다.</p></div>
+
+<h2 id="start">지금까지 드러난 관심을 기능으로 바꾸면</h2>
+<p>사용자는 독립 PC 앱, 작업·통신을 처리하는 백그라운드 프로그램, 로봇 상태값 활용, Docker에 관심을 표현했다. OpenCV는 시도할 의향이 있고, ML은 데이터 확보와 이해·검증 부담을 걱정하면서도 도전 가능성을 열어 두었다. 최근에는 가벼운 모형 투척과 불 그림 표적도 제안했다.</p>
+<p>이것은 관심 영역을 고른 상태다. 한 단계 더 구체화하려면 프로그램을 사용하는 장면을 떠올리면 된다.</p>
+<div class="table-wrap"><table><thead><tr><th>지금의 표현</th><th>화면이나 실제 동작으로 바꾼 표현</th><th>직접 개발할 부분</th></tr></thead><tbody>
+<tr><td>PC 진단 앱</td><td>실패 시점을 누르면 그때의 사진·센서 그래프·작업 이력이 함께 보인다.</td><td>시간과 작업의 연결, 조회·그래프·선택·내보내기</td></tr>
+<tr><td>시스템·통신 SW</td><td>서버 응답이 사라져도 기록을 보관하고, 복구되면 중복 없이 전달한다.</td><td>저장·확인·재시도·중복 처리·복구 시험</td></tr>
+<tr><td>하드웨어 상태 조회</td><td>전압과 센서 수신 상황을 확인하고, 필요한 입력이 없으면 이유를 보여 준다.</td><td>수집·유효성 검사·상태 규칙·이력</td></tr>
+<tr><td>OpenCV</td><td>사진의 관심 영역을 지정하고 밝기·색상 기준을 바꿔 결과를 비교한다.</td><td>특징 계산·설정·일괄 평가·정답 대조</td></tr>
+<tr><td>Docker</td><td>팀원 PC에서 같은 서비스가 실행되고, 서버를 다시 띄워도 점검 기록을 조회한다.</td><td>실행 구성·저장 설정·준비 확인·복구 검증</td></tr>
+<tr><td>모형 투척</td><td>설정과 실제 결과를 쌓아 어떤 조건에서 잘 맞는지 비교한다.</td><td>시험 기록·조건 관리·명중 판정·통계</td></tr>
+</tbody></table></div>
+
+<h2 id="research">실제 제품에서 찾은 세 가지 방향</h2>
+<h3>현장 관측을 업무 결과로 연결하기</h3>
+<p>Boston Dynamics는 Orbit을 이용한 임무 시작·예약·진행 확인·수집 자료 검토를 설명한다. ANYbotics의 Shift 소개도 임무 관리, 로봇 상태 확인, 점검 이력 비교, 후속 업무 연계를 주요 기능으로 제시한다. 점검 로봇의 소프트웨어에는 ‘어디에 갔는가’와 함께 ‘무슨 자료를 얻었고, 그 자료로 무엇을 확인했는가’를 다루는 기능이 들어간다. <a href="https://bostondynamics.com/blog/automated-inspections-made-simple/">Boston Dynamics 공식 설명</a> · <a href="https://www.anybotics.com/news/anybotics-shift-launch/">ANYbotics 공식 설명</a></p>
+<p>우리에게 적용할 후보는 점검 항목별 사진 연결, 사람의 확인 결과, 미확인 이유, 재점검 이력, 이전 관측과 비교, 아직 조치하지 않은 항목 찾기다. 이것들은 위 제품의 기능을 참고해 새롭게 제안하는 교육용 개발 범위다.</p>
+<h3>오류를 시간 순서로 다시 조사하기</h3>
+<p>Foxglove는 영상·지도·그래프·상태 등을 같은 시간축에서 살펴보는 도구를 제공한다. Diagnostics 패널은 정상·경고·오류와 갱신 중단을 다루고, Playback과 Plot은 기록 재생과 수치의 시간 변화를 지원한다. 이 기능들은 로봇 개발 도구에서 실제로 제공되는 기능이다. <a href="https://foxglove.dev/product/visualization">Foxglove Visualization</a> · <a href="https://docs.foxglove.dev/docs/visualization/panels/diagnostics">Diagnostics</a> · <a href="https://docs.foxglove.dev/docs/visualization/playback">Playback</a> · <a href="https://docs.foxglove.dev/docs/visualization/panels/plot">Plot</a></p>
+<p>우리의 PC 앱은 한 번의 점검 작업에 필요한 사진·배터리 전압·센서 수신 이력·작업 이벤트를 묶어 보여 주는 작은 범위에서 시작할 수 있다. 범위를 좁히면 개인이 직접 만든 조회·분석 로직과 검증 결과를 설명하기 쉽다.</p>
+<h3>통신이 실패한 다음의 동작을 설계하기</h3>
+<p>AWS의 공식 기술 글은 요청 응답이 유실된 상황에서 재시도가 중복 작업을 일으킬 수 있음을 설명하고, 요청 식별자와 서버의 일관된 처리를 논의한다. 우리 프로젝트에서는 점검 결과 중복 저장, 취소한 작업의 뒤늦은 실행, 투척 명령 재수신 같은 문제를 다루는 설계 참고가 된다. <a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">AWS Builders’ Library</a></p>
+<p>사진 업로드 재시도와 실제 투척 재실행은 각각 정책을 정해야 한다. 물리 동작의 결과가 불명확하면 ‘실행 확인 필요’를 남기고 확인 절차로 연결하는 기능을 후보로 둘 수 있다. 요청 ID만으로 전원 중단까지 포함한 물리 동작의 정확히 한 번 실행을 보장할 수는 없다.</p>
+
+<h2 id="catalog">장면으로 고르는 기능 후보</h2>
+<p>아래 항목은 관심을 고르는 메뉴다. 같은 프로그램 안에 여러 기능이 들어갈 수 있으며, 한 기능이 웹·PC·실행 프로그램을 함께 필요로 할 수도 있다. 실행 위치와 프레임워크는 팀의 환경 시험과 분업에서 구체화한다.</p>
+
+<h3>관리자가 “그래서 점검은 어떻게 됐나요?”라고 물을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>1. 점검 대상과 요청 관리</td><td>장소·확인 항목을 골라 작업을 등록하고 진행을 조회한다.</td><td>소수 지점의 실제 이동·촬영 결과까지 연결된 한 작업</td></tr>
+<tr><td>2. 항목별 결과와 근거</td><td>소화기 모형 사진과 담당자 확인을 해당 장소에 연결한다.</td><td>확인됨·추가 확인 필요 항목을 구분한 점검 기록</td></tr>
+<tr><td>3. 관측 이력 비교</td><td>같은 장소의 이전 사진과 현재 사진, 확인자·시각을 함께 본다.</td><td>직접 기록을 뒤지지 않고 상태 변화를 검토하는 기능</td></tr>
+<tr><td>4. 재점검과 조치 이력</td><td>흐린 사진을 재촬영 요청으로 연결하고 새 사진과 처리 결과를 남긴다.</td><td>관측 실패부터 후속 확인까지 끝나는 업무</td></tr>
+</tbody></table></div>
+
+<h3>개발자가 “아까 왜 실패했죠?”라고 물을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>5. 데이터 갱신 상태 표시</td><td>마지막 수신 후 경과 시간과 갱신 중단을 표시한다.</td><td>오래된 값을 보고 현재 상태를 오해하는 문제를 발견</td></tr>
+<tr><td>6. 작업 시간축 조사</td><td>실패 이벤트를 선택하면 그 주변의 사진·수치·작업 이력을 조회한다.</td><td>한 번의 실패를 조사하는 독립적인 PC 도구</td></tr>
+<tr><td>7. 진단 자료 묶음 내보내기</td><td>선택한 작업의 사진·설정·로그·수치를 한 폴더로 저장한다.</td><td>다른 팀원 PC에서 같은 사건을 검토할 자료</td></tr>
+<tr><td>8. 기록 자료로 시험 반복</td><td>로봇에서 저장한 자료를 열어 표시·판정 로직을 다시 시험한다.</td><td>장비 사용 시간 밖에서도 가능한 분석·회귀 검증</td></tr>
+</tbody></table></div>
+<p>ROS2의 rosbag2는 통신 자료 기록과 재생을 지원한다. 처음에는 작업별 CSV·사진·이벤트를 읽는 기능으로 시작하고, 데이터 규모와 필요에 따라 rosbag2를 연계할 수 있다. 재생 환경에서는 기록 데이터를 관찰하는 도구와 실제 구동 명령 경로의 연결 범위를 정한다. <a href="https://github.com/ros2/rosbag2/tree/humble">rosbag2 Humble 공식 저장소</a></p>
+
+<h3>네트워크와 작업 흐름이 예상대로 흘러가지 않을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>9. 작업 상태를 단계별로 전달</td><td>요청 접수·이동 중·도착·촬영·전송 대기·확인 완료를 표시한다.</td><td>어느 단계에서 멈췄는지 추적되는 작업 한 건</td></tr>
+<tr><td>10. 결과 보관·복구 전송</td><td>서버 경로가 끊긴 동안 파일을 보존하고 복구 후 전달한다.</td><td>시험한 장애 조건에서 누락·중복을 확인한 기록 전송 기능</td></tr>
+<tr><td>11. 중복 명령 처리</td><td>같은 요청을 다시 보내도 기존 처리 이력으로 응답한다.</td><td>명령·시도 식별자와 처리 상태를 검증한 실행 흐름</td></tr>
+<tr><td>12. 취소와 현재 상태 확인</td><td>취소 요청 접수, 이동 취소 결과, 남은 점검을 구분해 보여 준다.</td><td>이동 도중 취소하고 결과를 확인할 수 있는 작업 관리</td></tr>
+<tr><td>13. 신고에 따른 작업 전환</td><td>현재 작업을 마치거나 취소한 뒤 신고 장소를 확인하고 미완료 항목을 남긴다.</td><td>정의한 전환 정책으로 두 종류의 작업을 수행한 기록</td></tr>
+</tbody></table></div>
+<p>Nav2 Humble의 BasicNavigator에는 이동 요청, 진행 정보·결과 확인과 취소 인터페이스가 있다. 팀이 정할 부분은 점검 업무의 단계, 취소·전환 조건, 결과 저장과 후속 조치다. 이 범위를 직접 구현하면 기존 이동 기능을 활용하면서 업무 로직을 개발할 수 있다. <a href="https://api.nav2.org/nav2-humble/html/robot__navigator_8py_source.html">Nav2 Humble 공식 소스</a></p>
+
+<h3>로봇의 기본 상태를 작업 판단에 활용하고 싶을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>14. 출발 전 준비 검사</td><td>지원되는 배터리·카메라·필수 센서 입력을 확인하고 판단 이유를 기록한다.</td><td>준비 조건이 충족된 작업을 실행하고 부족한 조건을 알리는 검사</td></tr>
+<tr><td>15. 주행·센서 기록 비교</td><td>주행 명령과 엔코더·Odometry·IMU 등의 관측값을 함께 본다.</td><td>시험 구간별 차이를 조사하는 분석 도구</td></tr>
+<tr><td>16. 로봇별 제공 기능 확인</td><td>플랫폼별 영상·전압·명령·상태 항목을 실제 조회해 지원 여부를 기록한다.</td><td>후속 통합의 근거가 되는 기능 목록과 시험 기록</td></tr>
+</tbody></table></div>
+<p><strong>14·15번은 실제 공개 값과 의미를 확인한 뒤 범위를 정해야 한다.</strong> TurtleBot3 공식 Bringup 문서는 배터리·IMU·관절·Odometry·LiDAR·SensorState 등의 토픽을 제시하며 설치 버전에 따라 달라진다고 설명한다. Humble SensorState의 <code>torque</code>는 불리언이고, 엔코더·배터리 필드가 있다. 모터의 힘이나 온도를 연속 측정할 수 있는지는 드라이버와 실장비에서 별도로 확인해야 한다. <a href="https://emanual.robotis.com/docs/en/platform/turtlebot3/bringup/">ROBOTIS Bringup</a> · <a href="https://github.com/ROBOTIS-GIT/turtlebot3_msgs/blob/humble/msg/SensorState.msg">SensorState 정의</a></p>
+<p>엔코더·Odometry와 주행 명령의 차이를 관찰할 수는 있지만, 실제 바닥에서의 이동 오차를 평가하려면 독립적인 위치 기준이 필요하다. 수신 중단은 관측된 현상으로 기록하고 카메라 고장·통신 고장 같은 원인은 확인 절차로 조사한다.</p>
+<p>16번의 기능 조사만으로 원격 점검 PBL의 최소 완결형이 성립하지는 않는다. 준비 활동으로 수행하고, 확인한 정보를 실제 점검·진단 기능에 연결해야 한다. JetBot MINI는 세팅에 성공하면 포함한다는 사용자 전제를 반영하되 임무는 열린 상태로 둔다. 제조사 저장소는 영상처리·기본 제어·수동 카메라 각도 조정 등을 소개한다. 해당 저장소의 Nano 2GB 구성과 사용자의 실제 장비 구성도 대조해야 한다. <a href="https://github.com/YahboomTechnology/jetbot-mini">Yahboom 공식 저장소</a></p>
+
+<h3>사진과 인식 결과를 직접 개선하고 싶을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>17. 관심 영역·색상 기준 조정</td><td>사진에서 확인할 영역을 고르고 기준값을 바꾸면 판정 결과가 보인다.</td><td>모형 표시등·표식에 적용한 판정·보정 도구</td></tr>
+<tr><td>18. 사진 품질과 재촬영 지원</td><td>밝기·선명도 관련 특징을 계산하고 판독 가능 여부를 사람의 평가와 비교한다.</td><td>사진의 확인 가능성을 측정한 기본 규칙과 평가 결과</td></tr>
+<tr><td>19. 판정 기준 일괄 비교</td><td>저장 사진 전체에 두 기준을 적용하고 오판 사진·결과 차이를 찾는다.</td><td>같은 자료에서 개선 효과를 검증하는 시험 도구</td></tr>
+</tbody></table></div>
+<p>OpenCV 공식 예제는 HSV 색상 범위로 대상을 구분하는 <code>inRange</code>와 이미지 미분을 계산하는 <code>Laplacian</code>을 제공한다. 이를 참고해 색상·밝기·선명도 관련 특징을 계산할 수 있다. ‘특징값이 어느 정도면 사람이 읽을 수 있는 사진인가’는 우리 촬영 자료에서 정하고 검증할 판단이다. <a href="https://docs.opencv.org/4.9.0/da/d97/tutorial_threshold_inRange.html">OpenCV HSV 범위 처리</a> · <a href="https://docs.opencv.org/4.5.4/d5/db5/tutorial_laplace_operator.html">OpenCV Laplace Operator</a></p>
+
+<h3>모형 투척을 실험 가능한 기능으로 만들고 싶을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>20. 투척 시험 기록</td><td>거리·표적 높이·물체 질량·장치 설정·명중 여부를 회차별로 저장한다.</td><td>기구의 반복성과 가능한 조건을 설명할 실험 자료</td></tr>
+<tr><td>21. 투척 결과 검토</td><td>전후 사진 또는 추가 웹캠 자료로 명중 위치를 확인·표시한다.</td><td>사람이 검토할 수 있는 근거와 조건별 오차 그래프</td></tr>
+<tr><td>22. 표적 방향 보정</td><td>불 그림 표적의 화면 위치를 찾고 몸체 방향이나 접근 위치를 보정한다.</td><td>보정 전후의 명중 결과 비교. 하드웨어 시험에 의존</td></tr>
+</tbody></table></div>
+<p>실제 소화 성능을 시험하는 범위는 이 제안에서 정해지지 않았다. 사용자가 제안한 가벼운 모형·인쇄 표적의 투척 실험을 다룬다. EK100 키트의 정확한 서보 모델과 구조는 미확인이므로 도달 거리·명중률은 시험 전 수치로 제시할 수 없다. Arduino Servo의 위치 제어 인터페이스를 참고할 수 있으며 실제 속도·도달 거리·물체 이탈은 기구와 부하에 따라 평가해야 한다. <a href="https://github.com/arduino-libraries/Servo/blob/master/src/Servo.h">Arduino Servo 공식 소스</a></p>
+
+<h3>팀원들이 같은 환경에서 실행하고 시험하게 만들고 싶을 때</h3>
+<div class="table-wrap"><table><thead><tr><th>기능 후보</th><th>실제로 보여 줄 동작</th><th>작게 완성했을 때 남는 결과</th></tr></thead><tbody>
+<tr><td>23. 서비스 환경 재현</td><td>팀원 PC에서 같은 버전·설정으로 서버·DB를 실행하고 기록을 조회한다.</td><td>다른 환경에서 실제 점검 서비스를 실행한 절차와 결과</td></tr>
+<tr><td>24. 장애·보존 시험 자동화</td><td>시험 요청을 보내고 서버 재시작·응답 유실을 재현해 기록을 대조한다.</td><td>반복 가능한 시험·결과 보고와 데이터 보존 검증</td></tr>
+</tbody></table></div>
+<p>Compose 문서는 의존 서비스의 준비 확인과 볼륨을 통한 데이터 보존을 설명한다. 여기에 우리 서비스의 연결 재시도와 작업 복구를 구현해 함께 시험해야 한다. 컨테이너의 실행 상태, DB 준비 상태, 점검 업무의 처리 가능 상태는 각각 확인할 대상이다. <a href="https://docs.docker.com/compose/gettingstarted/">Docker Compose 공식 시작 안내</a> · <a href="https://docs.docker.com/compose/how-tos/startup-order/">Compose 시작 순서</a></p>
+
+<h2 id="deep">개인이 책임질 만한 기능을 더 구체화하면</h2>
+<p>다음 세 묶음을 우선 관심 후보로 제안한다. 이전에 사용자가 수행했다고 설명한 장치 연동·통합·시험 경험과 연결하면서, 새로 설계·구현·검증할 범위를 확보할 수 있다. 이는 대화에 기반한 제안이며 사용자의 선호와 숙련도를 확정한 평가는 아니다.</p>
+
+<h3>실패한 점검을 조사하는 PC 도구</h3>
+<p class="question">“왜 실패했는지 터미널 여러 개를 뒤지는 시간을 줄일 수 있을까?”</p>
+<p>작업을 선택하면 이동 요청·도착·촬영·전송 실패가 시간 순서대로 나타난다. 해당 시점의 사진과 배터리 전압, 카메라·LiDAR의 최근 수신 상태를 함께 조회한다. 담당자는 확인한 사실과 추정 원인을 구분해 메모하고 자료 묶음을 저장한다.</p>
+<p><strong>첫 완성</strong>은 저장된 한 작업을 열어 사진·이벤트·몇 개의 수치 기록을 함께 보고 내보내는 것이다. 이후 실시간 수신, 시간 구간 탐색, 시험 회차 비교, 판정 기준 조정을 추가할 수 있다.</p>
+<p><strong>직접 책임질 내용</strong>은 자료 읽기·검증, 작업과 시각의 연결, 화면 탐색, 그래프, 오류 표시, 내보내기, 시험 사례다. 원인 분석을 돕는 관측을 제공하고 원인을 자동 확정하는 기능은 별도 검증한다.</p>
+<p><strong>비교 실험</strong>은 같은 기록에서 특정 오류 발생 지점·누락 항목을 찾는 과제를 주고 수동 로그 조회와 도구 사용을 비교하는 것이다. 정확히 찾았는지와 조사 시간을 함께 기록한다. 서로 다른 PC 시각을 섞으면 오차가 생기므로 첫 범위는 동일 수집기의 수신 시각을 기준으로 맞추고 원본 시각도 보존하는 방법을 검토한다.</p>
+
+<h3>서버 장애 뒤에도 점검 결과를 회수하는 기능</h3>
+<p class="question">“사진은 찍었는데 서버에서 확인되지 않는 점검을 어떻게 처리할까?”</p>
+<p>촬영 결과를 로컬에 보관하고 서버가 수신을 확인할 때까지 전송 대기로 관리한다. 서버가 돌아오면 보관 자료를 보내고 같은 관측이 여러 번 도착한 상황을 처리한다. 웹에는 마지막 확인 상태와 전송 대기 항목을 표시한다.</p>
+<p><strong>첫 완성</strong>은 주행 연결이 유지되는 조건에서 서버 API 장애를 재현하고, 이미 확보한 사진·기록이 복구 후 누락·중복 없이 등록되는지 확인하는 것이다. 이후 실행 프로그램 재시작, 일부 파일 업로드 실패, 늦은 응답·취소와의 충돌을 확장 시험으로 둔다.</p>
+<p><strong>직접 책임질 내용</strong>은 관측 ID·시도 ID, 로컬 저장, 확인 응답, 재시도 간격, 서버 중복 처리, 처리 이력과 시험 프로그램이다. 웹 API와 실행 프로그램이 함께 필요할 수 있다.</p>
+<p><strong>비교 실험</strong>은 장애를 넣기 전후에 예상 관측 목록과 실제 등록 목록, 사진 파일, 처리 상태를 대조하는 것이다. 사진 복구와 새로운 주행·투척의 재실행 정책은 별도로 정한다.</p>
+
+<h3>사진을 판독하기 좋은 조건을 찾는 보정·평가 도구</h3>
+<p class="question">“어떤 사진을 재촬영해야 실제 확인 누락을 줄일 수 있을까?”</p>
+<p>관심 영역을 지정하고 밝기·색상 비율·선명도 관련 특징을 표시한다. 담당자가 ‘판독 가능’, ‘추가 촬영 필요’를 붙이고, 기준값을 바꾸며 같은 사진 묶음의 결과를 비교한다. 정답과 다른 사진을 모아 원인을 조사한다.</p>
+<p><strong>첫 완성</strong>은 촬영한 자료를 사람이 검토하고 제한된 모형 표시의 기본 규칙을 평가하는 도구다. 이후 자동 재촬영 제안, 실제 재촬영 효과 비교, 특징 기반 분류 모델을 추가할 수 있다.</p>
+<p><strong>직접 책임질 내용</strong>은 ROI·특징 계산, 기준 저장·버전, 자료·정답 관리, 일괄 판정, 오판 조회와 비교 그래프다. 장비 표시의 의미와 사진 품질은 각각 라벨과 평가 기준을 정한다.</p>
+<p><strong>비교 실험</strong>은 정상 촬영·어두움·흐림·가림 등 조건을 바꾸고, 기준 적용 전후의 판독 가능률과 불필요한 재촬영·놓친 불량 사진을 비교하는 것이다. 사전에 정확도나 필요한 자료 수를 확정하지 않는다.</p>
+
+<h2 id="choices">학습·구현 부담을 가늠할 기준</h2>
+<p>기간과 팀 구성, 실제 장비 상태가 미정이므로 소요 주수와 성공 확률은 산정하지 않았다. 다음은 구현 의존성에 대한 정성적 판단이다.</p>
+<div class="table-wrap"><table><thead><tr><th>후보</th><th>주로 새로 익힐 내용</th><th>작게 시작할 조건</th><th>부담이 커지는 지점</th></tr></thead><tbody>
+<tr><td>점검·조치 기록</td><td>관측·확인·재점검의 관계와 업무 상태</td><td>장소와 확인 항목을 제한하고 실제 관측 한 건을 끝낸다.</td><td>동시 요청·권한·다양한 예외 정책</td></tr>
+<tr><td>저장 자료 PC 분석</td><td>파일·시간축·그래프·사용자 조작</td><td>사진과 작은 수치·이벤트 자료로 시작한다.</td><td>대용량 영상·다중 시계·실시간 동기화</td></tr>
+<tr><td>결과 복구 전송</td><td>지속 저장·확인·중복·재시도</td><td>서버 경로 장애 한 종류부터 정의한다.</td><td>클라이언트 전원 중단·부분 파일·상태 충돌</td></tr>
+<tr><td>준비 검사</td><td>실제 데이터 의미·유효성·상태 규칙</td><td>지원되는 입력과 수신 중단 등 관측 가능한 조건을 고른다.</td><td>기계적 고장 원인 자동 진단</td></tr>
+<tr><td>영상 보정·평가</td><td>ROI·기본 영상처리·정답·실험 설계</td><td>같은 모형과 촬영 장면에서 규칙을 비교한다.</td><td>다양한 현장·물체·조명의 일반화</td></tr>
+<tr><td>투척 기록·분석</td><td>시험 조건 통제·명중 판정·통계</td><td>탁상 기구 시험과 고정 조건에서 시작한다.</td><td>기구 반복성·탄착점 관측·이동 후 자세 오차</td></tr>
+<tr><td>신고 우선 처리</td><td>작업 취소·체크포인트·미완료 업무 관리</td><td>한 작업의 종료 후 신고를 처리하는 정책을 완성한다.</td><td>실행 중 선점·복귀·중복 신고·기한</td></tr>
+<tr><td>Docker 운영 검증</td><td>서비스 준비·볼륨·연결·재시작</td><td>서버·DB와 실제 점검 기록으로 시험한다.</td><td>하드웨어·DDS·다중 플랫폼까지 컨테이너화</td></tr>
+</tbody></table></div>
+<p>중간 완성의 기준은 이용자에게 끝난 업무가 있는지다. 사진을 읽고 표시하는 준비 단계에서 더 나아가 한 점검 결과의 확인·재검토를 끝내거나, 장애 전후 자료를 회수해 대조하거나, 시험 조건별 명중 결과를 평가하는 단위를 만든다.</p>
+
+<h2 id="jobs">수집한 실제 모집 업무와 연결하면</h2>
+<p>이번에는 기능 후보와 직접 연결되는 일부 수집 공고를 다시 읽었다. 아래는 수집 당시 업무와의 연관성이다. 현재 접수 상태와 개인의 최종 지원 자격은 재평가하지 않았다. <a href="README.md#not-included">로컬 상세 모집요강 통합 원문</a></p>
+<div class="table-wrap"><table><thead><tr><th>공고</th><th>원문에서 확인한 업무·요구</th><th>프로젝트에서 증명할 후보</th><th>추가로 남는 확인·학습</th></tr></thead><tbody>
+<tr><td>레이저닉스<br>55405025</td><td>장치 제어, 프로그램 화면, 측정 데이터 표시·개선. C++ 또는 Python 기초, 전문학사 이상.</td><td>PC 진단·보정 도구, 시험 제어와 측정 결과 표시</td><td>실제 장치 제어 경험의 깊이, 선택 언어의 구현·시험</td></tr>
+<tr><td>대영에스텍<br>55472489</td><td>Linux USB 통신. C/C++와 Linux 시스템·네트워크 개발 경험 요구. 드라이버·멀티스레드·IPC·시그널 우대.</td><td>직접 구현한 C/C++ 통신·버퍼·타임아웃·복구 중 해당 부분</td><td>ROS2 사용 외의 USB·시스템 프로그래밍 증거, 우대 영역의 별도 경험</td></tr>
+<tr><td>넥센서 알고리즘<br>55349943</td><td>영상·3D·수치 처리. Python 검증, C++ 구현, 정확도·속도·메모리 개선.</td><td>영상 처리 기준의 Python 평가와 C++ 구현 비교</td><td>3D·수학·실제 제품 적용 경험, 두 언어 구현 깊이</td></tr>
+<tr><td>한국전력정보<br>55307969</td><td>에너지 플랫폼 개발·운영. Java/Spring, RDBMS, Ubuntu/Docker 등. 학사 조건.</td><td>작업·관측·확인 이력, API·DB·서비스 운영 시험</td><td>선택한 프레임워크의 실제 숙련도와 에너지·산업통신 영역</td></tr>
+<tr><td>비앤에프 SW 테스트<br>55426133</td><td>요구사항 기반 시험, Linux·네트워크 환경, 결함·로그 분석, 재시험·보고.</td><td>장애 재현·자동 시험·진단 묶음·검증 보고서</td><td>원자력 분야 절차·도메인과 체계적인 시험 산출물</td></tr>
+</tbody></table></div>
+<p>위 연결성은 구현할 기능에 대한 기술적 추론이다. 해당 공고의 필수 언어·전공·경력·업무 깊이를 각각 확인해야 한다. 선택한 기능이 요구 기술 중 어디를 증명하는지 소스·시험·측정 결과로 설명하는 방식이 적절하다.</p>
+
+<h2 id="ml">ML을 시도한다면 사진 품질 분류부터 검토할 수 있다</h2>
+<p>사용자가 걱정한 데이터 확보 문제를 고려하면, 직접 촬영하고 사람이 판독 가능 여부를 정할 수 있는 작은 문제부터 검토할 수 있다. 후보는 사진의 밝기·색상 비율·선명도 관련 특징을 사용해 ‘다시 촬영할 사진’을 분류하는 것이다. 먼저 기본 규칙과 사람의 판단을 기록해 평가 자료를 만든다.</p>
+<p>ML을 추가하면 같은 자료에서 기본 규칙과 비교한다. 사람이 읽을 수 있는 사진을 불필요하게 다시 찍게 하는 경우, 읽기 어려운 사진을 통과시키는 경우를 각각 조사한다. 촬영 구역과 조명·대상을 넓힐수록 새로운 자료가 필요하다. 일반적인 사진 품질 문제의 난도는 실제 장면에 따라 달라진다.</p>
+<p>같은 촬영 회차의 연속 프레임을 학습과 평가에 섞으면 실제 새 장면의 성능을 과대평가할 수 있다. 촬영 회차·날짜·대상 등 의미 있는 그룹을 정하고 분리하는 방식을 검토한다. scikit-learn은 데이터 누출 방지와 그룹을 겹치지 않게 나누는 GroupKFold를 공식 문서에서 설명한다. <a href="https://scikit-learn.org/stable/common_pitfalls.html">scikit-learn 데이터 누출 안내</a> · <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GroupKFold.html">GroupKFold</a></p>
+<p>필요한 표본 수와 목표 성능은 현재 결정할 근거가 부족하다. 먼저 독립된 촬영 조건에서 라벨을 붙일 수 있는지와 기본 규칙의 오류를 확인한다. ML 모델이 유용해지기 전에도 사진 검토·보정·재촬영 요청 기능이 업무 성과를 제공하도록 구성한다.</p>
+
+<h2 id="homework">팀 회의에 가져갈 개인 희망 목록 초안</h2>
+<p>아래 문장은 대화와 이번 조사에 근거해 작성한 추천 초안이다. 사용자가 모두 직접 맡겠다고 결정한 목록으로 취급하지 않는다. 특히 끌리는 항목과 더 알아보고 싶은 항목을 고르는 용도로 사용할 수 있다.</p>
+<blockquote>
+<p>저는 로봇을 이용한 점검 과정에서 아래 기능들을 만들어 보고 싶습니다.</p>
+<ol>
+<li><strong>요청부터 확인까지 끝나는 점검 업무</strong>를 만들고 싶습니다. 장소를 선택하면 실제 이동·촬영 결과가 저장되고, 담당자가 확인이나 재점검 요청을 남길 수 있으면 좋겠습니다.</li>
+<li><strong>실패한 작업을 조사하는 독립 PC 앱</strong>을 만들고 싶습니다. 그때의 사진·로봇 상태·통신 기록을 같은 작업에서 찾아볼 수 있으면 좋겠습니다.</li>
+<li><strong>센서 값의 최근 갱신 여부와 출발 준비 상태</strong>를 확인하고 싶습니다. 실제 지원되는 값으로 판단하고 이유를 보여 주고 싶습니다.</li>
+<li><strong>서버가 끊겨도 사진과 기록을 보존하고 복구 후 전달</strong>하는 기능을 구현해 보고 싶습니다.</li>
+<li><strong>중복 명령·타임아웃·취소를 처리하는 작업 프로그램</strong>을 만들어 보고 싶습니다. 투척은 수신·실행·결과 확인을 구분해 보고 싶습니다.</li>
+<li><strong>실제 기록을 다시 열어 오류를 재현하고 조사</strong>하는 기능을 만들고 싶습니다. 팀원에게 진단 자료도 전달할 수 있으면 좋겠습니다.</li>
+<li><strong>사진의 관심 영역과 판정 기준을 조정하고 비교</strong>해 보고 싶습니다. 흐림·어두움 때문에 재촬영이 필요한 상황도 다뤄 보고 싶습니다.</li>
+<li><strong>모형 투척의 조건과 결과를 기록·분석</strong>하고 싶습니다. 기구가 동작하면 거리·방향 보정 효과까지 비교해 보고 싶습니다.</li>
+<li><strong>Docker Compose로 서비스를 재현하고 재시작·데이터 보존을 시험</strong>하고 싶습니다. 가능하면 이 시험을 반복 실행하도록 만들고 싶습니다.</li>
+<li><strong>JetBot MINI의 세팅이 성공하면 실제 가능한 입력·제어를 확인해 팀 프로젝트에 연결</strong>하고 싶습니다. 맡길 임무는 기능과 장비를 확인하며 정하고 싶습니다.</li>
+</ol>
+</blockquote>
+<p>프로젝트의 PBL 문제는 팀에서 구체화하고, 웹·PC 앱·시스템 통신·로봇 상태 활용·Docker가 각각 어떤 문제 해결에 기여할지 기능과 함께 검토한다. 개인의 우선 관심 묶음으로는 ‘PC 진단과 기록 재검토’, ‘통신 장애 후 결과 회수’, ‘사진 보정·평가’를 제안한다. 투척 시험 도구도 실제 기구가 준비되면 독립적인 후보가 된다.</p>
+
+<h2 id="first">생각을 구체화하는 작은 활동</h2>
+<p>먼저 관심 기능 하나의 화면을 종이에 그려 본다. ‘사진과 실패 시각을 누르면 무엇이 보여야 할까’를 적거나, 같은 장소의 두 사진을 비교하면서 필요한 버튼과 정보를 적어도 된다.</p>
+<p>그다음 실제 자료 하나로 기능의 의미를 확인한다. 사진 검토를 고르면 서로 다른 촬영 조건의 사진을 보고 판독 가능 여부를 기록한다. 진단을 고르면 한 번의 시험에서 필요한 사건·센서·설정을 적는다. 투척을 고르면 기구 담당자와 함께 시험 조건과 결과 기록 양식을 정한다. 자료 확보가 어려운 부분은 미확인으로 남긴다.</p>
+<p>마지막으로 각 기능에 세 문장을 붙인다.</p>
+<ol>
+<li>누가 어떤 상황에서 이 기능을 쓰는가.</li>
+<li>입력으로 무엇을 받아 어떤 결과를 제공하는가.</li>
+<li>어떤 시험을 통과하면 작게 완성됐다고 말할 수 있는가.</li>
+</ol>
+<p>예를 들어 ‘사진 보정 도구’를 골랐다면, 담당자가 확인하기 어려운 점검 사진을 검토하고, 사진·관심 영역·기준값으로 판정과 재촬영 후보를 제공하며, 별도 촬영 자료에서 사람의 평가와 오류를 대조하는 것까지를 첫 범위로 적을 수 있다. 화면과 자료를 구체화하며 실행 위치와 책임을 정할 근거도 얻는다.</p>
+
+<h2 id="sources">출처와 확인 범위</h2>
+<p>조사는 로봇 점검 운영 제품의 공식 설명, 진단 도구 문서, Nav2 Humble·rosbag2·TurtleBot3 메시지의 공식 소스, Docker·OpenCV·scikit-learn 문서, 요청 재시도에 관한 AWS 기술 글을 중심으로 수행했다. 일부 ROS 문서 페이지는 접근 제한이 있어 공식 GitHub 저장소와 Humble 소스를 참고했다.</p>
+<p>제품이 지원한다고 설명한 기능, 공개 코드·메시지 정의에서 확인한 기능, 우리 프로젝트에 새로 제안한 기능을 본문에서 표시했다. 실제 장비·설치 버전·카메라 시야·서보 성능·팀 인원과 기간은 검증하지 않았다. 기업 제품의 성능 수치와 산업 현장 효과를 우리 프로젝트의 예상 성과로 옮기지 않았다.</p>
+<p>로컬 모집요강은 기능과 가까운 일부 공고를 다시 읽었다. 수집 공고 전체의 현재 접수 상태와 지원 자격을 이번에 새로 평가한 것은 아니다. 이 문서의 기능 선정·범위·난도 판단은 조사 자료와 대화를 바탕으로 한 제안이다.</p>
+<ul>
+<li><a href="https://bostondynamics.com/blog/automated-inspections-made-simple/">Boston Dynamics — Automated Inspections Made Simple</a></li>
+<li><a href="https://www.anybotics.com/news/anybotics-shift-launch/">ANYbotics — Data Navigator is now Shift</a></li>
+<li><a href="https://foxglove.dev/product/visualization">Foxglove — Visualization</a> · <a href="https://docs.foxglove.dev/docs/visualization/panels/diagnostics">Diagnostics</a> · <a href="https://docs.foxglove.dev/docs/visualization/playback">Playback</a> · <a href="https://docs.foxglove.dev/docs/visualization/panels/plot">Plot</a></li>
+<li><a href="https://api.nav2.org/nav2-humble/html/robot__navigator_8py_source.html">Nav2 Humble — BasicNavigator source</a> · <a href="https://github.com/ros2/rosbag2/tree/humble">rosbag2 Humble</a></li>
+<li><a href="https://emanual.robotis.com/docs/en/platform/turtlebot3/bringup/">ROBOTIS — TurtleBot3 Bringup</a> · <a href="https://github.com/ROBOTIS-GIT/turtlebot3_msgs/blob/humble/msg/SensorState.msg">SensorState</a></li>
+<li><a href="https://github.com/YahboomTechnology/jetbot-mini">Yahboom — JetBot MINI official repository</a></li>
+<li><a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">AWS — Making retries safe with idempotent APIs</a></li>
+<li><a href="https://docs.docker.com/compose/gettingstarted/">Docker Compose Quickstart</a> · <a href="https://docs.docker.com/compose/how-tos/startup-order/">Startup order</a></li>
+<li><a href="https://docs.opencv.org/4.9.0/da/d97/tutorial_threshold_inRange.html">OpenCV — inRange</a> · <a href="https://docs.opencv.org/4.5.4/d5/db5/tutorial_laplace_operator.html">Laplacian</a></li>
+<li><a href="https://scikit-learn.org/stable/common_pitfalls.html">scikit-learn — Common pitfalls</a> · <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GroupKFold.html">GroupKFold</a></li>
+<li><a href="https://github.com/arduino-libraries/Servo/blob/master/src/Servo.h">Arduino — Servo official source</a></li>
+<li><a href="README.md#not-included">수집한 상세 모집요강 통합 원문</a></li>
+</ul>
+<footer>기능 탐색·팀 회의용 조사 문서. 개별 기능의 채택과 담당 범위는 팀 협의와 실제 환경 시험에서 구체화한다.</footer>
+</main>
+</body>
+</html>
