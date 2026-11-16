@@ -2,12 +2,12 @@
 
 구성: 1) 화면 구조도(메뉴 트리)  2) 화면 흐름도  3) 화면별 설계(와이어프레임 + Description)
 화면을 고치려면 아래 SCREENS 데이터를 수정하고 실행한다:  python3 build_storyboard.py
-출력: docs/web_storyboard.svg
+출력: docs/storyboard/web_storyboard.svg
 """
 from html import escape
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / 'web_storyboard.svg'
+OUT = Path(__file__).resolve().parent / 'web_storyboard.svg'
 W = 1840
 FONT = 'Apple SD Gothic Neo, Noto Sans KR, Malgun Gothic, sans-serif'
 

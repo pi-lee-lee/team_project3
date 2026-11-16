@@ -27,7 +27,13 @@ ros/                       로봇 쪽
   sim/                     시뮬레이션(Gazebo·SLAM·Nav2·시험 도구)
   robot/                   로봇 측 노드(실제 로봇에도 같은 코드)
   maps/                    지도
+docs/                      문서 (목록: docs/README.md)
+  guide/                   실행 안내(이 파일)·Docker 구동 가이드
+  storyboard/              화면 스토리보드 SVG + 생성 스크립트
+scripts/                   E2E 시험
 ```
+
+명령은 모두 저장소 루트에서 실행한다. 루트에는 `README.md`, `도커_실행.md`, `compose.yaml`, `.env.example` 만 둔다.
 
 폴더 이름만 보고 무엇으로 만든 서비스인지 알 수 있게 기술별로 묶고, 그 안은 컨테이너(서비스)마다 폴더 하나다.
 
@@ -147,10 +153,12 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 ## 화면 문서
 
-- `docs/web_storyboard.svg` 화면 구조도·흐름도·화면 설계 / `docs/web_screen_tree.svg` 화면 트리 / `docs/web_service_scenario.svg` 가상 서비스 흐름
+- `docs/storyboard/web_storyboard.svg` 화면 구조도·흐름도·화면 설계 / `docs/storyboard/web_screen_tree.svg` 화면 트리 / `docs/storyboard/web_service_scenario.svg` 가상 서비스 흐름
 - 생성 스크립트: `docs/storyboard/*.py`
 
-## 신희초안 기능 후보 반영
+## 초안 기능 후보 반영
+
+번호는 처음 받은 기획 초안(07 기능 후보)의 번호다. 초안 폴더는 저장소에서 지웠고, 이전 커밋(a320e10)에 남아 있다.
 
 구현: 1·2·3·4·5·9·10·11·12·14·16·17(기준 설정)·18·23, 개선안 28~35(관제·조종, 게이트웨이 권한, 영상 중계, 워치독, 사용자·역할, 제어권 회수·비상 정지, 감사 로그, 시스템 상태).
 제외: 6·7·8·15·19·25~27(PC 로컬 분석), 13(전환 정책 미정), 20~22(투척 미채택), 24(장애 시험 자동화, 후속).
