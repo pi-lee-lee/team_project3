@@ -2,6 +2,8 @@
 
 웹(로그인·관리자·사용자 화면) + MSA 백엔드 + ROS 2 TurtleBot3 시뮬레이션(SLAM·Nav2)을 Docker Compose 로 한 번에 띄운다.
 
+> 설치부터 실행·초기화·문제 해결까지 단계별 안내(macOS·Linux·Windows PowerShell)는 [DOCKER_GUIDE.md](DOCKER_GUIDE.md) 를 본다.
+
 ## 실행
 
 ```bash
