@@ -1,0 +1,1034 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1840 2022" width="1840" height="2022" font-family="Apple SD Gothic Neo, Noto Sans KR, Malgun Gothic, sans-serif">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker></defs>
+<rect width="1840" height="2022" fill="#ffffff"/>
+<text x="30" y="44" font-size="24" fill="#0f172a" text-anchor="start" font-weight="bold">가상 서비스 흐름 스토리보드</text>
+<text x="372" y="44" font-size="12" fill="#475569" text-anchor="start" font-weight="normal">초안 시나리오: 지점 점검 요청 → 로봇 방문·촬영 → 담당자 확인 → 모의 이상 신고 → 해당 지점 재확인</text>
+<text x="30" y="66" font-size="11" fill="#94a3b8" text-anchor="start" font-weight="normal">역할 1·2·3 중 누가 요청·판정하는지는 권한 결정 때 정한다. 배경은 미정이므로 &quot;가상 시설&quot;의 예시다. 지점·좌표·화면은 현재 구현(시뮬레이션 월드, 웹 화면)과 같고, 작업 번호·시각·판정 내용은 예시 값이다.</text>
+<text x="30" y="110" font-size="18" fill="#0f172a" text-anchor="start" font-weight="bold">서비스 흐름 요약</text>
+<text x="200" y="110" font-size="11" fill="#475569" text-anchor="start" font-weight="normal">가로 = 시간 순서, 세로 = 장면의 주 행위자. 원 안의 번호는 아래 장면 카드와 같다.</text>
+<rect x="30" y="130" width="1780" height="56" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="130" width="130" height="56" rx="6" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="95" y="162.0" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">사용자 (역할 1·2·3)</text>
+<rect x="30" y="192" width="1780" height="56" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="192" width="130" height="56" rx="6" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="95" y="224.0" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">웹 admin</text>
+<rect x="30" y="254" width="1780" height="56" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="254" width="130" height="56" rx="6" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="95" y="286.0" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="30" y="316" width="1780" height="56" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="316" width="130" height="56" rx="6" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<text x="95" y="348.0" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">로봇</text>
+<circle cx="200.0" cy="220.0" r="16" fill="#7c3aed"/>
+<text x="200.0" y="224.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S0</text>
+<text x="200.0" y="250.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">준비</text>
+<path d="M216.0,220.0 C278.5,220.0 278.5,158.0 339.0,158.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M357.0,158.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="357.0" cy="282.0" r="5" fill="#2563eb"/>
+<circle cx="357.0" cy="158.0" r="16" fill="#0d9488"/>
+<text x="357.0" y="162.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S1</text>
+<text x="357.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">점검 요청</text>
+<path d="M373.0,158.0 C435.5,158.0 435.5,344.0 496.0,344.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M514.0,344.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="514.0" cy="282.0" r="5" fill="#2563eb"/>
+<circle cx="514.0" cy="344.0" r="16" fill="#ea580c"/>
+<text x="514.0" y="348.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S2</text>
+<text x="514.0" y="374.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">출발 전 검사</text>
+<path d="M530.0,344.0 C592.5,344.0 592.5,344.0 653.0,344.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<circle cx="671.0" cy="344.0" r="16" fill="#ea580c"/>
+<text x="671.0" y="348.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S3</text>
+<text x="671.0" y="374.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">P1 도착·촬영</text>
+<path d="M687.0,344.0 C749.5,344.0 749.5,344.0 810.0,344.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M828.0,344.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="828.0" cy="282.0" r="5" fill="#2563eb"/>
+<circle cx="828.0" cy="344.0" r="16" fill="#ea580c"/>
+<text x="828.0" y="348.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S4</text>
+<text x="828.0" y="374.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">P2</text>
+<path d="M844.0,344.0 C906.5,344.0 906.5,344.0 967.0,344.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M985.0,344.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="985.0" cy="282.0" r="5" fill="#2563eb"/>
+<circle cx="985.0" cy="344.0" r="16" fill="#ea580c"/>
+<text x="985.0" y="348.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S5</text>
+<text x="985.0" y="374.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">P3 촬영</text>
+<path d="M1001.0,344.0 C1063.5,344.0 1063.5,158.0 1124.0,158.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<circle cx="1142.0" cy="158.0" r="16" fill="#0d9488"/>
+<text x="1142.0" y="162.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S6</text>
+<text x="1142.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">담당자 판정</text>
+<path d="M1158.0,158.0 C1220.5,158.0 1220.5,158.0 1281.0,158.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M1299.0,158.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="1299.0" cy="282.0" r="5" fill="#2563eb"/>
+<circle cx="1299.0" cy="158.0" r="16" fill="#0d9488"/>
+<text x="1299.0" y="162.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S7</text>
+<text x="1299.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">모의 이상 신고</text>
+<path d="M1315.0,158.0 C1377.5,158.0 1377.5,158.0 1438.0,158.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M1456.0,158.0 V344.0" fill="none" stroke="#ea580c" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="1456.0" cy="344.0" r="5" fill="#ea580c"/>
+<circle cx="1456.0" cy="158.0" r="16" fill="#0d9488"/>
+<text x="1456.0" y="162.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S8</text>
+<text x="1456.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">재점검 결과·이상</text>
+<path d="M1472.0,158.0 C1534.5,158.0 1534.5,220.0 1595.0,220.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<circle cx="1613.0" cy="220.0" r="16" fill="#7c3aed"/>
+<text x="1613.0" y="224.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S9</text>
+<text x="1613.0" y="250.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">admin 사후 </text>
+<path d="M1629.0,220.0 C1691.5,220.0 1691.5,282.0 1752.0,282.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
+<path d="M1770.0,282.0 V344.0" fill="none" stroke="#ea580c" stroke-width="1" stroke-dasharray="3 3"/>
+<circle cx="1770.0" cy="344.0" r="5" fill="#ea580c"/>
+<circle cx="1770.0" cy="282.0" r="16" fill="#2563eb"/>
+<text x="1770.0" y="286.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S10</text>
+<text x="1770.0" y="312.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">예외</text>
+<rect x="33" y="411" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="408" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="30" y="408" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="30" y="432" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="44" y="430" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S0  준비: 지점·로봇 확인</text>
+<rect x="505" y="416" width="91" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="550.5" y="429" font-size="10" fill="#7c3aed" text-anchor="middle" font-weight="bold">웹 admin</text>
+<rect x="40" y="452" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(40,452) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/admin/points</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">사용자</text>
+<text x="61" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">로봇</text>
+<text x="99" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">점검 지점</text>
+<text x="170" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">분석 기준</text>
+<text x="241" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">감사 로그</text>
+<text x="312" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">시스템</text>
+<rect x="20" y="66" width="520" height="94" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="20" y="66" width="520" height="22" rx="2" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26.0" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">코드</text>
+<text x="100.28571428571429" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">이름</text>
+<text x="174.57142857142858" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">x</text>
+<text x="248.8571428571429" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">y</text>
+<text x="323.14285714285717" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">방향</text>
+<text x="397.42857142857144" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">상태</text>
+<text x="471.7142857142858" y="81" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">작업</text>
+<text x="26.0" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P1</text>
+<text x="100.28571428571429" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">소화기 앞</text>
+<text x="174.57142857142858" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">4.3</text>
+<text x="248.8571428571429" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">3.9</text>
+<text x="323.14285714285717" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">180°</text>
+<text x="397.42857142857144" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
+<text x="471.7142857142858" y="104" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
+<path d="M20,112 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P2</text>
+<text x="100.28571428571429" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">비상구 앞</text>
+<text x="174.57142857142858" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">7.55</text>
+<text x="248.8571428571429" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">6.1</text>
+<text x="323.14285714285717" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">90°</text>
+<text x="397.42857142857144" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
+<text x="471.7142857142858" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
+<path d="M20,136 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P3</text>
+<text x="100.28571428571429" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">분전반 앞</text>
+<text x="174.57142857142858" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.3</text>
+<text x="248.8571428571429" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">4.6</text>
+<text x="323.14285714285717" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">180°</text>
+<text x="397.42857142857144" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
+<text x="471.7142857142858" y="152" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
+<text x="20" y="216" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">지점 추가</text>
+<rect x="20" y="226" width="50" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26" y="242" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">코드</text>
+<rect x="78" y="226" width="150" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="84" y="242" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">이름</text>
+<rect x="236" y="226" width="56" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="242" y="242" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">x</text>
+<rect x="300" y="226" width="56" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="306" y="242" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">y</text>
+<rect x="364" y="226" width="70" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="370" y="242" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">방향(도)</text>
+<rect x="430" y="226" width="110" height="24" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="485.0" y="242.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">추가</text>
+</g>
+<text x="40" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 A3 점검 지점</text>
+<g transform="translate(330.0,452) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/admin/robots</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">사용자</text>
+<text x="61" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">로봇</text>
+<text x="99" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 지점</text>
+<text x="170" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">분석 기준</text>
+<text x="241" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">감사 로그</text>
+<text x="312" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">시스템</text>
+<rect x="20" y="66" width="520" height="54" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="32" y="86" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">tb3-sim · TurtleBot3 (시뮬레이션)</text>
+<text x="32" y="106" font-size="10" fill="#16a34a" text-anchor="start" font-weight="normal">● 연결됨 · 제어: user1 · 작업: 없음</text>
+<rect x="350" y="92" width="90" height="22" rx="3" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<text x="395.0" y="107.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">제어권 회수</text>
+<rect x="446" y="92" width="90" height="22" rx="3" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<text x="491.0" y="107.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">비상 정지</text>
+<text x="20" y="148" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">어댑터</text>
+<rect x="120" y="134" width="420" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="126" y="148" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">ROSBRIDGE ▾</text>
+<text x="20" y="174" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">rosbridge 주소</text>
+<rect x="120" y="160" width="420" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="126" y="174" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">ws://sim:9090</text>
+<text x="20" y="200" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">영상 주소</text>
+<rect x="120" y="186" width="420" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="126" y="200" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">http://sim:8080</text>
+<text x="20" y="226" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">토픽 매핑</text>
+<rect x="120" y="212" width="420" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="126" y="226" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">odom /odom · scan /scan · image /camera/image_raw · nav /inspection/bridge_status</text>
+<rect x="440" y="240" width="100" height="22" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="490.0" y="255.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">저장·재연결</text>
+<text x="20" y="284" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">제공 기능</text>
+<rect x="84" y="270" width="56" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
+<text x="112.0" y="284" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">odom ✓</text>
+<rect x="148" y="270" width="56" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
+<text x="176.0" y="284" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">scan ✓</text>
+<rect x="212" y="270" width="70" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
+<text x="247.0" y="284" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">camera ✓</text>
+<rect x="290" y="270" width="49" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
+<text x="314.5" y="284" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">nav ✓</text>
+<rect x="347" y="270" width="105" height="20" rx="10" fill="#fff" stroke="#dc2626" stroke-width="1"/>
+<text x="399.5" y="284" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="normal">battery ✕ 미지원</text>
+</g>
+<text x="330.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 A2 로봇 관리</text>
+<text x="44" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="82" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">웹 admin 이 점검할 지점 3곳(소화기 앞·비상구 앞·분전반 앞)의 위치와 촬영</text>
+<text x="82" y="685.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">방향을 등록하고, 로봇 연결과 제공 기능(odom·scan·camera)을</text>
+<text x="82" y="701.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">확인한다.</text>
+<text x="44" y="725.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="82" y="725.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 지점 좌표·방향 저장 (inspection-service)</text>
+<text x="82" y="741.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 로봇 연결 상태·제공 기능 확인 (robot-service)</text>
+<rect x="40" y="750.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="46" y="765.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="106" y="765.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">지점 등록 · 감사 로그(POST /api/admin/points)</text>
+<rect x="633" y="411" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="630" y="408" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="630" y="408" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="630" y="432" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="644" y="430" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S1  점검 요청</text>
+<rect x="1138" y="416" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1167.0" y="429" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="964" y="416" width="168" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1048.0" y="429" font-size="10" fill="#0d9488" text-anchor="middle" font-weight="bold">사용자 (역할 1·2·3)</text>
+<rect x="640" y="452" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(640,452) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/request</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<rect x="20" y="66" width="220" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">로봇: tb3-sim (연결됨) ▾</text>
+<text x="20" y="102" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">점검 지점 (고른 순서대로 방문)</text>
+<rect x="20" y="110" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+<text x="30" y="126" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">① P1 소화기 앞  (4.3, 3.9)</text>
+<rect x="20" y="138" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+<text x="30" y="154" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (7.55, 6.1)</text>
+<rect x="20" y="166" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="30" y="182" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">☐ P3 분전반 앞  (0.3, 4.6)</text>
+<rect x="20" y="198" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="214.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">메모</text>
+<rect x="20" y="232" width="520" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="280.0" y="250.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">점검 요청</text>
+</g>
+<text x="640" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U2 점검 요청</text>
+<rect x="930.0" y="452" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="976.0625" y="460.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="976.0625" y="625.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="458.95624999999995" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="975.01875" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1162.89375" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1026.1625" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1059.5625" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1105.4875" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1001.1125" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="977.10625" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1024.075" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1074.175" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1118.0125" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1080.4375" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1113.8375" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1060.60625" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="1149.325" y="462.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="977.10625" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<circle cx="1086.7" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1086.7" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">1</text>
+<text x="1086.7" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="1154.5" cy="483.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1154.54375" y="486.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">2</text>
+<text x="1154.54375" y="473.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="1003.2" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1003.2" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">3</text>
+<text x="1003.2" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="996.9" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="1005.9,610.3 992.1,613.9 992.1,606.7" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="930.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
+<text x="644" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="682" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">퇴근 전 정기 점검. 사용자가 로봇과 지점 순서(P1 → P2 → P3)를 골라</text>
+<text x="682" y="685.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">점검을 요청한다.</text>
+<text x="644" y="709.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="682" y="709.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 작업 #21 생성 → 로봇 서비스에 미션 전달</text>
+<text x="682" y="725.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 같은 작업 ID 는 다시 와도 한 번만 실행 (중복 명령 처리)</text>
+<rect x="640" y="734.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="646" y="749.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="706" y="749.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">REQUESTED (사용자) · ACCEPTED (로봇)</text>
+<rect x="1233" y="411" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="1230" y="408" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="1230" y="408" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="1230" y="432" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="1244" y="430" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S2  출발 전 검사 → 출발</text>
+<rect x="1738" y="416" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1767.0" y="429" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="1696" y="416" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1714.0" y="429" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="1240" y="452" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(1240,452) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/tasks/:id</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · tb3-sim · 진행 중</text>
+<rect x="20" y="66" width="250" height="216" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="30" y="84" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="bold">진행 기록</text>
+<circle cx="34" cy="102" r="4" fill="#16a34a"/>
+<text x="44" y="106" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">요청됨 (사용자)</text>
+<circle cx="34" cy="128" r="4" fill="#16a34a"/>
+<text x="44" y="132" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">로봇 접수</text>
+<circle cx="34" cy="154" r="4" fill="#16a34a"/>
+<text x="44" y="158" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">출발 전 검사 통과</text>
+<circle cx="34" cy="180" r="4" fill="#2563eb"/>
+<text x="44" y="184" font-size="9.5" fill="#2563eb" text-anchor="start" font-weight="normal">P1 이동 시작</text>
+<rect x="280" y="66" width="260" height="200" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="290" y="76" width="150" height="110" rx="3" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="360" y="106" width="20" height="50" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="296" y="92" font-size="9.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">P1 · 10:23 촬영</text>
+<text x="452" y="90" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">품질 분석</text>
+<text x="452" y="108" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">밝기 132 · 선명도 210</text>
+<text x="452" y="124" font-size="9.5" fill="#16a34a" text-anchor="start" font-weight="normal">→ 양호</text>
+<text x="452" y="148" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">사람 판정</text>
+<rect x="452" y="156" width="48" height="20" rx="3" fill="#dcfce7" stroke="#dcfce7" stroke-width="1"/>
+<text x="476" y="170" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="bold">정상</text>
+<rect x="504" y="156" width="48" height="20" rx="3" fill="#fee2e2" stroke="#fee2e2" stroke-width="1"/>
+<text x="528" y="170" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="bold">이상</text>
+<rect x="556" y="156" width="48" height="20" rx="3" fill="#ffedd5" stroke="#ffedd5" stroke-width="1"/>
+<text x="580" y="170" font-size="9.5" fill="#ea580c" text-anchor="middle" font-weight="bold">확인 불가</text>
+<rect x="452" y="184" width="148" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="458" y="198" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">의견 / 확인 불가 사유</text>
+<text x="290" y="206" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">판정 이력: user1 정상 (10:30)</text>
+<text x="452" y="248" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="bold">↺ 재점검 요청</text>
+<text x="290" y="234" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">P2 · 도착 전 (진행 중)</text>
+</g>
+<text x="1240" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
+<rect x="1530.0" y="452" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1576.0625" y="460.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="1576.0625" y="625.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1576.0625" y="458.95624999999995" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1575.01875" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1762.89375" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1658.51875" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1658.51875" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1576.0625" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1626.1625" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1658.51875" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1658.51875" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1659.5625" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1705.4875" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1744.10625" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1744.10625" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1601.1125" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1577.10625" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1624.075" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1674.175" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1718.0125" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1680.4375" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1713.8375" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1660.60625" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="1749.325" y="462.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="1577.10625" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<path d="M1596.9,610.3 L1642.9,612.4 L1695.0,612.4 L1695.0,585.2 L1686.7,535.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<circle cx="1686.7" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1686.7" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1686.7" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="1754.5" cy="483.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1754.54375" y="486.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1754.54375" y="473.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="1603.2" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1603.2" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1603.2" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="1596.9" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="1651.9,612.4 1638.1,616.0 1638.1,608.8" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="1530.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
+<text x="1244" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="1282" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">로봇이 위치(odom)·카메라 수신을 확인한 뒤 출발한다. 검사에 실패하면 지점마다</text>
+<text x="1282" y="685.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">&quot;확인 불가: 출발 전 검사 실패&quot;가 남는다.</text>
+<text x="1244" y="709.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="1282" y="709.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 로봇 쪽 목표 실행 노드가 주행 (서버는 목표 지점만 보냄)</text>
+<text x="1282" y="725.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 진행 단계가 작업 상세에 실시간 표시</text>
+<rect x="1240" y="734.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1246" y="749.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="1306" y="749.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">PREFLIGHT_OK · STARTED · MOVING(P1)</text>
+<rect x="33" y="807" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="804" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="30" y="804" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="30" y="828" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="44" y="826" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S3  P1 도착·촬영</text>
+<rect x="560" y="812" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="578.0" y="825" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="40" y="848" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(40,848) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/monitor</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<rect x="20" y="66" width="180" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">로봇: tb3-sim ▾</text>
+<rect x="20" y="96" width="320" height="182" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="196.0" y="168.8" width="38.4" height="72.8" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="180.0" y="118" font-size="10.5" fill="#e2e8f0" text-anchor="middle" font-weight="normal">실시간 영상 (MJPEG)</text>
+<rect x="350" y="96" width="190" height="104" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="360" y="116" font-size="10" fill="#16a34a" text-anchor="start" font-weight="normal">● 연결 정상</text>
+<text x="360" y="135" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">위치 x 0.52  y 0.10  θ 12°</text>
+<text x="360" y="154" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">odom 0.1s · scan 0.3s</text>
+<text x="360" y="173" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">camera 0.2s</text>
+<text x="360" y="192" font-size="10" fill="#ea580c" text-anchor="start" font-weight="normal">battery 미지원</text>
+<rect x="350" y="208" width="190" height="24" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="445.0" y="224.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">제어권 획득</text>
+<rect x="425" y="238" width="18" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="434" y="251" font-size="10" fill="#0f172a" text-anchor="middle" font-weight="normal">↑</text>
+<rect x="405" y="260" width="18" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="414" y="273" font-size="10" fill="#0f172a" text-anchor="middle" font-weight="normal">←</text>
+<rect x="425" y="260" width="18" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="434" y="273" font-size="10" fill="#0f172a" text-anchor="middle" font-weight="normal">■</text>
+<rect x="445" y="260" width="18" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="454" y="273" font-size="10" fill="#0f172a" text-anchor="middle" font-weight="normal">→</text>
+<text x="475" y="268" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">W A S D</text>
+<rect x="20" y="288" width="520" height="26" rx="3" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<text x="280.0" y="305.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">비상 정지</text>
+</g>
+<text x="40" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U1 관제·조종</text>
+<rect x="330.0" y="848" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="376.0625" y="856.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="376.0625" y="1021.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="376.0625" y="854.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="375.01875" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="562.89375" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="458.51875" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="458.51875" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="376.0625" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="426.1625" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="458.51875" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="458.51875" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="459.5625" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="505.4875" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="544.10625" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="544.10625" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="401.1125" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="377.10625" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="424.075" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="474.17499999999995" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="518.0125" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="480.4375" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="513.8375" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="460.60625000000005" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="549.325" y="858.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="377.10625" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<path d="M396.9,1006.3 L442.9,1008.4 L495.1,1008.4 L495.1,981.2 L486.7,931.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<circle cx="486.7" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="486.7" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="486.7" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="554.5" cy="879.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="554.54375" y="882.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="554.54375" y="869.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="403.2" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="403.2" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="403.2" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="396.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="477.7,924.9 491.5,921.3 491.5,928.5" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="330.0" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
+<text x="44" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="82" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">P1 에 도착해 소화기 쪽을 촬영한다. 사용자는 관제 화면에서 실시간 영상을 볼 수</text>
+<text x="82" y="1081.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">있다(점검 중에는 조종 불가).</text>
+<text x="44" y="1105.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="82" y="1105.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 도착 후 1.5초 정지 → 스냅샷 촬영</text>
+<text x="82" y="1121.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 사진은 먼저 로봇 서비스에 보관한 뒤 전송</text>
+<rect x="40" y="1130.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="46" y="1145.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="106" y="1145.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">ARRIVED · OBSERVATION_SAVED + 사진 · 품질 분석 &quot;양호&quot;</text>
+<rect x="633" y="807" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="630" y="804" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="630" y="804" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="630" y="828" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="644" y="826" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S4  P2: 우회 시도 후 진입 불가</text>
+<rect x="1138" y="812" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1167.0" y="825" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="1096" y="812" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1114.0" y="825" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="640" y="848" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(640,848) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/tasks/:id</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · 진행 중</text>
+<rect x="20" y="66" width="250" height="216" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="30" y="84" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="bold">진행 기록</text>
+<circle cx="34" cy="102" r="4" fill="#16a34a"/>
+<text x="44" y="106" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P1 촬영 저장</text>
+<circle cx="34" cy="128" r="4" fill="#16a34a"/>
+<text x="44" y="132" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P2 이동 시작 (C1 팔레트 우회)</text>
+<circle cx="34" cy="154" r="4" fill="#16a34a"/>
+<text x="44" y="158" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">C2 적재물 → 생산동 쪽 재계획</text>
+<circle cx="34" cy="180" r="4" fill="#16a34a"/>
+<text x="44" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">진입 불가: 경로 없음</text>
+<circle cx="34" cy="206" r="4" fill="#16a34a"/>
+<text x="44" y="210" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P2 확인 불가 저장</text>
+<circle cx="34" cy="232" r="4" fill="#2563eb"/>
+<text x="44" y="236" font-size="9.5" fill="#2563eb" text-anchor="start" font-weight="normal">P3 이동 시작</text>
+</g>
+<text x="640" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
+<rect x="930.0" y="848" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="976.0625" y="856.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="976.0625" y="1021.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="854.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="975.01875" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1162.89375" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1026.1625" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1059.5625" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1105.4875" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1001.1125" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="977.10625" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1024.075" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1074.175" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1118.0125" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1080.4375" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1113.8375" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1060.60625" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="1149.325" y="858.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="977.10625" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<rect x="1108.61875" y="1008.3875" width="10.4375" height="10.4375" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<text x="1121.8375" y="1016.60625" font-size="8.5" fill="#92400e" text-anchor="start" font-weight="bold">적재물</text>
+<rect x="1145.15" y="893.575" width="18.7875" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<text x="1146.54375" y="900.75" font-size="8.5" fill="#92400e" text-anchor="end" font-weight="bold">적재물</text>
+<path d="M1086.7,924.9 L1095.0,981.2 L1095.0,1004.2 L1113.8,1001.1 L1138.9,1008.4 L1154.5,1000.0 L1154.5,910.3" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M1154.5,910.3 L1134.7,920.7 L1134.7,881.0" fill="none" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<circle cx="1086.7" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="1086.7" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="1086.7" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="1154.5" cy="879.0" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<text x="1154.54375" y="882.4625" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
+<text x="1154.54375" y="869.9625" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="1003.2" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1003.2" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1003.2" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="996.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="1154.6,905.5 1158.1,919.3 1150.9,919.3" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="930.0" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
+<text x="644" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="682" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">C1 복도의 팔레트는 옆으로 비켜 지나간다(우회). C2 복도 위쪽이 적재물로 막혀</text>
+<text x="682" y="1081.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">생산동 쪽 경로도 다시 계산하지만, 비상구 앞으로 가는 길이 모두 막혀 있다.</text>
+<text x="644" y="1105.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="682" y="1105.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 일시 장애물은 기다리고, 돌아갈 수 있으면 우회 (로봇 측 Nav2)</text>
+<text x="682" y="1121.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 재계획·복구 동작을 다 써도 경로가 없을 때만 &quot;진입 불가: 경로 없음&quot;</text>
+<rect x="640" y="1130.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="646" y="1145.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="706" y="1145.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">ARRIVAL_BLOCKED · 확인 불가(사유 코드 BLOCKED_NO_PATH = 통로 막힘)</text>
+<rect x="1233" y="807" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="1230" y="804" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="1230" y="804" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="1230" y="828" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="1244" y="826" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S5  P3 촬영 → 재촬영 후보</text>
+<rect x="1738" y="812" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1767.0" y="825" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="1696" y="812" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1714.0" y="825" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="1240" y="848" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(1240,848) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/tasks/:id</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P3 분전반 앞 · 18:12 촬영</text>
+<rect x="20" y="66" width="300" height="200" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="185.0" y="146.0" width="36.0" height="80.0" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="170.0" y="88" font-size="10.5" fill="#e2e8f0" text-anchor="middle" font-weight="normal">어두운 사진</text>
+<text x="332" y="96" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">품질 분석</text>
+<text x="332" y="118" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">밝기 48 · 선명도 61</text>
+<text x="332" y="138" font-size="10" fill="#ea580c" text-anchor="start" font-weight="normal">→ 재촬영 후보</text>
+<text x="332" y="158" font-size="10" fill="#ea580c" text-anchor="start" font-weight="normal">(너무 어두움, 흐림)</text>
+</g>
+<text x="1240" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
+<rect x="1530.0" y="848" width="280.0" height="183.0" rx="4" fill="#0f172a" stroke="#0f172a" stroke-width="1"/>
+<text x="1542.0" y="870" font-size="10.5" fill="#93c5fd" text-anchor="start" font-weight="bold">analysis-service 작업 큐</text>
+<text x="1542.0" y="889" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">1. inspection 이 분석 요청</text>
+<text x="1542.0" y="908" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">2. 워커가 사진을 받아</text>
+<text x="1542.0" y="927" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">   ROI 밝기·선명도 계산</text>
+<text x="1542.0" y="946" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">3. 기준(A4) 밖 → RETAKE</text>
+<text x="1542.0" y="965" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">4. 결과를 작업 상세에 표시</text>
+<text x="1244" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="1282" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">분전반 앞 조명이 꺼져 사진이 어둡다. 분석 서비스가 관리자가 정한 기준(A4)</text>
+<text x="1282" y="1081.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">밖으로 판단해 &quot;재촬영 후보&quot;로 표시한다.</text>
+<text x="1244" y="1105.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="1282" y="1105.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 미션 완료: 촬영 2 · 확인 불가 1</text>
+<text x="1282" y="1121.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 분석은 배치로 처리, 결과는 원래 관측에 연결</text>
+<rect x="1240" y="1130.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1246" y="1145.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="1306" y="1145.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">COMPLETED · 분석 결과(밝기·선명도·판정·적용 기준)</text>
+<rect x="33" y="1203" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="1200" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="30" y="1200" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="30" y="1224" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="44" y="1222" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S6  담당자 판정</text>
+<rect x="428" y="1208" width="168" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="512.0" y="1221" font-size="10" fill="#0d9488" text-anchor="middle" font-weight="bold">사용자 (역할 1·2·3)</text>
+<rect x="40" y="1244" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(40,1244) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/tasks/:id</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="20" y="80" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P1 관측 판정</text>
+<rect x="20" y="90" width="250" height="170" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="157.5" y="158.0" width="30.0" height="68.0" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="145.0" y="112" font-size="10.5" fill="#e2e8f0" text-anchor="middle" font-weight="normal">P1 · 10:23 촬영</text>
+<text x="286" y="106" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">품질: 밝기 132 · 선명도 210</text>
+<rect x="286" y="118" width="76" height="26" rx="3" fill="#16a34a" stroke="#16a34a" stroke-width="1"/>
+<text x="324.0" y="135.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">정상</text>
+<rect x="368" y="118" width="76" height="26" rx="3" fill="#dc2626" stroke="#dc2626" stroke-width="1"/>
+<text x="406.0" y="135.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">이상</text>
+<rect x="450" y="118" width="90" height="26" rx="3" fill="#ea580c" stroke="#ea580c" stroke-width="1"/>
+<text x="495.0" y="135.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">확인 불가</text>
+<rect x="286" y="154" width="254" height="60" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="294" y="188.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">확인 불가 사유 (필수)</text>
+<rect x="286" y="224" width="254" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="413.0" y="242.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">판정 저장</text>
+<text x="286" y="278" font-size="10" fill="#94a3b8" text-anchor="start" font-weight="normal">판정은 덮어쓰지 않고 이력으로 쌓인다</text>
+</g>
+<text x="40" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4-1 관측 판정 입력</text>
+<rect x="330.0" y="1244" width="280.0" height="183.0" rx="4" fill="#0f172a" stroke="#0f172a" stroke-width="1"/>
+<text x="342.0" y="1266" font-size="10.5" fill="#93c5fd" text-anchor="start" font-weight="bold">판정 결과</text>
+<text x="342.0" y="1285" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">P1  정상</text>
+<text x="342.0" y="1304" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">P2  확인 불가</text>
+<text x="342.0" y="1323" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">    &quot;C2 복도 적재물, 통로 막힘&quot;</text>
+<text x="342.0" y="1342" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">P3  확인 불가</text>
+<text x="342.0" y="1361" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">    &quot;조명 꺼짐, 재촬영 필요&quot;</text>
+<text x="44" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="82" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">사용자가 사진과 품질 결과를 보고 지점별로 판정한다. 확인 불가는 사유를 반드시</text>
+<text x="82" y="1477.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">적는다.</text>
+<text x="44" y="1501.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="82" y="1501.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 판정은 덮어쓰지 않고 이력으로 쌓인다</text>
+<text x="82" y="1517.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 누가 언제 판정했는지 함께 남는다</text>
+<rect x="40" y="1526.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="46" y="1541.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="106" y="1541.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">REVIEWED × 3 · 판정 이력</text>
+<rect x="633" y="1203" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="630" y="1200" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="630" y="1200" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="630" y="1224" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="644" y="1222" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S7  모의 이상 신고 → 재점검 요청</text>
+<rect x="1138" y="1208" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1167.0" y="1221" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="964" y="1208" width="168" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1048.0" y="1221" font-size="10" fill="#0d9488" text-anchor="middle" font-weight="bold">사용자 (역할 1·2·3)</text>
+<rect x="640" y="1244" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(640,1244) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/tasks/:id</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · 완료</text>
+<rect x="20" y="70" width="520" height="54" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="32" y="90" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">모의 이상 신고 (야간 경비)</text>
+<text x="32" y="110" font-size="10" fill="#16a34a" text-anchor="start" font-weight="normal">분전반 부근에서 탄 냄새가 난다</text>
+<text x="20" y="150" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P3 분전반 앞 · 확인 불가 (조명 꺼짐)</text>
+<rect x="20" y="160" width="160" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="100.0" y="178.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">↺ 재점검 요청</text>
+<text x="20" y="218" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P2 비상구 앞 · 진입 불가 (통로 막힘)</text>
+<rect x="20" y="228" width="160" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="100.0" y="246.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">↺ 재점검 요청</text>
+</g>
+<text x="640" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
+<rect x="930.0" y="1244" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="976.0625" y="1252.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="976.0625" y="1417.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="1250.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="975.01875" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1162.89375" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="1414.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="1335.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="976.0625" y="1334.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1026.1625" y="1334.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="1293.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1058.51875" y="1252.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1059.5625" y="1388.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1105.4875" y="1388.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="1327.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1144.10625" y="1252.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1001.1125" y="1360.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="977.10625" y="1337.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1024.075" y="1276.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1074.175" y="1352.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1118.0125" y="1348.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1080.4375" y="1268.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1113.8375" y="1268.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1060.60625" y="1315.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="1149.325" y="1254.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="977.10625" y="1300.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<rect x="1145.15" y="1289.575" width="18.7875" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<text x="1146.54375" y="1296.75" font-size="8.5" fill="#92400e" text-anchor="end" font-weight="bold">적재물</text>
+<circle cx="1086.7" cy="1320.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="1086.7" y="1324.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="1086.7" y="1311.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="1154.5" cy="1275.0" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<text x="1154.54375" y="1278.4625" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
+<text x="1154.54375" y="1265.9625" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="1154.5" cy="1275.0" r="10" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="3 2"/>
+<circle cx="1003.2" cy="1306.3" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<text x="1003.2" y="1309.775" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
+<text x="1003.2" y="1297.275" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="1003.2" cy="1306.3" r="10" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="3 2"/>
+<circle cx="996.9" cy="1402.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="994.2,1306.3 1008.0,1302.7 1008.0,1309.9" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="930.0" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
+<text x="644" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="682" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">모의 이상 신고가 들어온다. 사용자가 조명을 켜게 한 뒤 P3 재점검을, 적재물을</text>
+<text x="682" y="1477.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">치운 뒤 P2 재점검을 요청한다.</text>
+<text x="644" y="1501.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="682" y="1501.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 재점검 작업 #22·#23 생성</text>
+<text x="682" y="1517.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 새 작업은 원래 관측(#57·#58)과 연결</text>
+<rect x="640" y="1526.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="646" y="1541.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="706" y="1541.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">REQUESTED (recheckOf = 원래 관측 ID)</text>
+<rect x="1233" y="1203" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="1230" y="1200" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="1230" y="1200" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="1230" y="1224" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="1244" y="1222" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S8  재점검 결과·이상 판정</text>
+<rect x="1760" y="1208" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1778.0" y="1221" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="1586" y="1208" width="168" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1670.0" y="1221" font-size="10" fill="#0d9488" text-anchor="middle" font-weight="bold">사용자 (역할 1·2·3)</text>
+<rect x="1240" y="1244" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(1240,1244) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/history</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
+<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
+<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">지점 이력</text>
+<rect x="20" y="66" width="200" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">지점: P3 분전반 앞 ▾</text>
+<text x="540" y="82" font-size="10" fill="#94a3b8" text-anchor="end" font-weight="normal">마지막 관측 2분 전</text>
+<rect x="20" y="102" width="122" height="92" rx="3" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="72" y="126" width="18" height="46" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="20" y="210" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">11/14 18:03</text>
+<text x="20" y="226" font-size="9.5" fill="#16a34a" text-anchor="start" font-weight="normal">정상</text>
+<rect x="152" y="102" width="122" height="92" rx="3" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="213" y="152" font-size="9.5" fill="#94a3b8" text-anchor="middle" font-weight="normal">(촬영 없음)</text>
+<text x="152" y="210" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">11/16 18:12</text>
+<text x="152" y="226" font-size="9.5" fill="#ea580c" text-anchor="start" font-weight="normal">확인 불가 (조명)</text>
+<rect x="284" y="102" width="122" height="92" rx="3" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="336" y="126" width="18" height="46" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
+<text x="284" y="210" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">11/16 18:31</text>
+<text x="284" y="226" font-size="9.5" fill="#dc2626" text-anchor="start" font-weight="normal">이상 · 재점검</text>
+<rect x="416" y="102" width="122" height="92" rx="3" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="477" y="152" font-size="9.5" fill="#94a3b8" text-anchor="middle" font-weight="normal">(촬영 없음)</text>
+<text x="416" y="210" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">-</text>
+<text x="416" y="226" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal"></text>
+<path d="M144,148 H280" fill="none" stroke="#ea580c" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<text x="213" y="142" font-size="9" fill="#ea580c" text-anchor="middle" font-weight="normal">재점검</text>
+</g>
+<text x="1240" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U5 지점 이력</text>
+<rect x="1530.0" y="1244" width="280.0" height="183.0" rx="4" fill="#0f172a" stroke="#0f172a" stroke-width="1"/>
+<text x="1542.0" y="1266" font-size="10.5" fill="#93c5fd" text-anchor="start" font-weight="bold">P3 판정: 이상</text>
+<text x="1542.0" y="1285" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">&quot;분전반 경고등 점등.</text>
+<text x="1542.0" y="1304" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal"> 전기 담당 확인 요청&quot;</text>
+<text x="1542.0" y="1323" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal"></text>
+<text x="1542.0" y="1342" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">P2 판정: 정상</text>
+<text x="1542.0" y="1361" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">&quot;적재물 치운 뒤 통로 확보&quot;</text>
+<text x="1244" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="1282" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">재촬영 사진은 품질 양호. 분전반 경고등 점등을 확인해 &quot;이상&quot;으로 판정하고 조치</text>
+<text x="1282" y="1477.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">의견을 남긴다. 지점 이력에서 확인 불가 → 재점검 → 결론 흐름이 이어진다.</text>
+<text x="1244" y="1501.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="1282" y="1501.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 같은 지점의 과거·현재 사진을 나란히 비교</text>
+<text x="1282" y="1517.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 재점검 관측은 원래 관측과 연결 표시</text>
+<rect x="1240" y="1526.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1246" y="1541.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="1306" y="1541.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">OBSERVATION_SAVED · REVIEWED (이상 + 의견)</text>
+<rect x="33" y="1599" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="30" y="1596" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="30" y="1596" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="30" y="1620" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="44" y="1618" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S9  admin 사후 확인</text>
+<rect x="505" y="1604" width="91" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="550.5" y="1617" font-size="10" fill="#7c3aed" text-anchor="middle" font-weight="bold">웹 admin</text>
+<rect x="40" y="1640" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(40,1640) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/admin/audit</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">사용자</text>
+<text x="61" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">로봇</text>
+<text x="99" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 지점</text>
+<text x="170" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">분석 기준</text>
+<text x="241" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">감사 로그</text>
+<text x="312" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">시스템</text>
+<rect x="20" y="66" width="120" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26" y="82" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">사용자</text>
+<rect x="148" y="66" width="100" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="154" y="82" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">동작 ▾</text>
+<rect x="450" y="66" width="90" height="24" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="495.0" y="82.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">새로고침</text>
+<rect x="20" y="102" width="520" height="142" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="20" y="102" width="520" height="22" rx="2" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26.0" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">시각</text>
+<text x="112.66666666666667" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">사용자</text>
+<text x="199.33333333333334" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">역할</text>
+<text x="286.0" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="372.6666666666667" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">대상</text>
+<text x="459.33333333333337" y="117" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">결과</text>
+<text x="26.0" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">10:21:03</text>
+<text x="112.66666666666667" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">admin</text>
+<text x="199.33333333333334" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">ADMIN</text>
+<text x="286.0" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">PATCH</text>
+<text x="372.6666666666667" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">/api/admin/users/3</text>
+<text x="459.33333333333337" y="140" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">200</text>
+<path d="M20,148 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">10:20:41</text>
+<text x="112.66666666666667" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">user1</text>
+<text x="199.33333333333334" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">USER</text>
+<text x="286.0" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">POST</text>
+<text x="372.6666666666667" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">/api/inspections</text>
+<text x="459.33333333333337" y="164" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">201</text>
+<path d="M20,172 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">10:19:12</text>
+<text x="112.66666666666667" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">mgr1</text>
+<text x="199.33333333333334" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">-</text>
+<text x="286.0" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">LOGIN_FAILED</text>
+<text x="372.6666666666667" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">/api/auth/login</text>
+<text x="459.33333333333337" y="188" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">401</text>
+<path d="M20,196 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">10:18:55</text>
+<text x="112.66666666666667" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">sup1</text>
+<text x="199.33333333333334" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">SUPERVISOR</text>
+<text x="286.0" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">POST</text>
+<text x="372.6666666666667" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">/api/robots/1/estop</text>
+<text x="459.33333333333337" y="212" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">200</text>
+<path d="M20,220 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">10:17:30</text>
+<text x="112.66666666666667" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">admin</text>
+<text x="199.33333333333334" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">ADMIN</text>
+<text x="286.0" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">POST</text>
+<text x="372.6666666666667" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">/api/admin/robots/1/…</text>
+<text x="459.33333333333337" y="236" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">200</text>
+</g>
+<text x="40" y="1836.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 A5 감사 로그</text>
+<g transform="translate(330.0,1640) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/admin/system</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">사용자</text>
+<text x="61" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">로봇</text>
+<text x="99" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 지점</text>
+<text x="170" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">분석 기준</text>
+<text x="241" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">감사 로그</text>
+<text x="312" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">시스템</text>
+<rect x="20" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">gateway</text>
+<text x="28" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="126" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="134" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">user-service</text>
+<text x="134" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="232" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="240" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">inspection</text>
+<text x="240" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="338" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="346" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">robot-service</text>
+<text x="346" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="444" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="452" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">analysis</text>
+<text x="452" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="20" y="146" width="520" height="46" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="20" y="146" width="520" height="22" rx="2" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">로봇</text>
+<text x="130.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">rosbridge</text>
+<text x="234.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">odom</text>
+<text x="338.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">scan</text>
+<text x="442.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">camera</text>
+<text x="26.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">tb3-sim</text>
+<text x="130.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">연결</text>
+<text x="234.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.1s</text>
+<text x="338.0" y="184" font-size="9.5" fill="#ea580c" text-anchor="start" font-weight="normal">2.4s 지연</text>
+<text x="442.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.2s</text>
+<text x="20" y="226" font-size="10" fill="#94a3b8" text-anchor="start" font-weight="normal">5초마다 자동 새로고침</text>
+</g>
+<text x="330.0" y="1836.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 A6 시스템 상태</text>
+<text x="44" y="1857.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="82" y="1857.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">웹 admin 이 감사 로그로 누가 무엇을 요청·판정했는지 보고, 시스템 상태로</text>
+<text x="82" y="1873.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">로봇 연결과 미전송 보고가 없는지 확인한다.</text>
+<text x="44" y="1897.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="82" y="1897.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 변경 요청과 로그인 기록 조회</text>
+<text x="82" y="1913.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 서비스 UP/DOWN, 토픽 갱신 지연 확인</text>
+<rect x="40" y="1922.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="46" y="1937.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="106" y="1937.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">(조회만) 감사 로그는 수정·삭제하지 않는다</text>
+<rect x="633" y="1599" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="630" y="1596" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+<rect x="630" y="1596" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<rect x="630" y="1620" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
+<text x="644" y="1618" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S10  예외: 서버 일시 중단</text>
+<rect x="1160" y="1604" width="36" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1178.0" y="1617" font-size="10" fill="#ea580c" text-anchor="middle" font-weight="bold">로봇</text>
+<rect x="1096" y="1604" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
+<text x="1125.0" y="1617" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
+<rect x="640" y="1640" width="280.0" height="183.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<g transform="translate(640,1640) scale(0.5)">
+<rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+<rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/admin/system</text>
+<circle cx="10" cy="10" r="4" fill="#f87171"/>
+<circle cx="22" cy="10" r="4" fill="#fbbf24"/>
+<circle cx="34" cy="10" r="4" fill="#4ade80"/>
+<rect x="0" y="20" width="560" height="26" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1"/>
+<text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">사용자</text>
+<text x="61" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">로봇</text>
+<text x="99" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 지점</text>
+<text x="170" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">분석 기준</text>
+<text x="241" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">감사 로그</text>
+<text x="312" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">시스템</text>
+<rect x="20" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="28" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">gateway</text>
+<text x="28" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="126" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="134" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">user-service</text>
+<text x="134" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="232" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="240" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">inspection</text>
+<text x="240" y="108" font-size="13" fill="#dc2626" text-anchor="start" font-weight="bold">DOWN</text>
+<rect x="338" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="346" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">robot-service</text>
+<text x="346" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="444" y="66" width="98" height="56" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+<text x="452" y="86" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">analysis</text>
+<text x="452" y="108" font-size="13" fill="#16a34a" text-anchor="start" font-weight="bold">UP</text>
+<rect x="20" y="146" width="520" height="46" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="20" y="146" width="520" height="22" rx="2" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">로봇</text>
+<text x="130.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">rosbridge</text>
+<text x="234.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">odom</text>
+<text x="338.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">scan</text>
+<text x="442.0" y="161" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">미전송 보고</text>
+<text x="26.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">tb3-sim</text>
+<text x="130.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">연결</text>
+<text x="234.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.1s</text>
+<text x="338.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.3s</text>
+<text x="442.0" y="184" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">3</text>
+</g>
+<text x="640" y="1836.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 A6 시스템 상태</text>
+<rect x="930.0" y="1640" width="280.0" height="183.0" rx="4" fill="#0f172a" stroke="#0f172a" stroke-width="1"/>
+<text x="942.0" y="1662" font-size="10.5" fill="#93c5fd" text-anchor="start" font-weight="bold">robot-service 보관함</text>
+<text x="942.0" y="1681" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">① ARRIVED       보관</text>
+<text x="942.0" y="1700" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">② 관측 + 사진    보관</text>
+<text x="942.0" y="1719" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">③ COMPLETED     보관</text>
+<text x="942.0" y="1738" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">→ 복구 후 순서대로 전송</text>
+<text x="942.0" y="1757" font-size="10.5" fill="#e2e8f0" text-anchor="start" font-weight="normal">→ 같은 보고는 한 번만 반영</text>
+<text x="644" y="1857.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="682" y="1857.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">점검 중 inspection-service 가 재시작된다. 로봇의 보고는</text>
+<text x="682" y="1873.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">robot-service 보관함에 쌓였다가 복구 후 순서대로 전송된다.</text>
+<text x="644" y="1897.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="682" y="1897.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 원격 조종 중 연결이 끊기면 로봇 측 워치독이 0.5초 안에 정지</text>
+<text x="682" y="1913.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· robot-service 가 재시작되면 진행 중 작업을 &quot;중단(상태 불명)&quot;으로 기록</text>
+<rect x="640" y="1922.0" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="646" y="1937.0" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="706" y="1937.0" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">보고 ID 로 중복 제거 · MISSION_INTERRUPTED (해당 시)</text>
+<rect x="1233" y="1599" width="580" height="372" rx="10" fill="#e2e8f0" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="1230" y="1596" width="580" height="372" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="6 4"/>
+<rect x="1230" y="1596" width="580" height="34" rx="10" fill="#94a3b8" stroke="#94a3b8" stroke-width="1"/>
+<rect x="1230" y="1620" width="580" height="10" rx="0" fill="#94a3b8" stroke="#94a3b8" stroke-width="1"/>
+<text x="1244" y="1618" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S11  후속 후보 (이번 범위 밖)</text>
+<text x="1244" y="1656" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
+<text x="1282" y="1656" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">모형 대응 장치(서보 투석기)는 필요성과 시험 결과에 따라 연결한다. PC 앱의</text>
+<text x="1282" y="1672" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">로컬 분석은 개선안에서 서버 배치 분석으로 옮겼다.</text>
+<text x="1244" y="1696" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
+<text x="1282" y="1696" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 20~22 투척 시험·결과 검토·방향 보정: 미채택</text>
+<text x="1282" y="1712" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 13 신고에 따른 작업 자동 전환: 정책 미정 → 지금은 담당자가 재점검 요청</text>
+<rect x="1240" y="1721" width="560" height="22" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+<text x="1246" y="1736" font-size="10" fill="#2563eb" text-anchor="start" font-weight="bold">남는 기록</text>
+<text x="1306" y="1736" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">채택 시 장면을 추가한다</text>
+</svg>

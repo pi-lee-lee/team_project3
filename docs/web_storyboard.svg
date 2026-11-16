@@ -532,7 +532,7 @@
 <text x="166" y="1910" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">http://sim:8080</text>
 <text x="60" y="1936" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">토픽 매핑</text>
 <rect x="160" y="1922" width="420" height="20" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
-<text x="166" y="1936" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">odom /odom · scan /scan · image /camera/image_raw</text>
+<text x="166" y="1936" font-size="10" fill="#0f172a" text-anchor="start" font-weight="normal">odom /odom · scan /scan · image /camera/image_raw · nav /inspection/bridge_status</text>
 <rect x="480" y="1950" width="100" height="22" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
 <text x="530.0" y="1965.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">저장·재연결</text>
 <text x="60" y="1994" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">제공 기능</text>
@@ -542,10 +542,10 @@
 <text x="216.0" y="1994" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">scan ✓</text>
 <rect x="252" y="1980" width="70" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
 <text x="287.0" y="1994" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">camera ✓</text>
-<rect x="330" y="1980" width="56" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
-<text x="358.0" y="1994" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">goal ✓</text>
-<rect x="394" y="1980" width="105" height="20" rx="10" fill="#fff" stroke="#dc2626" stroke-width="1"/>
-<text x="446.5" y="1994" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="normal">battery ✕ 미지원</text>
+<rect x="330" y="1980" width="49" height="20" rx="10" fill="#fff" stroke="#16a34a" stroke-width="1"/>
+<text x="354.5" y="1994" font-size="9.5" fill="#16a34a" text-anchor="middle" font-weight="normal">nav ✓</text>
+<rect x="387" y="1980" width="105" height="20" rx="10" fill="#fff" stroke="#dc2626" stroke-width="1"/>
+<text x="439.5" y="1994" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="normal">battery ✕ 미지원</text>
 <circle cx="54" cy="1784" r="8" fill="#dc2626"/>
 <text x="54" y="1788" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">1</text>
 <circle cx="434" cy="1796" r="8" fill="#dc2626"/>
@@ -633,24 +633,24 @@
 <text x="1411.7142857142858" y="1791" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">작업</text>
 <text x="966.0" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P1</text>
 <text x="1040.2857142857142" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">소화기 앞</text>
-<text x="1114.5714285714287" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">1.0</text>
-<text x="1188.857142857143" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.0</text>
-<text x="1263.142857142857" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0°</text>
+<text x="1114.5714285714287" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">4.3</text>
+<text x="1188.857142857143" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">3.9</text>
+<text x="1263.142857142857" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">180°</text>
 <text x="1337.4285714285716" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
 <text x="1411.7142857142858" y="1814" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
 <path d="M960,1822 H1480" fill="none" stroke="#e2e8f0" stroke-width="1"/>
 <text x="966.0" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P2</text>
 <text x="1040.2857142857142" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">비상구 앞</text>
-<text x="1114.5714285714287" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.0</text>
-<text x="1188.857142857143" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">1.0</text>
+<text x="1114.5714285714287" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">7.55</text>
+<text x="1188.857142857143" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">6.1</text>
 <text x="1263.142857142857" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">90°</text>
 <text x="1337.4285714285716" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
 <text x="1411.7142857142858" y="1838" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
 <path d="M960,1846 H1480" fill="none" stroke="#e2e8f0" stroke-width="1"/>
 <text x="966.0" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P3</text>
 <text x="1040.2857142857142" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">분전반 앞</text>
-<text x="1114.5714285714287" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">-1.0</text>
-<text x="1188.857142857143" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.0</text>
+<text x="1114.5714285714287" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">0.3</text>
+<text x="1188.857142857143" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">4.6</text>
 <text x="1263.142857142857" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">180°</text>
 <text x="1337.4285714285716" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
 <text x="1411.7142857142858" y="1862" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수정 · 비활성</text>
@@ -1111,11 +1111,11 @@
 <text x="68" y="3171.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">로봇: tb3-sim (연결됨) ▾</text>
 <text x="60" y="3192" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">점검 지점 (고른 순서대로 방문)</text>
 <rect x="60" y="3200" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-<text x="70" y="3216" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">① P1 소화기 앞  (1.0, 0.0)</text>
+<text x="70" y="3216" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">① P1 소화기 앞  (4.3, 3.9)</text>
 <rect x="60" y="3228" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-<text x="70" y="3244" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (0.0, 1.0)</text>
+<text x="70" y="3244" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (7.55, 6.1)</text>
 <rect x="60" y="3256" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
-<text x="70" y="3272" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">☐ P3 분전반 앞  (-1.0, 0.0)</text>
+<text x="70" y="3272" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">☐ P3 분전반 앞  (0.3, 4.6)</text>
 <rect x="60" y="3288" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
 <text x="68" y="3304.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">메모</text>
 <rect x="60" y="3322" width="520" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
