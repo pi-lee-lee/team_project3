@@ -16,7 +16,7 @@ C = {
     'dev': ('#3a3a3c', '#f2f2f7'),
     'gray': ('#8e8e93', '#ffffff'),
 }
-NET = {'edge': '#5856d6', 'backend': '#248a3d', 'robot': '#8944ab'}
+NET = {'front': '#0a84c7', 'edge': '#5856d6', 'backend': '#248a3d', 'robot': '#8944ab'}
 
 
 def text_width(s, mono=True, size=12):

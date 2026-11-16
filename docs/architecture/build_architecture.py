@@ -7,7 +7,7 @@
 - 왼쪽: db 컨테이너. 위아래 계층이 아니라, 각 서비스의 '저장 계층'에서 옆으로 붙는 저장소다(서비스마다 자기 DB).
 - 오른쪽: sim 컨테이너(로봇 시스템). robot-service 의 RosbridgeRobotAdapter 가
   WebSocket 으로 rosbridge(:9090)에, HttpClient 로 web_video_server(:8080)에 옆으로 붙는다.
-- 컨테이너 이름 옆 색 표시는 Docker 네트워크(edge · backend · robot)다.
+- 컨테이너 이름 옆 색 표시는 Docker 네트워크(front · edge · backend · robot)다.
 실행: python3 docs/architecture/build_architecture.py  →  docs/architecture/system_architecture.svg
 """
 from pathlib import Path
@@ -22,7 +22,7 @@ BUS = 1262                     # 게이트웨이 → 서비스 라우팅 선
 STRIP = 34                     # 컨테이너 안 계층 한 줄 높이
 HEAD = 62                      # 컨테이너 머리(이름 + 컨테이너·서비스 설명) 높이
 GREEN, PURPLE, BLUE = C['spring'][0], C['bridge'][0], C['ros'][0]
-LAYER_NAME = {'static': '정적 화면', 'proxy': 'API 프록시', 'stream': '영상 중계', 'ws': 'WebSocket',
+LAYER_NAME = {'cache': '화면 캐시', 'bypass': '캐시 우회', 'static': '정적 화면', 'proxy': 'API 프록시', 'stream': '영상 중계', 'ws': 'WebSocket',
               'web': '웹 계층', 'svc': '업무 계층', 'repo': '저장 계층', 'adapter': '연결 계층',
               'filter': '필터 체인', 'api': 'API', 'worker': '워커'}
 
@@ -76,7 +76,7 @@ def container(x, y, w, title, kind, networks, strips, sub=None, tag=None, extra=
 
 def build():
     S.text(24, 44, '화재 점검 로봇 서비스 — 시스템 아키텍처 (컨테이너 · MSA · Spring Boot 계층)', 24, 700)
-    S.text(24, 70, '굵은 실선 상자 = 컨테이너 · 가운데 = 요청이 지나는 길(브라우저 → nginx → 게이트웨이 → 서비스) · 왼쪽 = 서비스별 저장소(계층 아님) · '
+    S.text(24, 70, '굵은 실선 상자 = 컨테이너 · 가운데 = 요청이 지나는 길(브라우저 → cdn → web → 게이트웨이 → 서비스) · 왼쪽 = 서비스별 저장소(계층 아님) · '
                    '오른쪽 = 로봇 시스템(브리지로 수평 연결)', 13, 400, '#636366')
 
     # 브라우저(호스트 밖)
@@ -88,27 +88,39 @@ def build():
 
     host_idx = len(S.body)       # Docker 호스트 테두리는 높이를 안 뒤 이 자리에 넣는다
     S.text(30, 182, 'Docker Compose 호스트', 13, 700, '#636366')
-    S.text(30, 200, '실행 컨테이너 8 · 빌드 전용 2(common-build, frontend-build)', 11.5, 400, '#8e8e93')
+    S.text(30, 200, '실행 컨테이너 9 · 빌드 전용 2(common-build, frontend-build)', 11.5, 400, '#8e8e93')
 
-    # ------------------------------------------------------------ web (nginx)
-    wh, wys, _ = container(CX0, 210, CX1 - CX0, 'web', 'edge', ['edge'],
+    # ------------------------------------------------------------ cdn (엣지 캐시)
+    ch, _, _ = container(CX0, 210, CX1 - CX0, 'cdn', 'edge', ['front'],
+                         [('cache', ['location /', '→', 'web:80', 'proxy_cache', '/assets/* 1년 HIT',
+                                     ('text', 'index.html 은 보관 안 함 · X-Cache-Status')]),
+                          ('bypass', ['location /api/ · /ws/', '→', 'web:80', 'proxy_buffering off',
+                                      ('text', '사용자별 응답은 보관하지 않고 통과')])],
+                         sub='nginx:1.27 · listen 80 ← 호스트 :8080 · 실제 배포에서는 외부 CDN(CloudFront 등) 자리',
+                         tag='컨테이너 · 정문(CDN 엣지)')
+    WY = 210 + ch + 30
+    S.line([(860, 210 + ch), (860, WY)])
+    S.text(870, 210 + ch + 19, '원본 요청 — 보관본이 없거나 만료됐을 때만', 11.5, 600, '#636366', late=True)
+
+    # ------------------------------------------------------------ web (nginx, 원본)
+    wh, wys, _ = container(CX0, WY, CX1 - CX0, 'web', 'edge', ['front', 'edge'],
                            [('static', ['location /', '→', 'root /usr/share/nginx/html', 'try_files → /index.html',
-                                        ('text', '새로고침 대응')]),
+                                        'Cache-Control', 'gzip']),
                             ('proxy', ['location /api/', '→', 'gateway:8080', 'Host · X-Forwarded-For',
                                        'client_max_body_size 12m']),
                             ('stream', ['location ~ /api/robots/{id}/stream', '→', 'gateway', 'proxy_buffering off',
                                         'read_timeout 1h']),
                             ('ws', ['location /ws/', '→', 'gateway', 'Upgrade · Connection 헤더', 'read_timeout 1h'])],
-                           sub='nginx:1.27 · listen 80 ← 호스트 :8080 · 업무 로직 없음(정적 화면 + 프록시)',
-                           tag='컨테이너 · 정문')
+                           sub='nginx:1.27 · listen 80 · 업무 로직 없음(정적 화면 + 프록시) · 캐시 기간을 헤더로 지시',
+                           tag='컨테이너 · 원본 서버')
     fx = 40
-    S.rect(fx, 222, 290, 96, fill='#ffffff', stroke=C['edge'][0], sw=1.2, rx=12, dash='5 4')
-    S.text(fx + 14, 246, 'frontend-build', 14, 700, C['edge'][0])
-    S.text(fx + 14, 265, '빌드 전용 컨테이너 (node)', 11.5, 600, '#636366')
-    S.text(fx + 14, 283, 'npm run build → frontend/dist', 11.5, 400, '#3a3a3c', mono=True)
-    S.text(fx + 14, 301, 'web 이 dist 를 읽기 전용으로 마운트', 11.5, 400, '#636366')
+    S.rect(fx, WY + 12, 290, 96, fill='#ffffff', stroke=C['edge'][0], sw=1.2, rx=12, dash='5 4')
+    S.text(fx + 14, WY + 36, 'frontend-build', 14, 700, C['edge'][0])
+    S.text(fx + 14, WY + 55, '빌드 전용 컨테이너 (node)', 11.5, 600, '#636366')
+    S.text(fx + 14, WY + 73, 'npm run build → frontend/dist', 11.5, 400, '#3a3a3c', mono=True)
+    S.text(fx + 14, WY + 91, 'web 이 dist 를 읽기 전용으로 마운트', 11.5, 400, '#636366')
     S.line([(fx + 290, wys['static']), (CX0, wys['static'])], color=C['edge'][0], dash='5 4')
-    web_bottom = 210 + wh
+    web_bottom = WY + wh
 
     # ------------------------------------------------------------ Spring Boot 층
     top = web_bottom + 30

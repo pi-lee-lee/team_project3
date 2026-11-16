@@ -40,7 +40,7 @@ python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 �
 
 폴더는 아키텍처 계층 > 기술 > 컨테이너: `web/{nginx,spring,python,postgres}`, `ros/{sim,robot,maps}`. 코드는 이미지에 굽지 않고 볼륨으로 마운트해 실행한다(Spring 은 시작 시 `mvn package`, `common` 은 `common-build` 가 m2 볼륨에 설치).
 
-- **요청 경로**: 브라우저 → `web`(nginx: 정적 화면, `/api`·`/ws` 프록시) → `gateway`(Spring Cloud Gateway: HttpOnly 쿠키 JWT 검증·세션 확인·경로별 역할 정책·감사 기록, 규칙은 `application.yml`) → 각 서비스.
+- **요청 경로**: 브라우저 → `cdn`(nginx 캐시 프록시: CDN 엣지 역할, 외부 포트 8080, `/assets/*` 만 보관하고 `index.html`·`/api`·`/ws` 는 통과. 설정 `web/nginx/cdn.conf`, 응답 헤더 `X-Cache-Status` 로 확인, 비우기는 `--force-recreate cdn`) → `web`(nginx 원본 서버: 정적 화면 + `Cache-Control` 지시, `/api`·`/ws` 프록시) → `gateway`(Spring Cloud Gateway: HttpOnly 쿠키 JWT 검증·세션 확인·경로별 역할 정책·감사 기록, 규칙은 `application.yml`) → 각 서비스.
 - **서비스**: `user-service`(로그인·사용자·역할 0 ADMIN/1 관리자/2 매니저/3 사용자·감사 로그), `inspection-service`(점검 지점·작업·사건 기록·관측·판정·이력), `robot-service`(로봇 연결 계층), `analysis-service`(Python FastAPI: 관측 사진 품질 분석, PostgreSQL LISTEN/NOTIFY + SKIP LOCKED 작업 큐). DB 는 PostgreSQL 17 하나에 서비스별 DB, 스키마는 Flyway 마이그레이션.
 - **로봇 추상화**: `robot-service` 의 `RobotAdapter` 인터페이스(구현: `RosbridgeRobotAdapter`, `MockRobotAdapter`)가 시뮬레이션/실로봇 교체 지점이다. 웹은 Nav2 를 직접 모르고 **목표 단위 토픽 계약**만 쓴다: `/inspection/goal` → `/inspection/goal_status`(사유 코드 `BLOCKED_NO_PATH`·`NAV_FAILED`·`NO_PROGRESS`·`NAV_UNAVAILABLE`), `bridge_status`, `map_pose`, `map`, `scan_map`. 이 계약을 Nav2 로 옮기는 쪽이 `ros/robot/src/nav2_goal_bridge.py`(실로봇에도 같은 코드)이고, rosbridge(9090)로 연결된다.
 - **신뢰성**: 미션은 멱등, 결과는 outbox 에 보관 후 재전송, 조종은 제어권 임대 + `cmd_vel_watchdog.py`(0.5초 무명령 시 정지) + 비상 정지.
@@ -55,6 +55,6 @@ python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 �
 - 커밋·푸시는 사용자가 요청할 때만. 작업 브랜치는 `feat/msa-sim-stack`이고, main 에는 아직 올리지 않는다(PR·병합 금지).
 - `개선초안/` 은 사용자의 커밋하지 않은 폴더다. 커밋하거나 고치지 않는다.
 - 루트에는 `README.md`(보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더(`architecture/`, `guide/`, `plan/`, `storyboard/`)에 둔다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
-- `nginx.conf` 같은 단일 파일 바인드 마운트는 파일을 새로 쓰면 컨테이너가 옛 파일을 본다 → 해당 컨테이너를 `--force-recreate` 한다.
+- `nginx.conf`·`cdn.conf` 같은 단일 파일 바인드 마운트는 파일을 새로 쓰면 컨테이너가 옛 파일을 본다 → 해당 컨테이너를 `--force-recreate` 한다.
 - 화면을 다시 빌드한 뒤 결과가 안 바뀐 것처럼 보이면 먼저 브라우저 새로고침 여부를 확인한다.
 - 문서·주석·커밋 메시지는 한국어로 쓴다.

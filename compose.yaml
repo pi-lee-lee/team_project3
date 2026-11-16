@@ -4,7 +4,7 @@
 #   http://localhost:8080
 #
 # 폴더 구조 = 아키텍처 계층(web: 서버 쪽 / ros: 로봇 쪽) > 컨테이너(서비스)마다 폴더 하나
-#   web/nginx/             정문(nginx.conf) + React 화면(frontend/)
+#   web/nginx/             정문 cdn(cdn.conf) + 원본 서버 web(nginx.conf) + React 화면(frontend/)
 #   web/spring/<서비스>/   Spring 서비스: src + 빌드 파일 + Dockerfile — 서비스 하나가 독립적으로 빌드·구동된다
 #   web/spring/common/     서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 — common-build 가 m2 볼륨에 설치
 #   web/python/            Python 서비스(analysis-service) / web/postgres/ DB 초기화
@@ -12,11 +12,12 @@
 # 이미지에는 실행 환경만 있고, 코드는 각 폴더를 볼륨으로 연결해 구동한다. 코드를 고친 뒤:
 #   Spring 서비스 : docker compose restart <서비스>          (시작할 때 다시 빌드한다)
 #   common 변경   : docker compose run --rm common-build && docker compose restart gateway user-service inspection-service robot-service
-#   화면          : docker compose run --rm frontend-build   (nginx 는 그대로)
+#   화면          : docker compose run --rm frontend-build   (web·cdn 은 그대로 — index.html 은 캐시하지 않고, 나머지는 파일 이름이 바뀐다)
 #   분석·ROS      : docker compose restart analysis-service | sim
 #
 # 네트워크
-#   edge    : web(nginx) ↔ gateway            — 외부에 여는 포트는 web 의 8080 하나
+#   front   : cdn ↔ web                       — 외부에 여는 포트는 cdn 의 8080 하나
+#   edge    : web(nginx) ↔ gateway
 #   backend : gateway ↔ 서비스들 ↔ db
 #   robot   : robot-service ↔ sim(rosbridge)  — rosbridge 는 robot-service 만 접근
 name: tp3
@@ -148,18 +149,28 @@ services:
       - frontend_modules:/app/node_modules
     restart: "no"
 
-  web:                          # 정문: 화면 파일 제공 + /api·/ws 를 gateway 로 전달
+  web:                          # 원본 서버: 화면 파일 제공 + /api·/ws 를 gateway 로 전달 (밖에서는 cdn 을 거쳐서만 닿는다)
     image: nginx:1.27-alpine
     restart: unless-stopped
-    ports:
-      - "${WEB_PORT:-8080}:80"
     volumes:
       - ./web/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./web/nginx/frontend/dist:/usr/share/nginx/html:ro
-    networks: [edge]
+    networks: [front, edge]
     depends_on:
       frontend-build: { condition: service_completed_successfully }
       gateway: { condition: service_started }
+
+  cdn:                          # 정문(CDN 엣지 역할): 화면 파일을 보관해 두고 대신 내준다. /api·/ws 는 보관 없이 통과
+    image: nginx:1.27-alpine    # 보관본은 컨테이너 안에만 있다 → 비우려면 docker compose up -d --force-recreate cdn
+    restart: unless-stopped
+    mem_limit: 128m
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./web/nginx/cdn.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [front]
+    depends_on:
+      web: { condition: service_started }
 
   # ================================================================ ros (로봇 쪽)
   # TurtleBot3 시뮬레이션. Gazebo Classic 이 amd64 전용이라 Apple Silicon 에서는 에뮬레이션으로 실행된다.
@@ -182,6 +193,7 @@ services:
     networks: [robot]
 
 networks:
+  front:
   edge:
   backend:
   robot:

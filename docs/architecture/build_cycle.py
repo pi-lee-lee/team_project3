@@ -14,7 +14,7 @@ OUT = Path(__file__).resolve().parent / 'system_cycle.svg'
 
 LANES = [  # 키, 이름, 설명, 색
     ('b', '브라우저', 'React SPA', 'client'),
-    ('g', 'web · gateway', 'nginx · 인증 · 권한', 'edge'),
+    ('g', 'cdn · web · gateway', 'nginx · 인증 · 권한', 'edge'),
     ('u', 'user-service', '계정 · 세션 · 감사', 'spring'),
     ('i', 'inspection-service', '작업 · 사건 · 관측', 'spring'),
     ('a', 'analysis-service', 'Python 작업 큐', 'py'),
