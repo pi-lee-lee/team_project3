@@ -117,7 +117,7 @@
 <path d="M20,112 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
 <text x="26.0" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">P2</text>
 <text x="100.28571428571429" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">비상구 앞</text>
-<text x="174.57142857142858" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">7.55</text>
+<text x="174.57142857142858" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">7.65</text>
 <text x="248.8571428571429" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">6.1</text>
 <text x="323.14285714285717" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">90°</text>
 <text x="397.42857142857144" y="128" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">사용</text>
@@ -231,7 +231,7 @@
 <rect x="20" y="110" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
 <text x="30" y="126" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">① P1 소화기 앞  (4.3, 3.9)</text>
 <rect x="20" y="138" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-<text x="30" y="154" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (7.55, 6.1)</text>
+<text x="30" y="154" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (7.65, 6.1)</text>
 <rect x="20" y="166" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
 <text x="30" y="182" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">☐ P3 분전반 앞  (0.3, 4.6)</text>
 <rect x="20" y="198" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
@@ -241,42 +241,42 @@
 </g>
 <text x="640" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U2 점검 요청</text>
 <rect x="930.0" y="452" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="976.0625" y="460.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
-<rect x="976.0625" y="625.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="458.95624999999995" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="975.01875" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1162.89375" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1026.1625" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1059.5625" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1105.4875" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1001.1125" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="977.10625" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1024.075" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1074.175" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1118.0125" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1080.4375" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1113.8375" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1060.60625" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="973.975" y="460.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="973.975" y="625.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="458.95624999999995" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="972.93125" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1164.98125" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1024.075" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1057.475" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1103.4" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="999.025" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="975.0187500000001" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1021.9875000000001" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1072.0875" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1115.925" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1078.35" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1111.75" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1058.51875" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
 <rect x="1149.325" y="462.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
-<rect x="977.10625" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
-<circle cx="1086.7" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1086.7" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">1</text>
-<text x="1086.7" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
+<rect x="975.0187500000001" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<circle cx="1084.6" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1084.6125" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">1</text>
+<text x="1084.6125" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
 <circle cx="1154.5" cy="483.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
 <text x="1154.54375" y="486.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">2</text>
 <text x="1154.54375" y="473.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
-<circle cx="1003.2" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1003.2" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">3</text>
-<text x="1003.2" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
-<circle cx="996.9" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
-<polygon points="1005.9,610.3 992.1,613.9 992.1,606.7" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="1001.1" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1001.1125000000001" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold">3</text>
+<text x="1001.1125000000001" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="994.9" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="1003.9,610.3 990.0,613.9 990.0,606.7" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="930.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="644" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
 <text x="682" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">퇴근 전 정기 점검. 사용자가 로봇과 지점 순서(P1 → P2 → P3)를 골라</text>
@@ -342,43 +342,43 @@
 </g>
 <text x="1240" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
 <rect x="1530.0" y="452" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1576.0625" y="460.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
-<rect x="1576.0625" y="625.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1576.0625" y="458.95624999999995" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1575.01875" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1762.89375" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1658.51875" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1658.51875" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1576.0625" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1626.1625" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1658.51875" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1658.51875" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1659.5625" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1705.4875" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1744.10625" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1744.10625" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1601.1125" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1577.10625" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1624.075" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1674.175" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1718.0125" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1680.4375" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1713.8375" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1660.60625" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
-<rect x="1749.325" y="462.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
-<rect x="1577.10625" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
-<path d="M1596.9,610.3 L1642.9,612.4 L1695.0,612.4 L1695.0,585.2 L1686.7,535.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
-<circle cx="1686.7" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1686.7" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
-<text x="1686.7" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
+<rect x="1573.975" y="460.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="1573.975" y="625.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1573.975" y="458.95624999999995" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1572.9312499999999" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1764.9812499999998" y="460.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1656.4312499999999" y="622.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1656.4312499999999" y="543.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1573.975" y="542.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1624.0749999999998" y="542.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1656.4312499999999" y="501.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1656.4312499999999" y="460.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1657.475" y="596.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1703.3999999999999" y="596.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1742.01875" y="535.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1742.01875" y="460.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1599.0249999999999" y="568.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1575.01875" y="545.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1621.9875" y="484.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1672.0874999999999" y="560.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1715.925" y="556.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1678.35" y="476.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1711.75" y="476.70000000000005" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1658.51875" y="523.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="1749.3249999999998" y="462.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
+<rect x="1575.01875" y="508.01250000000005" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<path d="M1594.8,610.3 L1640.8,612.4 L1693.0,612.4 L1693.0,585.2 L1684.6,535.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<circle cx="1684.6" cy="528.9" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1684.6125" y="532.3875" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1684.6125" y="519.8875" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P1</text>
 <circle cx="1754.5" cy="483.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1754.54375" y="486.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
-<text x="1754.54375" y="473.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
-<circle cx="1603.2" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1603.2" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
-<text x="1603.2" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
-<circle cx="1596.9" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
-<polygon points="1651.9,612.4 1638.1,616.0 1638.1,608.8" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<text x="1754.5437499999998" y="486.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1754.5437499999998" y="473.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
+<circle cx="1601.1" cy="514.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1601.1125" y="517.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1601.1125" y="505.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="1594.8" cy="610.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="1649.8,612.4 1636.0,616.0 1636.0,608.8" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="1530.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="1244" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
 <text x="1282" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">로봇이 위치(odom)·카메라 수신을 확인한 뒤 출발한다. 검사에 실패하면 지점마다</text>
@@ -436,43 +436,43 @@
 </g>
 <text x="40" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U1 관제·조종</text>
 <rect x="330.0" y="848" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="376.0625" y="856.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
-<rect x="376.0625" y="1021.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="376.0625" y="854.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="375.01875" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="562.89375" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="458.51875" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="458.51875" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="376.0625" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="426.1625" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="458.51875" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="458.51875" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="459.5625" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="505.4875" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="544.10625" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="544.10625" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="401.1125" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="377.10625" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="424.075" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="474.17499999999995" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="518.0125" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="480.4375" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="513.8375" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="460.60625000000005" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="373.975" y="856.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="373.975" y="1021.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="373.975" y="854.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="372.93125000000003" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="564.98125" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="456.43125000000003" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="456.43125000000003" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="373.975" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="424.07500000000005" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="456.43125000000003" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="456.43125000000003" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="457.475" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="503.40000000000003" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="542.0187500000001" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="542.0187500000001" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="399.02500000000003" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="375.01875" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="421.9875" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="472.0875" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="515.925" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="478.35" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="511.75" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="458.51875000000007" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
 <rect x="549.325" y="858.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
-<rect x="377.10625" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
-<path d="M396.9,1006.3 L442.9,1008.4 L495.1,1008.4 L495.1,981.2 L486.7,931.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
-<circle cx="486.7" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
-<text x="486.7" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
-<text x="486.7" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<rect x="375.01875" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<path d="M394.9,1006.3 L440.8,1008.4 L493.0,1008.4 L493.0,981.2 L484.6,931.1" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<circle cx="484.6" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="484.6125" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="484.6125" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
 <circle cx="554.5" cy="879.0" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
 <text x="554.54375" y="882.4625" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
 <text x="554.54375" y="869.9625" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P2</text>
-<circle cx="403.2" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="403.2" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
-<text x="403.2" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
-<circle cx="396.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
-<polygon points="477.7,924.9 491.5,921.3 491.5,928.5" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="401.1" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="401.1125" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="401.1125" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="394.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="475.6,924.9 489.4,921.3 489.4,928.5" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="330.0" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="44" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
 <text x="82" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">P1 에 도착해 소화기 쪽을 촬영한다. 사용자는 관제 화면에서 실시간 영상을 볼 수</text>
@@ -523,47 +523,47 @@
 </g>
 <text x="640" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
 <rect x="930.0" y="848" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="976.0625" y="856.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
-<rect x="976.0625" y="1021.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="854.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="975.01875" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1162.89375" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1026.1625" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1059.5625" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1105.4875" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1001.1125" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="977.10625" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1024.075" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1074.175" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1118.0125" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1080.4375" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1113.8375" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1060.60625" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="973.975" y="856.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="973.975" y="1021.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="854.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="972.93125" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1164.98125" y="856.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="1018.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="939.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="938.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1024.075" y="938.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="897.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="856.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1057.475" y="992.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1103.4" y="992.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="931.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="856.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="999.025" y="964.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="975.0187500000001" y="941.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1021.9875000000001" y="880.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1072.0875" y="956.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1115.925" y="952.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1078.35" y="872.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1111.75" y="872.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1058.51875" y="919.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
 <rect x="1149.325" y="858.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
-<rect x="977.10625" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
-<rect x="1108.61875" y="1008.3875" width="10.4375" height="10.4375" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
-<text x="1121.8375" y="1016.60625" font-size="8.5" fill="#92400e" text-anchor="start" font-weight="bold">적재물</text>
-<rect x="1145.15" y="893.575" width="18.7875" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<rect x="975.0187500000001" y="904.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<rect x="1106.53125" y="1008.3875" width="10.4375" height="10.4375" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<text x="1119.75" y="1016.60625" font-size="8.5" fill="#92400e" text-anchor="start" font-weight="bold">적재물</text>
+<rect x="1143.0625" y="893.575" width="22.962500000000002" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
 <text x="1146.54375" y="900.75" font-size="8.5" fill="#92400e" text-anchor="end" font-weight="bold">적재물</text>
-<path d="M1086.7,924.9 L1095.0,981.2 L1095.0,1004.2 L1113.8,1001.1 L1138.9,1008.4 L1154.5,1000.0 L1154.5,910.3" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
-<path d="M1154.5,910.3 L1134.7,920.7 L1134.7,881.0" fill="none" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
-<circle cx="1086.7" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
-<text x="1086.7" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
-<text x="1086.7" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<path d="M1084.6,924.9 L1093.0,981.2 L1093.0,1004.2 L1111.8,1001.1 L1136.8,1008.4 L1154.5,1000.0 L1154.5,910.3" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#arr)"/>
+<path d="M1154.5,910.3 L1132.6,920.7 L1132.6,881.0" fill="none" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+<circle cx="1084.6" cy="924.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="1084.6125" y="928.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="1084.6125" y="915.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
 <circle cx="1154.5" cy="879.0" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
 <text x="1154.54375" y="882.4625" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
 <text x="1154.54375" y="869.9625" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P2</text>
-<circle cx="1003.2" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
-<text x="1003.2" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
-<text x="1003.2" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
-<circle cx="996.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
+<circle cx="1001.1" cy="910.3" r="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+<text x="1001.1125000000001" y="913.775" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="bold"></text>
+<text x="1001.1125000000001" y="901.275" font-size="9" fill="#475569" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="994.9" cy="1006.3" r="4" fill="none" stroke="#94a3b8"/>
 <polygon points="1154.6,905.5 1158.1,919.3 1150.9,919.3" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="930.0" y="1044.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="644" y="1065.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
@@ -712,46 +712,46 @@
 </g>
 <text x="640" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U4 작업 상세</text>
 <rect x="930.0" y="1244" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="976.0625" y="1252.0" width="187.875" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
-<rect x="976.0625" y="1417.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="1250.95625" width="187.875" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="975.01875" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1162.89375" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="1414.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="1335.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="976.0625" y="1334.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1026.1625" y="1334.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="1293.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1058.51875" y="1252.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1059.5625" y="1388.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1105.4875" y="1388.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="1327.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1144.10625" y="1252.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
-<rect x="1001.1125" y="1360.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="977.10625" y="1337.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1024.075" y="1276.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1074.175" y="1352.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1118.0125" y="1348.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1080.4375" y="1268.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1113.8375" y="1268.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
-<rect x="1060.60625" y="1315.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
+<rect x="973.975" y="1252.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
+<rect x="973.975" y="1417.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="1250.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="972.93125" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1164.98125" y="1252.0" width="2.0875" height="167.0" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="1414.825" width="2.0875" height="4.175000000000002" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="1335.5" width="2.0875" height="58.45" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="973.975" y="1334.45625" width="31.3125" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1024.075" y="1334.45625" width="33.4" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="1293.75" width="2.0875" height="41.75" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1056.43125" y="1252.0" width="2.0875" height="22.962500000000013" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1057.475" y="1388.73125" width="25.050000000000004" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1103.4" y="1388.73125" width="39.66249999999999" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="1327.15" width="2.0875" height="62.625" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="1142.01875" y="1252.0" width="2.0875" height="54.27500000000001" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
+<rect x="999.025" y="1360.55" width="33.4" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="975.0187500000001" y="1337.5875" width="10.4375" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1021.9875000000001" y="1276.00625" width="25.05" height="10.4375" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1072.0875" y="1352.2" width="25.05" height="16.7" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1115.925" y="1348.025" width="16.7" height="20.875" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1078.35" y="1268.7" width="12.525" height="41.75" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1111.75" y="1268.7" width="12.525" height="33.4" rx="0" fill="#cbd5e1" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="1058.51875" y="1315.66875" width="6.2625" height="10.4375" rx="0" fill="#cc1919" stroke="#cc1919" stroke-width="1"/>
 <rect x="1149.325" y="1254.0875" width="10.4375" height="4.175" rx="0" fill="#19b233" stroke="#19b233" stroke-width="1"/>
-<rect x="977.10625" y="1300.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
-<rect x="1145.15" y="1289.575" width="18.7875" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
+<rect x="975.0187500000001" y="1300.0125" width="6.2625" height="12.525" rx="0" fill="#e5cc19" stroke="#e5cc19" stroke-width="1"/>
+<rect x="1143.0625" y="1289.575" width="22.962500000000002" height="8.35" rx="0" fill="#92400e" stroke="#92400e" stroke-width="1"/>
 <text x="1146.54375" y="1296.75" font-size="8.5" fill="#92400e" text-anchor="end" font-weight="bold">적재물</text>
-<circle cx="1086.7" cy="1320.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
-<text x="1086.7" y="1324.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
-<text x="1086.7" y="1311.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
+<circle cx="1084.6" cy="1320.9" r="6" fill="#fff" stroke="#16a34a" stroke-width="2"/>
+<text x="1084.6125" y="1324.3875" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="bold">✓</text>
+<text x="1084.6125" y="1311.8875" font-size="9" fill="#16a34a" text-anchor="middle" font-weight="bold">P1</text>
 <circle cx="1154.5" cy="1275.0" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
 <text x="1154.54375" y="1278.4625" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
 <text x="1154.54375" y="1265.9625" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P2</text>
 <circle cx="1154.5" cy="1275.0" r="10" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="3 2"/>
-<circle cx="1003.2" cy="1306.3" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
-<text x="1003.2" y="1309.775" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
-<text x="1003.2" y="1297.275" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P3</text>
-<circle cx="1003.2" cy="1306.3" r="10" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="3 2"/>
-<circle cx="996.9" cy="1402.3" r="4" fill="none" stroke="#94a3b8"/>
-<polygon points="994.2,1306.3 1008.0,1302.7 1008.0,1309.9" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
+<circle cx="1001.1" cy="1306.3" r="6" fill="#fff" stroke="#dc2626" stroke-width="2"/>
+<text x="1001.1125000000001" y="1309.775" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="bold">✕</text>
+<text x="1001.1125000000001" y="1297.275" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="bold">P3</text>
+<circle cx="1001.1" cy="1306.3" r="10" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="3 2"/>
+<circle cx="994.9" cy="1402.3" r="4" fill="none" stroke="#94a3b8"/>
+<polygon points="992.1,1306.3 1005.9,1302.7 1005.9,1309.9" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="930.0" y="1440.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="644" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
 <text x="682" y="1461.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">모의 이상 신고가 들어온다. 사용자가 조명을 켜게 한 뒤 P3 재점검을, 적재물을</text>

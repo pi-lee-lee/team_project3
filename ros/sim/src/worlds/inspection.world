@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<!-- world_spec.py 로 생성. 직접 고치지 말고 world_spec.py 를 고친 뒤 다시 생성한다. -->
+<sdf version="1.6">
+  <world name="factory">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+    <scene><shadows>false</shadows><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
+    <physics type="ode"><max_step_size>0.004</max_step_size><real_time_update_rate>250</real_time_update_rate></physics>
+    <model name="outer_south_0">
+      <static>true</static>
+      <pose>3.600 -0.800 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>9.200 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>9.200 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="outer_north_0">
+      <static>true</static>
+      <pose>3.600 7.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>9.200 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>9.200 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="outer_west_0">
+      <static>true</static>
+      <pose>-1.000 3.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 8.000 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 8.000 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="outer_east_0">
+      <static>true</static>
+      <pose>8.200 3.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 8.000 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 8.000 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="office_east_0">
+      <static>true</static>
+      <pose>3.000 -0.700 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 0.200 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 0.200 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="office_east_1">
+      <static>true</static>
+      <pose>3.000 1.800 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 2.800 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 2.800 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="office_north_0">
+      <static>true</static>
+      <pose>-0.275 3.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.450 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.450 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="office_north_1">
+      <static>true</static>
+      <pose>2.225 3.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.550 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.550 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="elec_east_0">
+      <static>true</static>
+      <pose>3.000 4.200 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 2.000 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 2.000 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="elec_east_1">
+      <static>true</static>
+      <pose>3.000 6.650 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 1.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 1.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="c1_north_0">
+      <static>true</static>
+      <pose>3.600 0.600 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.200 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.200 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="c1_north_1">
+      <static>true</static>
+      <pose>6.150 0.600 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.900 0.100 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.900 0.100 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="hall_east_0">
+      <static>true</static>
+      <pose>7.100 2.100 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 3.000 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 3.000 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="hall_east_1">
+      <static>true</static>
+      <pose>7.100 5.900 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.100 2.600 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.100 2.600 0.600</size></box></geometry>
+          <material><ambient>0.78 0.78 0.8 1</ambient><diffuse>0.78 0.78 0.8 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="desk_island">
+      <static>true</static>
+      <pose>1.000 1.600 0.375 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.600 0.800 0.750</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.600 0.800 0.750</size></box></geometry>
+          <material><ambient>0.55 0.42 0.3 1</ambient><diffuse>0.55 0.42 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="office_cabinet">
+      <static>true</static>
+      <pose>-0.700 2.600 0.600 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.500 1.000 1.200</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.500 1.000 1.200</size></box></geometry>
+          <material><ambient>0.5 0.5 0.55 1</ambient><diffuse>0.5 0.5 0.55 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="elec_shelf">
+      <static>true</static>
+      <pose>1.900 5.800 0.750 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.200 0.500 1.500</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.200 0.500 1.500</size></box></geometry>
+          <material><ambient>0.5 0.5 0.55 1</ambient><diffuse>0.5 0.5 0.55 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="machine_1">
+      <static>true</static>
+      <pose>4.300 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.200 0.800 1.000</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.200 0.800 1.000</size></box></geometry>
+          <material><ambient>0.35 0.45 0.6 1</ambient><diffuse>0.35 0.45 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="machine_2">
+      <static>true</static>
+      <pose>6.200 2.100 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.800 1.000 1.000</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.800 1.000 1.000</size></box></geometry>
+          <material><ambient>0.35 0.45 0.6 1</ambient><diffuse>0.35 0.45 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_1">
+      <static>true</static>
+      <pose>4.300 5.400 0.800 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.600 2.000 1.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.600 2.000 1.600</size></box></geometry>
+          <material><ambient>0.6 0.5 0.3 1</ambient><diffuse>0.6 0.5 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_2">
+      <static>true</static>
+      <pose>5.900 5.600 0.800 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.600 1.600 1.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.600 1.600 1.600</size></box></geometry>
+          <material><ambient>0.6 0.5 0.3 1</ambient><diffuse>0.6 0.5 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="target_red">
+      <static>true</static>
+      <pose>3.200 3.900 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.300 0.500 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.300 0.500 0.600</size></box></geometry>
+          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="target_green">
+      <static>true</static>
+      <pose>7.650 7.000 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.500 0.200 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.500 0.200 0.600</size></box></geometry>
+          <material><ambient>0.1 0.7 0.2 1</ambient><diffuse>0.1 0.7 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="target_yellow">
+      <static>true</static>
+      <pose>-0.800 4.600 0.300 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.300 0.600 0.600</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.300 0.600 0.600</size></box></geometry>
+          <material><ambient>0.9 0.8 0.1 1</ambient><diffuse>0.9 0.8 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+  </world>
+</sdf>

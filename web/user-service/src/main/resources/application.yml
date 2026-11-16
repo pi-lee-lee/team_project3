@@ -1,0 +1,26 @@
+server:
+  port: 8081
+  error:
+    include-message: always
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://db:5432/userdb}
+    username: ${DB_USER:user_svc}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+app:
+  jwt-secret: ${JWT_SECRET}
+  token-ttl: ${TOKEN_TTL:8h}
+  cookie-secure: ${COOKIE_SECURE:false}
+  initial-admin:
+    login: ${INITIAL_ADMIN_LOGIN:admin}
+    password: ${INITIAL_ADMIN_PASSWORD:}
+  demo-users-password: ${DEMO_USERS_PASSWORD:}

@@ -1,0 +1,32 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  jwt-secret: ${JWT_SECRET}
+  services:
+    user: ${USER_SERVICE_URL:http://user-service:8081}
+    inspection: ${INSPECTION_SERVICE_URL:http://inspection-service:8082}
+    robot: ${ROBOT_SERVICE_URL:http://robot-service:8083}
+    analysis: ${ANALYSIS_SERVICE_URL:http://analysis-service:8084}
+
+# 경로별 접근 정책. 위에서부터 처음 맞는 규칙을 적용하고, 맞는 규칙이 없으면 거부한다.
+# 역할 1·2·3(SUPERVISOR·MANAGER·USER)의 세부 차이는 구현 단계에서 이 표에 줄을 추가해 정한다.
+gateway:
+  public-paths:
+    - /api/auth/login
+    - /api/auth/logout
+  rules:
+    - pattern: /api/admin/**
+      roles: [ADMIN]
+    - pattern: /api/**
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER]
+    - pattern: /ws/**
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER]
