@@ -27,7 +27,7 @@
 <circle cx="357.0" cy="282.0" r="5" fill="#2563eb"/>
 <circle cx="357.0" cy="158.0" r="16" fill="#0d9488"/>
 <text x="357.0" y="162.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">S1</text>
-<text x="357.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">점검 요청</text>
+<text x="357.0" y="188.0" font-size="9.5" fill="#475569" text-anchor="middle" font-weight="normal">점검 실행</text>
 <path d="M373.0,158.0 C435.5,158.0 435.5,344.0 496.0,344.0" fill="none" stroke="#64748b" stroke-width="1.4" marker-end="url(#arr)"/>
 <path d="M514.0,344.0 V282.0" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="3 3"/>
 <circle cx="514.0" cy="282.0" r="5" fill="#2563eb"/>
@@ -207,7 +207,7 @@
 <rect x="630" y="408" width="580" height="372" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
 <rect x="630" y="408" width="580" height="34" rx="10" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
 <rect x="630" y="432" width="580" height="10" rx="0" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
-<text x="644" y="430" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S1  점검 요청</text>
+<text x="644" y="430" font-size="14" fill="#fff" text-anchor="start" font-weight="bold">S1  점검 실행</text>
 <rect x="1138" y="416" width="58" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
 <text x="1167.0" y="429" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="bold">웹·서버</text>
 <rect x="964" y="416" width="168" height="18" rx="9" fill="#fff" stroke="#fff" stroke-width="1"/>
@@ -216,30 +216,40 @@
 <g transform="translate(640,452) scale(0.5)">
 <rect x="0" y="0" width="560" height="366" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
 <rect x="0" y="0" width="560" height="20" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
-<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/request</text>
+<text x="50" y="14" font-size="10" fill="#475569" text-anchor="start" font-weight="normal">localhost:8080/app/plans</text>
 <circle cx="10" cy="10" r="4" fill="#f87171"/>
 <circle cx="22" cy="10" r="4" fill="#fbbf24"/>
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
-<rect x="20" y="66" width="220" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
-<text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">로봇: tb3-sim (연결됨) ▾</text>
-<text x="20" y="102" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">점검 지점 (고른 순서대로 방문)</text>
-<rect x="20" y="110" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-<text x="30" y="126" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">① P1 소화기 앞  (4.3, 3.9)</text>
-<rect x="20" y="138" width="520" height="24" rx="3" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-<text x="30" y="154" font-size="10.5" fill="#2563eb" text-anchor="start" font-weight="normal">② P2 비상구 앞  (7.65, 6.1)</text>
-<rect x="20" y="166" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
-<text x="30" y="182" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">☐ P3 분전반 앞  (0.3, 4.6)</text>
-<rect x="20" y="198" width="520" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
-<text x="28" y="214.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">메모</text>
-<rect x="20" y="232" width="520" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
-<text x="280.0" y="250.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">점검 요청</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<rect x="20" y="66" width="42" height="24" rx="12" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="41.0" y="82" font-size="10" fill="#fff" text-anchor="middle" font-weight="normal">전체</text>
+<rect x="68" y="66" width="42" height="24" rx="12" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="89.0" y="82" font-size="10" fill="#475569" text-anchor="middle" font-weight="normal">예약</text>
+<rect x="116" y="66" width="42" height="24" rx="12" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="137.0" y="82" font-size="10" fill="#475569" text-anchor="middle" font-weight="normal">수동</text>
+<rect x="20" y="100" width="520" height="70" rx="2" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+<rect x="20" y="100" width="520" height="22" rx="2" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="26.0" y="115" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">점검</text>
+<text x="156.0" y="115" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">로봇 · 지점</text>
+<text x="286.0" y="115" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold">실행 방식</text>
+<text x="416.0" y="115" font-size="10" fill="#0f172a" text-anchor="start" font-weight="bold"></text>
+<text x="26.0" y="138" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">평일 아침 순회</text>
+<text x="156.0" y="138" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">tb3-sim · P1 → P3</text>
+<text x="286.0" y="138" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">월~금 09:00</text>
+<text x="416.0" y="138" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">실행</text>
+<path d="M20,146 H540" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+<text x="26.0" y="162" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">수동 점검</text>
+<text x="156.0" y="162" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">tb3-sim · P2</text>
+<text x="286.0" y="162" font-size="9.5" fill="#475569" text-anchor="start" font-weight="normal">실행할 때만</text>
+<text x="416.0" y="162" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">실행</text>
+<rect x="20" y="196" width="520" height="28" rx="3" fill="#2563eb" stroke="#2563eb" stroke-width="1"/>
+<text x="280.0" y="214.0" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">+ 새 점검</text>
 </g>
-<text x="640" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U2 점검 요청</text>
+<text x="640" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">화면 U2 점검</text>
 <rect x="930.0" y="452" width="280.0" height="183.0" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
 <rect x="973.975" y="460.0" width="192.04999999999998" height="167.0" rx="0" fill="#fff" stroke="#fff" stroke-width="1"/>
 <rect x="973.975" y="625.95625" width="192.04999999999998" height="2.0875" rx="0" fill="#475569" stroke="#475569" stroke-width="1"/>
@@ -279,8 +289,8 @@
 <polygon points="1003.9,610.3 990.0,613.9 990.0,606.7" fill="#2563eb" stroke="#1e3a8a" stroke-width="1"/>
 <text x="930.0" y="648.0" font-size="9.5" fill="#94a3b8" text-anchor="start" font-weight="normal">시설 지도 (왼쪽 아래 사무실·충전 위치, 위 전기실, 가운데 생산동, 아래 C1·오른쪽 C2 복도)</text>
 <text x="644" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">상황</text>
-<text x="682" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">퇴근 전 정기 점검. 사용자가 로봇과 지점 순서(P1 → P2 → P3)를 골라</text>
-<text x="682" y="685.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">점검을 요청한다.</text>
+<text x="682" y="669.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">퇴근 전 정기 점검. 사용자가 점검 계획(로봇, 지점 순서 P1 → P2 →</text>
+<text x="682" y="685.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="normal">P3)에서 실행을 누른다. 같은 계획에 시각을 정해 두면 그때 자동으로 실행된다.</text>
 <text x="644" y="709.0" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">동작</text>
 <text x="682" y="709.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 작업 #21 생성 → 로봇 서비스에 미션 전달</text>
 <text x="682" y="725.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">· 같은 작업 ID 는 다시 와도 한 번만 실행 (중복 명령 처리)</text>
@@ -306,9 +316,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · tb3-sim · 진행 중</text>
 <rect x="20" y="66" width="250" height="216" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
 <text x="30" y="84" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="bold">진행 기록</text>
@@ -406,9 +416,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <rect x="20" y="66" width="180" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
 <text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">로봇: tb3-sim ▾</text>
 <rect x="20" y="96" width="320" height="182" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
@@ -502,9 +512,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · 진행 중</text>
 <rect x="20" y="66" width="250" height="216" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
 <text x="30" y="84" font-size="10.5" fill="#0f172a" text-anchor="start" font-weight="bold">진행 기록</text>
@@ -594,9 +604,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P3 분전반 앞 · 18:12 촬영</text>
 <rect x="20" y="66" width="300" height="200" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
 <rect x="185.0" y="146.0" width="36.0" height="80.0" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
@@ -640,9 +650,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <text x="20" y="80" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">P1 관측 판정</text>
 <rect x="20" y="90" width="250" height="170" rx="4" fill="#1e293b" stroke="#1e293b" stroke-width="1"/>
 <rect x="157.5" y="158.0" width="30.0" height="68.0" rx="0" fill="#b91c1c" stroke="#b91c1c" stroke-width="1"/>
@@ -696,9 +706,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">지점 이력</text>
 <text x="20" y="56" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">작업 #21 · 완료</text>
 <rect x="20" y="70" width="520" height="54" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
 <text x="32" y="90" font-size="11" fill="#0f172a" text-anchor="start" font-weight="bold">모의 이상 신고 (야간 경비)</text>
@@ -781,9 +791,9 @@
 <circle cx="34" cy="10" r="4" fill="#4ade80"/>
 <rect x="0" y="20" width="560" height="26" rx="0" fill="#0d9488" stroke="#0d9488" stroke-width="1"/>
 <text x="12" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">관제</text>
-<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검 요청</text>
-<text x="121" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업 목록</text>
-<text x="192" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">지점 이력</text>
+<text x="50" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">점검</text>
+<text x="88" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="normal">작업</text>
+<text x="126" y="37" font-size="11" fill="#fff" text-anchor="start" font-weight="bold">지점 이력</text>
 <rect x="20" y="66" width="200" height="22" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
 <text x="28" y="81.0" font-size="10.5" fill="#475569" text-anchor="start" font-weight="normal">지점: P3 분전반 앞 ▾</text>
 <text x="540" y="82" font-size="10" fill="#94a3b8" text-anchor="end" font-weight="normal">마지막 관측 2분 전</text>

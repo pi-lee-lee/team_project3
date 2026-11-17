@@ -174,7 +174,7 @@
 <text x="734.0" y="693.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">변경 요청(POST·PUT·DELETE)은 끝난 뒤 감사 기록 /internal/audit</text>
 <circle cx="300" cy="809.0" r="4" fill="#248a3d"/>
 <path d="M300.0 809.0 L1146.0 809.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
-<text x="310.0" y="803.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">점검 요청 POST /api/inspections (지점 선택)</text>
+<text x="310.0" y="803.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">점검 실행 POST /api/inspections/schedules/{id}/run (점검 계획)</text>
 <circle cx="1148" cy="847.0" r="4" fill="#248a3d"/>
 <path d="M1148.0 847.0 L1570.0 847.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
 <text x="1158.0" y="841.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">로봇 확인 GET /internal/robots/{id} → 작업 저장 · 사건 REQUESTED</text>

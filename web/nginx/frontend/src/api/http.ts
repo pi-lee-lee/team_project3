@@ -84,7 +84,19 @@ export const httpApi: Api = {
   review: (id, result, comment) => post(`/api/observations/${id}/reviews`, { result, comment }),
   recheck: (id) => post(`/api/observations/${id}/recheck`),
 
+  schedules: () => get('/api/inspections/schedules'),
+  schedule: (id) => get(`/api/inspections/schedules/${id}`),
+  saveSchedule: (s, id) =>
+    id ? call('PUT', `/api/inspections/schedules/${id}`, s) : post('/api/inspections/schedules', s),
+  setScheduleEnabled: (id, enabled) => post(`/api/inspections/schedules/${id}/enabled`, { enabled }),
+  runSchedule: (id) => post(`/api/inspections/schedules/${id}/run`),
+  deleteSchedule: (id) => call('DELETE', `/api/inspections/schedules/${id}`),
+  pendingRuns: () => get('/api/inspections/schedules/pending'),
+  scheduleBacklog: () => get('/api/inspections/schedules/backlog'),
+  cancelPendingRun: (key) => call('DELETE', `/api/inspections/schedules/pending/${key}`),
+
   criteria: () => get('/api/admin/analysis/criteria'),
   saveCriteria: (c) => call('PUT', '/api/admin/analysis/criteria', c),
   system: () => get('/api/admin/system'),
+  serverTime: () => get('/api/time'),
 };

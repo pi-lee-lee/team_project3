@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { MapInfo, MapView, Point, RobotStatus } from '../../api/types';
 import { ErrorBox, useAction, useApi, useAuth, usePoll } from '../../util';
 import { Icon } from '../../Icon';
+import { Page, Picker, Segmented } from '../../ui';
+import { mapGeo } from '../../mapGeo';
+import './user.css';
 
 const CAP_LABEL: Record<string, [string, string]> = {
   VERIFIED: ['✓', 'ok'], SUPPORTED: ['토픽 있음', 'muted'], STALE: ['멈춤', 'warn-t'],
@@ -29,6 +32,7 @@ const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLInputElement || t instanceof HTMLSelectElement || t instanceof HTMLTextAreaElement;
 
 type Mode = 'camera' | 'map';
+const MODES: [Mode, string][] = [['camera', '카메라'], ['map', '지도']];
 
 /** U1 관제·조종: 카메라 모드(영상 + 방향키 조종) / 지도 모드(지도 위 위치·경로·라이다 + 클릭 이동) */
 export default function Monitor() {
@@ -51,18 +55,14 @@ export default function Monitor() {
   const acquire = () => act.run(async () => { await api.acquireControl(robotId!); await st.reload(); });
 
   return (
-    <section>
-      <div className="row between">
-        <h2>관제·조종</h2>
-        <div className="row">
-          <div className="tabs compact">
-            <button className={mode === 'camera' ? 'on' : ''} onClick={() => setMode('camera')}><Icon name="camera.fill" size={16} />카메라</button>
-            <button className={mode === 'map' ? 'on' : ''} onClick={() => setMode('map')}><Icon name="map.fill" size={16} />지도</button>
-          </div>
-          <select value={robotId ?? ''} onChange={(e) => setRobotId(Number(e.target.value))}>
-            {robots.data?.filter((r) => r.enabled).map((r) => <option key={r.robotId} value={r.robotId}>{r.code} · {r.name}</option>)}
-          </select>
-        </div>
+    <Page title="관제" width="wide">
+      <div className="row wrap monitor-bar">
+        <Segmented value={mode} options={MODES} onChange={setMode} />
+        {/* 로봇 고르기: 이름표 + 선택 상자. 높이·모양을 카메라/지도 세그먼트와 맞춘다 */}
+        <Picker label="로봇" icon="cpu" value={robotId} onChange={setRobotId}
+          options={(robots.data ?? []).filter((r) => r.enabled).map((r) => ({
+            value: r.robotId, label: `${r.code} · ${r.name}`, sub: r.connected ? (r.mission ? '작업 중' : '연결됨') : '연결 안 됨',
+          }))} />
       </div>
       <ErrorBox msg={act.error || st.error} />
       {robotId && (
@@ -85,14 +85,15 @@ export default function Monitor() {
                 ? <div className="muted small">방향키로 이동 (누르는 동안만). 제어권이 없으면 방향키를 누를 때 자동으로 요청합니다.</div>
                 : <div className="muted small">지도를 클릭해 목적지를 고른 뒤 "이 위치로 이동". 이동은 로봇의 Nav2 가 장애물을 피해 수행합니다.</div>}
             </div>
-          </div>
+            {/* 비상 정지는 옆 칸 맨 아래(PC·태블릿 가로에서는 영상 아래 끝과 맞춘다) */}
           <button className="danger estop" onClick={() => act.run(async () => { await api.estop(robotId); await st.reload(); })}>
-            <Icon name="exclamationmark.octagon.fill" size={22} />비상 정지
-          </button>
+              <Icon name="exclamationmark.octagon.fill" size={22} />비상 정지
+            </button>
+          </div>
         </div>
       )}
       <p className="muted">조종은 제어권을 가진 1명만 할 수 있고, 점검 작업 중에는 제어권을 얻을 수 없습니다. 연결이 끊기면 로봇이 0.5초 안에 멈춥니다.</p>
-    </section>
+    </Page>
   );
 }
 
@@ -187,19 +188,18 @@ function CameraView({ robotId, s, iHold, canAcquire, onAcquire }: {
     <div className="camera-view">
       <div className="video">
         {s?.connected ? <img src={api.streamUrl(robotId)} alt="실시간 영상" /> : <div className="novideo">영상 없음 (연결 끊김)</div>}
+        {/* 안내는 영상 위쪽, 방향키는 영상 안 아래 가운데에 반투명으로 겹쳐 영상을 가리지 않게 한다 */}
         <div className={`drive-hint ${iHold ? 'on' : ''}`}>
           <Icon name={iHold ? 'arrow.up' : 'hand.raised.fill'} size={14} />
           {iHold ? (active ? '이동 중' : '방향키 ↑↓ 전진·후진 · ←→ 회전 · Space 정지') : '방향키를 누르면 제어권을 요청합니다'}
         </div>
-      </div>
-      <div className="teleop row">
-        <div className="pad">
+        <div className={`pad pad-overlay ${iHold ? 'holding' : ''}`} aria-label="방향키">
           <span />{btn('ArrowUp', <Icon name="arrow.up" size={22} />)}<span />
-          {btn('ArrowLeft', <Icon name="arrow.counterclockwise" size={22} />)}<button onClick={stop}><Icon name="stop.fill" size={20} /></button>{btn('ArrowRight', <Icon name="arrow.clockwise" size={22} />)}
+          {btn('ArrowLeft', <Icon name="arrow.counterclockwise" size={22} />)}<button onClick={stop} aria-label="정지"><Icon name="stop.fill" size={20} /></button>{btn('ArrowRight', <Icon name="arrow.clockwise" size={22} />)}
           <span />{btn('ArrowDown', <Icon name="arrow.down" size={22} />)}<span />
         </div>
-        {msg && <div className="bad small">{msg}</div>}
       </div>
+      {msg && <div className="bad small teleop-msg">{msg}</div>}
     </div>
   );
 }
@@ -290,12 +290,11 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
   }, [m]);
 
   // 지도 좌표 ↔ 화면(CSS px) 좌표
-  const toPx = (x: number) => ((x - m!.originX) / m!.resolution) * cssScale;
-  const toPy = (y: number) => (m!.height - (y - m!.originY) / m!.resolution) * cssScale;
-  const toWorld = (cx: number, cy: number) => ({
-    x: m!.originX + (cx / cssScale) * m!.resolution,
-    y: m!.originY + (m!.height - cy / cssScale) * m!.resolution,
-  });
+  // 변환식은 mapGeo.ts 한 곳에 있다(점검 지점 지정 지도와 같은 식)
+  const geo = m ? mapGeo(m, cssScale) : null;
+  const toPx = (x: number) => geo!.toPx(x);
+  const toPy = (y: number) => geo!.toPy(y);
+  const toWorld = (cx: number, cy: number) => geo!.toWorld(cx, cy);
 
   // 그리기
   useEffect(() => {

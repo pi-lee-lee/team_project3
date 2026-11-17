@@ -1,0 +1,70 @@
+/* 사용자 영역 화면(작업·관측·지점 이력·관제) 전용 스타일. 공통 부품은 styles.css 의 "공통 화면 부품". */
+
+/* 목록 칸 제목 옆 작은 꼬리표(예약·재점검) */
+.tag-sm { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 6px; background: var(--fill); color: var(--label2); vertical-align: 1px; }
+
+/* 누를 수 없는 상태의 칸(예: 이미 끝난 작업의 취소) */
+.cell.is-disabled { opacity: .4; cursor: default; }
+
+/* 진행 기록 칸 앞의 출처 점 */
+.ev-dot { flex: none; width: 10px; height: 10px; border-radius: 5px; background: var(--green); }
+.ev-dot.src-USER { background: var(--blue); }
+.ev-dot.src-SYSTEM { background: var(--label3); }
+
+/* 관측 사진 */
+.photo-link { display: block; margin: 0 0 22px; }
+.photo-empty { aspect-ratio: 4 / 3; margin: 0 0 22px; }
+.thumb-sm.ph { font-size: 11px; }
+
+/* 판정 고르기는 칸 하나를 꽉 채운다 */
+.cell .segmented.full { width: 100%; }
+
+/* 스마트폰에서 아래쪽 고정 동작 버튼에 내용이 가리지 않게 */
+@media (max-width: 743px) { .has-action-bar { padding-bottom: 72px; } }
+
+/* 관제: 좁은 화면에서 격자가 넘치지 않게 (main.tsx 가 styles.css 를 나중에 불러오므로 선택자를 한 단계 높인다) */
+.page .monitor { grid-template-columns: minmax(0, 1fr) 320px; }
+@media (max-width: 1000px) { .page .monitor { grid-template-columns: minmax(0, 1fr); } }
+.monitor-bar { margin: 0 0 14px; }
+.monitor-bar .segmented { margin: 0; }
+.monitor-bar select { max-width: 100%; min-width: 0; }
+.camera-view, .map-view { min-width: 0; }
+
+/* 관제 카메라 모드: 방향키를 영상 안 아래 가운데에 반투명(유리 질감)으로 겹친다 */
+.page .monitor .video .drive-hint { top: 12px; bottom: auto; max-width: calc(100% - 24px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page .monitor .video .pad-overlay {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 2;
+  display: grid; grid-template-columns: repeat(3, 52px); gap: 6px; pointer-events: none;
+}
+.page .monitor .video .pad-overlay span { pointer-events: none; }
+.page .monitor .video .pad-overlay button {
+  pointer-events: auto; height: 46px; padding: 0; border-radius: 14px; touch-action: none;
+  color: rgba(255, 255, 255, .95); background: rgba(0, 0, 0, .28);
+  border: 0.5px solid rgba(255, 255, 255, .22);
+  backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+  opacity: .78; transition: opacity .15s, background .15s;
+}
+.page .monitor .video:hover .pad-overlay button, .page .monitor .video .pad-overlay.holding button { opacity: .95; }
+.page .monitor .video .pad-overlay button:hover { background: rgba(0, 0, 0, .4); }
+.page .monitor .video .pad-overlay button.pressed { background: color-mix(in srgb, var(--blue) 75%, transparent); opacity: 1; }
+.teleop-msg { margin-top: 8px; }
+@media (max-width: 743px) {
+  .page .monitor .video .pad-overlay { grid-template-columns: repeat(3, 44px); gap: 5px; bottom: 8px; }
+  .page .monitor .video .pad-overlay button { height: 38px; border-radius: 12px; }
+  .page .monitor .video .drive-hint { top: 8px; font-size: 12px; padding: 4px 10px; }
+}
+
+/* 관제 상단 줄: 카메라/지도 세그먼트와 로봇 고르기(Picker)를 같은 높이(36px)·같은 모양으로 */
+.monitor-bar { gap: 12px; align-items: center; }
+.monitor-bar .segmented button { height: 32px; padding: 0 18px; font-size: 14px; }
+@media (max-width: 743px) {
+  .monitor-bar .segmented { flex: 1 1 100%; }
+  .monitor-bar .segmented button { flex: 1; }
+  .monitor-bar .picker { flex: 1 1 100%; }
+  .monitor-bar .picker-btn { min-width: 0; }
+}
+
+/* 진행 기록 제목 옆 출처 꼬리표 */
+.ev-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cell.rich .thumb-sm { margin-top: 2px; }
+.thumb .meta-line { margin-top: 2px; }

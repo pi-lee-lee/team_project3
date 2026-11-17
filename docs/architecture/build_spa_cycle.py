@@ -65,7 +65,7 @@ SECTIONS = [
         ('u', 'p', '로그인 폼 입력: onChange → setState → 다시 렌더(글자마다)'),
         ('p', 'g', 'submit → useAction.run: api.login POST /api/auth/login {loginId, password} — 요청 중에는 버튼 비활성(busy)'),
         ('g', 'r', '200 + Set-Cookie(HttpOnly) · 본문 Me → setMe(AuthContext) → navigate(홈) → D2 처럼 화면만 바뀐다'),
-        ('p', 'g', '그 밖의 변경(점검 요청 · 판정 · 취소): POST → 성공하면 reload() 나 navigate, 실패하면 ErrorBox'),
+        ('p', 'g', '그 밖의 변경(점검 실행 · 판정 · 취소): POST → 성공하면 reload() 나 navigate, 실패하면 ErrorBox'),
     ]),
     ('F', '실시간 화면(관제) — React 렌더를 거치지 않는 통로', '영상 · 조종 · 지도는 state 로 다시 그리기에는 너무 빠르다. 브라우저 기능을 직접 쓴다', 'ros', [
         ('p', 'g', '폴링: 로봇 상태 1초 · 지도 위치(mapview) 0.2초 · 지도 정보 10초 — 화면을 떠나면 모두 멈춘다'),

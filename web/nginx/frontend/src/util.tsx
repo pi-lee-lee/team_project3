@@ -38,8 +38,10 @@ export function fmtTime(v: string | number | null | undefined, withDate = true) 
   if (v === null || v === undefined) return '-';
   const d = new Date(v);
   if (isNaN(d.getTime())) return String(v);
-  const t = d.toLocaleTimeString('ko-KR', { hour12: false });
-  return withDate ? `${d.getMonth() + 1}/${d.getDate()} ${t}` : t;
+  const p2 = (n: number) => String(n).padStart(2, '0');
+  const hm = `${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  // 날짜가 있으면 "11/18 09:00", 시각만이면 초까지 "09:00:05"(진행 기록처럼 촘촘한 사건용)
+  return withDate ? `${d.getMonth() + 1}/${d.getDate()} ${hm}` : `${hm}:${p2(d.getSeconds())}`;
 }
 
 export function ago(v: string | number | null | undefined) {

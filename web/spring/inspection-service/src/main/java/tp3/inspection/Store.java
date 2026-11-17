@@ -49,11 +49,13 @@ public class Store {
     }
 
     // ------------------------------------------------------------- 작업
-    public long insertTask(long robotId, String robotCode, long userId, String login, String note, Long recheckOf) {
+    public long insertTask(long robotId, String robotCode, long userId, String login, String note, Long recheckOf,
+                           Long scheduleId) {
         return jdbc.sql("""
-                        INSERT INTO inspection_task (robot_id, robot_code, requested_by, requester_login, note, recheck_of)
-                        VALUES (?, ?, ?, ?, ?, ?) RETURNING task_id""")
-                .params(robotId, robotCode, userId, login, note, recheckOf).query(Long.class).single();
+                        INSERT INTO inspection_task (robot_id, robot_code, requested_by, requester_login, note, recheck_of,
+                                                     schedule_id)
+                        VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING task_id""")
+                .params(robotId, robotCode, userId, login, note, recheckOf, scheduleId).query(Long.class).single();
     }
 
     public void insertTaskPoint(long taskId, int seq, long pointId) {
@@ -87,7 +89,7 @@ public class Store {
             where += " AND t.requested_by = " + userId.longValue();
         }
         return jdbc.sql("""
-                        SELECT t.task_id, t.robot_id, t.robot_code, t.requester_login, t.note, t.recheck_of, t.status,
+                        SELECT t.task_id, t.robot_id, t.robot_code, t.requester_login, t.note, t.recheck_of, t.schedule_id, t.status,
                                t.status_reason, t.created_at, t.updated_at,
                                (SELECT string_agg(p.code, ', ' ORDER BY tp.seq) FROM task_point tp
                                   JOIN inspection_point p USING (point_id) WHERE tp.task_id = t.task_id) AS points,

@@ -24,3 +24,4 @@ app:
   photo-dir: ${PHOTO_DIR:/data/photos}
   robot-url: ${ROBOT_SERVICE_URL:http://robot-service:8083}
   analysis-url: ${ANALYSIS_SERVICE_URL:http://analysis-service:8084}
+  schedule-zone: ${SCHEDULE_ZONE:Asia/Seoul}   # 예약 점검 시각 해석 기준

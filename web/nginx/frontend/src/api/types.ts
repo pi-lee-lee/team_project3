@@ -81,6 +81,7 @@ export interface TaskRow {
   requester_login: string;
   note: string | null;
   recheck_of: number | null;
+  schedule_id?: number | null;
   status: TaskStatus;
   status_reason: string | null;
   created_at: string | number;
@@ -147,6 +148,102 @@ export interface MapView {
   mission: { missionId: number; currentPointId: number | null } | null;
 }
 
+export type ScheduleKind = 'MANUAL' | 'ONCE' | 'INTERVAL' | 'DAILY' | 'WEEKLY';
+export type ScheduleOutcome = 'CREATED' | 'SKIPPED_BUSY' | 'SKIPPED_OFFLINE' | 'MISSED' | 'FAILED' | 'CANCELLED';
+
+/** 실행 버퍼에서 기다리는(지연된) 예약 회차 */
+export interface PendingRun {
+  key: number;
+  scheduleId: number;
+  name: string;
+  points: string | null;
+  robotId: number;
+  plannedAt: string;
+  queuedAt: string;
+  delaySec: number;
+  waitReason: string | null;
+  manualBy: string | null;
+}
+
+/** 예약 점검. 시각 문자열은 서버의 예약 기준 시간대(기본 Asia/Seoul)로 해석한다. */
+export interface Schedule {
+  schedule_id: number;
+  name: string;
+  robot_id: number;
+  point_ids: number[];
+  points: string | null;
+  note: string | null;
+  kind: ScheduleKind;
+  run_at: string | number | null;
+  run_at_local: string | null;     // 'YYYY-MM-DDTHH:mm'
+  interval_minutes: number | null;
+  time_of_day: string | null;      // 'HH:mm'
+  days_of_week: number[] | null;   // 1=월 … 7=일
+  window_start: string | null;
+  window_end: string | null;
+  enabled: boolean;
+  next_run_at: string | number | null;
+  created_by: number;
+  creator_login: string;
+  last_outcome: ScheduleOutcome | null;
+  last_ran_at: string | number | null;
+  last_task_id: number | null;
+  last_reason: string | null;
+  last_delay_sec: number | null;
+  runs?: ScheduleRun[];
+}
+
+/** 로봇별 밀린 예약: 지금 하는 작업 + 실행 버퍼에 쌓인 회차(실행 순서) */
+export interface Backlog {
+  total: number;
+  robots: {
+    robotId: number;
+    robotCode: string | null;
+    waitReason: string | null;
+    count: number;
+    maxDelaySec: number;
+    current: {
+      taskId: number;
+      status?: TaskStatus;
+      requester?: string;
+      note?: string | null;
+      scheduleId?: number | null;
+      createdAt?: string | null;
+      points?: string;
+      currentPoint?: string | null;
+      progress?: string | null;
+      elapsedSec?: number | null;
+    } | null;
+    queue: (PendingRun & { order: number })[];
+  }[];
+}
+
+export interface ScheduleRun {
+  run_id: number;
+  planned_at: string | number;
+  ran_at: string | number;
+  outcome: ScheduleOutcome;
+  task_id: number | null;
+  task_status: TaskStatus | null;
+  reason: string | null;
+  delay_sec: number | null;
+}
+
+export interface ScheduleInput {
+  name: string;
+  robotId: number;
+  pointIds: number[];
+  note: string;
+  kind: ScheduleKind;
+  runAt?: string | null;
+  intervalMinutes?: number | null;
+  timeOfDay?: string | null;
+  daysOfWeek?: number[];
+  windowStart?: string | null;
+  windowEnd?: string | null;
+  enabled: boolean;
+}
+
 export interface Criteria { minBrightness: number; maxBrightness: number; minSharpness: number; roi: number[] }
 
 export interface SystemStatus {
@@ -197,8 +294,20 @@ export interface Api {
   imageUrl(observationId: number): string;
   review(observationId: number, result: string, comment: string): Promise<Observation>;
   recheck(observationId: number): Promise<TaskDetail>;
+  // 예약 점검
+  schedules(): Promise<{ zone: string; schedules: Schedule[] }>;
+  schedule(id: number): Promise<Schedule>;
+  saveSchedule(s: ScheduleInput, id?: number): Promise<Schedule>;
+  setScheduleEnabled(id: number, enabled: boolean): Promise<Schedule>;
+  runSchedule(id: number): Promise<{ outcome: ScheduleOutcome | 'QUEUED'; taskId: number | null; reason: string | null }>;
+  pendingRuns(): Promise<PendingRun[]>;
+  scheduleBacklog(): Promise<Backlog>;
+  cancelPendingRun(key: number): Promise<void>;
+  deleteSchedule(id: number): Promise<void>;
   // A4 분석 · A6 시스템
   criteria(): Promise<Criteria>;
   saveCriteria(c: Criteria): Promise<Criteria>;
   system(): Promise<SystemStatus>;
+  // 서버 시간(게이트웨이)
+  serverTime(): Promise<{ epochMs: number; zone: string; offset: string; local: string }>;
 }

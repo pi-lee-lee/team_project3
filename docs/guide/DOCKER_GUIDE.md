@@ -104,7 +104,7 @@ docker compose ps
 | --- | --- |
 | 서비스 상태 | admin 로그인 → 상단 "시스템" 메뉴: 모든 서비스 UP, tb3-sim 연결 |
 | 로봇 영상·조종 | 시험 계정(user1 등) 로그인 → "관제" |
-| 점검 흐름 | "점검 요청"에서 지점 선택 → 작업 상세에서 이동·촬영·판정 |
+| 점검 흐름 | "점검"에서 새 점검(로봇·지점 순서) → 저장하고 실행 → 작업 상세에서 이동·촬영 → 관측 화면에서 판정 |
 | 자동 시험 | 아래 명령 (Python 3 필요) |
 
 ```bash
@@ -199,5 +199,5 @@ docker compose up -d --scale sim=0
 | 로그인 안 됨 | `.env` 비밀번호는 DB 를 처음 만들 때만 적용된다. 9절 초기화 또는 관리자 화면에서 변경 |
 | 관제 화면에 영상이 안 나옴 | `docker compose ps sim` 이 healthy 인지 확인(healthy = 위치·카메라 영상 모두 발행 중). 아니면 `docker compose logs sim` 에서 `Xvfb` 오류 확인 후 `docker compose up -d --force-recreate sim` |
 | 로봇이 "연결 안 됨" | `docker compose ps sim` 이 healthy 인지, `docker compose logs sim` 에 `Managed nodes are active` 가 있는지 확인 |
-| 점검 요청이 "주행 시스템 준비 안 됨" | 시뮬레이터 시작 후 1~2분 더 기다린다 (Nav2·위치 추정 준비) |
+| 점검 실행이 "주행 시스템 준비 안 됨" | 시뮬레이터 시작 후 1~2분 더 기다린다 (Nav2·위치 추정 준비) |
 | 작업이 "진입 불가"로 끝남 | 장애물을 놓아 두었는지 확인: `docker compose exec sim /sim/tools/obstacle.sh clear` |

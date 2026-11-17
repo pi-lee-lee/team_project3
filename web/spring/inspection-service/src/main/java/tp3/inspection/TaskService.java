@@ -42,6 +42,12 @@ public class TaskService {
 
     // ------------------------------------------------------------- 생성
     public Map<String, Object> create(CurrentUser u, long robotId, List<Long> pointIds, String note, Long recheckOf) {
+        return create(u, robotId, pointIds, note, recheckOf, null);
+    }
+
+    /** scheduleId: 예약 점검이 만든 작업이면 그 예약 ID. */
+    public Map<String, Object> create(CurrentUser u, long robotId, List<Long> pointIds, String note, Long recheckOf,
+                                      Long scheduleId) {
         if (pointIds == null || pointIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "점검 지점을 하나 이상 고르세요");
         }
@@ -61,7 +67,7 @@ public class TaskService {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "로봇 서비스에 연결할 수 없습니다");
         }
-        long taskId = store.insertTask(robotId, r.path("code").asText(), u.id(), u.login(), note, recheckOf);
+        long taskId = store.insertTask(robotId, r.path("code").asText(), u.id(), u.login(), note, recheckOf, scheduleId);
         for (int i = 0; i < points.size(); i++) {
             store.insertTaskPoint(taskId, i + 1, ((Number) points.get(i).get("point_id")).longValue());
         }
@@ -69,6 +75,9 @@ public class TaskService {
         d.put("points", points.stream().map(p -> p.get("code")).toList());
         if (recheckOf != null) {
             d.put("recheckOf", recheckOf);
+        }
+        if (scheduleId != null) {
+            d.put("scheduleId", scheduleId);
         }
         userEvent(taskId, "REQUESTED", d, u.login());
         dispatch(taskId, robotId, points);

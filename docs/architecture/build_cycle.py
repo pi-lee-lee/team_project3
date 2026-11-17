@@ -43,7 +43,7 @@ SECTIONS = [
         ('g', 'u', '변경 요청(POST·PUT·DELETE)은 끝난 뒤 감사 기록 /internal/audit'),
     ]),
     ('C', '점검 미션', '작업 하나 = 미션 하나(번호 같음). 지점마다 이동 → 도착 → 촬영을 반복한다', 'spring', [
-        ('b', 'i', '점검 요청 POST /api/inspections (지점 선택)'),
+        ('b', 'i', '점검 실행 POST /api/inspections/schedules/{id}/run (점검 계획)'),
         ('i', 'r', '로봇 확인 GET /internal/robots/{id} → 작업 저장 · 사건 REQUESTED'),
         ('i', 'r', '미션 전달 POST /internal/missions — missionId = 작업 번호(같은 번호는 다시 실행하지 않음)'),
         ('r', 'r', '미션이 제어권을 가짐 → ACCEPTED → 출발 전 검사(연결 · odom 2초 · 카메라 5초 · Nav2 준비 · 위치 추정)'),

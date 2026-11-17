@@ -232,7 +232,7 @@
 <text x="864.0" y="1715.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">200 + Set-Cookie(HttpOnly) · 본문 Me → setMe(AuthContext) → navigate(홈) → D2 처럼 화면만 바뀐다</text>
 <circle cx="1116" cy="1759.0" r="4" fill="#b25000"/>
 <path d="M1116.0 1759.0 L1638.0 1759.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
-<text x="1126.0" y="1753.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">그 밖의 변경(점검 요청 · 판정 · 취소): POST → 성공하면 reload() 나 navigate, 실패하면 ErrorBox</text>
+<text x="1126.0" y="1753.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">그 밖의 변경(점검 실행 · 판정 · 취소): POST → 성공하면 reload() 나 navigate, 실패하면 ErrorBox</text>
 <circle cx="1116" cy="1869.0" r="4" fill="#0071a4"/>
 <path d="M1116.0 1869.0 L1638.0 1869.0" fill="none" stroke="#0071a4" stroke-width="2" marker-end="url(#a0071a4)"/>
 <text x="1126.0" y="1863.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">폴링: 로봇 상태 1초 · 지도 위치(mapview) 0.2초 · 지도 정보 10초 — 화면을 떠나면 모두 멈춘다</text>
