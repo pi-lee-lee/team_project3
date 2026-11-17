@@ -1,7 +1,7 @@
 """시스템 아키텍처 구성도: 컨테이너 · MSA · Spring Boot 내부 계층 · 저장소 · 로봇 브리지.
 
 읽는 법
-- 가운데 세로: 브라우저 → web(nginx) → Spring Boot 층 → analysis-service(Python).
+- 가운데 세로: 브라우저 → cdn(엣지 캐시) → web(nginx 원본) → Spring Boot 층 → analysis-service(Python).
   굵은 실선 상자 = 컨테이너. 'Spring Boot 영역'은 컨테이너가 아니라 같은 기술의 서비스를 묶어 보인 옅은 점선이다.
   그 안의 상자 하나 = 컨테이너 하나 = MSA 서비스 하나(자기 jar · 포트 · DB).
 - 왼쪽: db 컨테이너. 위아래 계층이 아니라, 각 서비스의 '저장 계층'에서 옆으로 붙는 저장소다(서비스마다 자기 DB).
