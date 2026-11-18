@@ -21,6 +21,15 @@ python3 scripts/e2e_test.py                    # 전체
 python3 scripts/e2e_test.py --skip-obstacles   # 장애물 시나리오 제외
 python3 scripts/e2e_test.py --only-obstacles   # 장애물 시나리오(우회·다른 길·진입 불가)만
 ```
+시나리오(소방 관제 · 소화액 투척) 전 구간 시험은 따로 있다(20~40분):
+
+```bash
+python3 scripts/e2e_scenarios.py               # 전부
+python3 scripts/e2e_scenarios.py --only rules  # 소방 관제(규칙 → 등급 → 경고)
+python3 scripts/e2e_scenarios.py --only fire   # 소화액 투척(감지 → 출동 → 재판독 → 승인/자동 투척)
+```
+
+시연(시나리오를 한 번에 실행, 시뮬레이션 전용): admin 화면 "시연" 메뉴의 실행 단추, 또는 `python3 scripts/demo.py [fire-approval|fire-auto|fire-false|fire-preempt|rules-abnormal|rules-restore|reset|all|stop]`. 둘 다 inspection-service `DemoService`(`/api/admin/demo`)를 부르고, 시뮬레이션 대상은 robot-service `SimService` → 토픽 `/sim/command` → sim 의 `ros/sim/src/tools/sim_control.py` 가 `fire.sh`·`target.sh` 를 실행해 바꾼다.
 macOS 에는 `timeout` 명령이 없으니 붙이지 않는다.
 
 시뮬레이션 도구(`ros/sim/src/tools/`, 컨테이너 안 `/sim/tools/`):
@@ -34,6 +43,8 @@ python3 ros/sim/src/tools/explore.py --check              # 순회 계획 여유
 docker compose exec sim /sim/tools/obstacle.sh place detour|reroute|block   # 시험용 장애물, clear 로 치움
 docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'  # 주행 품질 측정
 python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 지도 재생성(inspection.world 는 직접 고치지 않는다)
+docker compose exec sim /sim/tools/target.sh gauge 0.6|lamp red|extinguisher remove|reset|status   # 점검 대상(계기판·표시등·소화기) 바꾸기
+docker compose exec sim /sim/tools/fire.sh place <자리> [normal|warning|emergency] [--detect]       # 열화상 인쇄물 세우기(+젯봇 대신 감지 보고), list·detect·clear
 ```
 
 ## 구조 (큰 그림)
@@ -41,8 +52,11 @@ python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 �
 폴더는 아키텍처 계층 > 기술 > 컨테이너: `web/{nginx,spring,python,postgres}`, `ros/{sim,robot,maps}`. 코드는 이미지에 굽지 않고 볼륨으로 마운트해 실행한다(Spring 은 시작 시 `mvn package`, `common` 은 `common-build` 가 m2 볼륨에 설치).
 
 - **요청 경로**: 브라우저 → `cdn`(nginx 캐시 프록시: CDN 엣지 역할, 외부 포트 8080, `/assets/*` 만 보관하고 `index.html`·`/api`·`/ws` 는 통과. 설정 `web/nginx/cdn/default.conf`, 응답 헤더 `X-Cache-Status` 로 확인, 비우기는 `--force-recreate cdn`) → `web`(nginx 원본 서버: 정적 화면 + `Cache-Control` 지시, `/api`·`/ws` 프록시) → `gateway`(Spring Cloud Gateway: HttpOnly 쿠키 JWT 검증·세션 확인·경로별 역할 정책·감사 기록, 규칙은 `application.yml`) → 각 서비스.
-- **서비스**: `user-service`(로그인·사용자·역할 0 ADMIN/1 관리자/2 매니저/3 사용자/4 대시보드(조회 전용, 게이트웨이가 GET 만 허용)·감사 로그), `inspection-service`(점검 지점·작업·사건 기록·관측·판정·이력·예약 점검: `ScheduleService` 가 때가 된 회차를 로봇별 메모리 실행 버퍼에 담아 로봇이 비면 이어서 실행(건너뛰지 않음, 지연은 화면 상단 안내). 재기동하면 버퍼가 비고 꺼진 동안 지난 회차는 MISSED 로만 기록. 시각은 `SCHEDULE_ZONE` 기준), `robot-service`(로봇 연결 계층), `analysis-service`(Python FastAPI: 관측 사진 품질 분석, PostgreSQL LISTEN/NOTIFY + SKIP LOCKED 작업 큐). DB 는 PostgreSQL 17 하나에 서비스별 DB, 스키마는 Flyway 마이그레이션.
+- **서비스**: `user-service`(로그인·사용자·역할 0 ADMIN/1 관리자/2 매니저/3 사용자/4 대시보드(조회 전용, 게이트웨이가 GET 만 허용 — 예외로 투척 승인 `/api/incidents/*/approve` 는 허용)·감사 로그), `inspection-service`(점검 지점·작업·사건 기록·관측·판정·이력·예약 점검: `ScheduleService` 가 때가 된 회차를 로봇별 메모리 실행 버퍼에 담아 로봇이 비면 이어서 실행(건너뛰지 않음, 지연은 화면 상단 안내). 재기동하면 버퍼가 비고 꺼진 동안 지난 회차는 MISSED 로만 기록. 시각은 `SCHEDULE_ZONE` 기준), `robot-service`(로봇 연결 계층), `analysis-service`(Python FastAPI: 관측 사진 품질 분석, PostgreSQL LISTEN/NOTIFY + SKIP LOCKED 작업 큐). DB 는 PostgreSQL 17 하나에 서비스별 DB, 스키마는 Flyway 마이그레이션.
 - **로봇 추상화**: `robot-service` 의 `RobotAdapter` 인터페이스(구현: `RosbridgeRobotAdapter`, `MockRobotAdapter`)가 시뮬레이션/실로봇 교체 지점이다. 웹은 Nav2 를 직접 모르고 **목표 단위 토픽 계약**만 쓴다: `/inspection/goal` → `/inspection/goal_status`(사유 코드 `BLOCKED_NO_PATH`·`NAV_FAILED`·`NO_PROGRESS`·`NAV_UNAVAILABLE`), `bridge_status`, `map_pose`, `map`, `scan_map`. 이 계약을 Nav2 로 옮기는 쪽이 `ros/robot/src/nav2_goal_bridge.py`(실로봇에도 같은 코드)이고, rosbridge(9090)로 연결된다.
+- **시나리오(브랜치 `feat/scenarios-sim`, 설계 `docs/plan/SCENARIOS.md`·`INTERFACES.md`)**: 터틀봇 한 대로 시뮬레이션에서 돈다. 젯봇(위치 추정·순찰·두 로봇 조정)은 아직 없고 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다. 시뮬레이션에 투척 기구가 없어 `ros/robot/src/mock_launcher.py` 가 투척 계약(`/inspection/actuator` → `actuator_status`·`actuator_state`)에 답한다(실로봇용 시리얼 브리지 `launcher_bridge.py` 는 만들어만 둠).
+  - **소방 관제**: 지점마다 규칙(`inspection_rule`: 판독기 종류 + 설정 + 영역 + 등급 기준) → analysis-service 판독기(`src/checkers/`: OBJECT·GAUGE·LAMP·THERMAL, numpy+Pillow, `GET /checkers`·`POST /check`) → `rule_result` → `RuleService.saveResults` 가 경고(`alert`)를 열고, 다음 점검이 정상이면 스스로 푼다. 등급은 NORMAL/WARNING/EMERGENCY/UNKNOWN. OBJECT 는 학습 모델이 없어 색으로 찾는다(`detector: color`).
+  - **소화액 투척**: `IncidentService` 가 2초마다 열린 사건을 상태대로 끌고 간다(DETECTED→DISPATCHED→ARRIVED→재판독→AWAITING_APPROVAL→LAUNCHING→LAUNCHED→RESOLVED/DISMISSED/FAILED). 판단은 서버가 한다. robot-service 는 출동 미션(`RESPONSE`: 투척 위치 후보를 차례로 시도해 도착하면 HOLDING), 투척 명령(`ActuatorService`, commandId 로 한 번만), 투척 위치 후보(`Standoff`: 점유 격자에서 사거리·시야 확인), 감지 전달(`DetectionForwarder`)을 맡는다. 투척 모드(`launch.mode`: APPROVAL/AUTO)와 사거리 등 미정 값은 설정(`SettingsService`, `/api/settings`)이다.
 - **신뢰성**: 미션은 멱등, 결과는 outbox 에 보관 후 재전송, 조종은 제어권 임대 + `cmd_vel_watchdog.py`(0.5초 무명령 시 정지) + 비상 정지.
 - **시뮬레이션**(`ros/sim`): Apple Silicon 에서 amd64 에뮬레이션으로 Gazebo Classic 헤드리스(Xvfb) 실행 → 실제보다 느리다. `sim.launch.py` 가 Gazebo·Nav2 bringup(nav: AMCL, slam: slam_toolbox)·rosbridge·web_video_server·브리지를 띄우고, 로봇 모델은 패키지 SDF 에서 라이다 거리만 `LIDAR_MAX_RANGE`(기본 8m) 로 바꾼 사본을 스폰한다.
 - **Nav2 설정**: `ros/sim/src/config/nav2_params.yaml`. 기본값에서 바꾼 점과 이유가 파일 머리에 번호로 적혀 있다(Smac 2D A* + smoother, Regulated Pure Pursuit, 팽창 0.6/3.0, voxel 층 제거, AMCL 조정 등). 설정을 바꿀 때 그 목록도 함께 고친다. slam_toolbox 는 기본값 유지(조정했을 때 지도가 깨졌다).

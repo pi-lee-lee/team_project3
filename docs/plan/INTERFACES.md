@@ -49,7 +49,7 @@
 | S4 | 판독 결과 `POST /internal/observations/{id}/analysis` | analysis → inspection | 있음 + 확장 | 4.3 |
 | A1~A6 | 화면이 부르는 API(경고 · 규칙 · 사건 · 설정 · 기준 좌표 · 대시보드) | 화면 ↔ gateway | 새로 | 5 |
 | D1~D7 | DB 표 | 서비스별 DB | 새로 | 6 |
-| F1~F3 | 상태 흐름(사건 · 경고 · 젯봇 작업) | 서버 | 새로 | 7 |
+| F1~F4 | 상태 흐름(사건 · 경고 · 젯봇 작업) · 두 로봇의 조정 | 서버 | 새로 | 7 |
 
 ---
 
@@ -183,7 +183,7 @@
 ```
 
 - **판독기**는 "찾기"와 "읽기"만 한다. 읽은 값(숫자 또는 이름)을 **등급으로 바꾸는 것은 공통 코드**이고 기준은 설정이다. 그래서 등급 기준이 미정이어도 판독기는 만들 수 있다.
-- 품질이 `RETAKE` 면 판독하지 않고 모든 규칙을 `UNKNOWN` 으로 낸다.
+- 사진이 너무 어둡거나 밝으면 판독하지 않고 모든 규칙을 `UNKNOWN` 으로 낸다. "흐림"만으로는 건너뛰지 않는다 — 대상이 사라져 빈 벽만 찍힌 사진도 선명도가 낮게 나오는데, 그것이 "없음"으로 판독해야 하는 경우다(시뮬레이션 시험에서 확인).
 
 ### 3.2 API
 
@@ -383,7 +383,7 @@ inspection-service 는 결과를 저장하고(D2), 등급에 따라 경고를 �
 | --- | --- | --- |
 | `GET /api/incidents?state=open` · `GET /api/incidents/{id}` | 모두 | 목록 · 상세(사건 기록, 사진, 대응 로봇, 재판독 결과) |
 | `GET /api/incidents/{id}/image?kind=detection\|recheck\|after` | 모두 | 근거 사진 |
-| `POST /api/incidents/{id}/approve` | S·M·U | 투척 승인(`AWAITING_APPROVAL` 일 때만) |
+| `POST /api/incidents/{id}/approve` | S·M·U·D | 투척 승인(`AWAITING_APPROVAL` 일 때만). 대시보드 계정도 할 수 있다 — 조회 전용의 유일한 예외(상황실 화면의 투척 승인 팝업) |
 | `POST /api/incidents/{id}/launch` | S·M | 수동 투척(도착해 있을 때, 모드와 무관) |
 | `POST /api/incidents/{id}/dismiss` | S·M·U | 오탐으로 닫기 `{"comment"}` |
 | `POST /api/incidents/{id}/resolve` | S·M | 조치 완료로 닫기 |
@@ -608,17 +608,22 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | → `DETECTED` | 감지 보고(S3) | 등급이 비상일 때만 사건을 만든다. 열린 사건이 `incident.merge_radius_m` 안에 있으면 새로 만들지 않고 그 사건에 붙인다. 경고 `FIRE_DETECTED` 를 연다 |
 | `DETECTED` → `DISPATCHED` | 서버(자동) | 대응 로봇 고르기(설정된 로봇 또는 한가한 `INSPECTOR` 중 가까운 것) → 점검 중이면 그 작업 취소 요청 → 투척 위치 후보 받기(S2 standoff) → 출동 미션(`RESPONSE`) |
 | `DISPATCHED` → `ARRIVED` | 로봇 보고 `HOLDING` | `BLOCKED_NO_PATH` 면 다음 후보로 다시 보낸다. 후보가 없으면 `FAILED` |
-| `ARRIVED` → 재판독 | 서버 | 사진 받기(S2 snapshot) → 즉시 판독(C2, `THERMAL`). 안 보이면 제자리에서 정한 각도만큼 돌며 `launch.search_steps` 번까지 다시 본다 |
+| `ARRIVED` → 재판독 | 서버 | 사진 받기(S2 snapshot) → 즉시 판독(C2, `THERMAL`). 안 보이면 `launch.search_steps` 번까지 다시 본다. **열원은 보이는데 조준 범위 밖이면**(로봇의 도착 방향 허용 오차 8.6° 가 조준 범위보다 크다) 그 각도만큼 제자리에서 돌리고(`POST /internal/missions/{id}/aim`, 오도메트리로 확인하며 회전) 다시 본다 — 최대 3번 |
 | 재판독 → `LAUNCHING` | 서버 | **모드 `AUTO`**: 재판독 = 비상이고, 대상이 `launch.aim_tolerance_deg` 안에 있으면 투척 명령(S2 actuate). 조건을 못 채우면 `AWAITING_APPROVAL` 로 넘긴다 |
 | 재판독 → `AWAITING_APPROVAL` | 서버 | **모드 `APPROVAL`**: 재판독 결과와 사진을 붙여 승인 요청. `launch.approval_remind_sec` 마다 다시 알린다 |
 | `AWAITING_APPROVAL` → `LAUNCHING` | 사용자(A3 approve) | 투척 명령 |
 | 재판독 → `DISMISSED` | 서버 | `launch.search_steps` 번을 다 봐도 정상(열원 없음)이면 오탐으로 닫는다 |
-| `LAUNCHING` → `LAUNCHED` | 로봇 보고 `ACTUATED` | 투척 후 한 번 더 판독해 `after_check` 에 남긴다 |
-| `LAUNCHED` → `RESOLVED` | 서버 또는 사용자 | 투척 후 판독이 정상이면 자동, 아니면 사람이 닫을 때까지 `LAUNCHED` 에 머문다(경고 유지) |
+| `LAUNCHING` → 투척 후 판독 | 로봇 보고 `ACTUATED` | 투척 후 한 번 더 판독해 `after_check` 에 남긴다. 정상이면 `RESOLVED` |
+| → `MONITORING` | 서버 | **투척 후에도 열원이 보이면 대응 로봇(터틀봇)이 그 자리에 머물며 계속 감시한다.** `incident.monitor_interval_sec` 마다 다시 찍어 판독하고 가장 최근 사진 · 결과를 남긴다(등급이 바뀌면 사건 기록). 로봇은 풀어 주지 않는다. 다시 쏘려면 수동 투척 |
+| `MONITORING` → `RESOLVED` | 서버 또는 사용자 | 연속 `incident.monitor_clear_count` 회 정상이면 열원이 사라진 것으로 보고 자동으로 닫는다. 그 밖에는 사람이 닫을 때까지 감시를 계속한다 |
+| `MONITORING` → `LAUNCHED` | 서버 | 대응 로봇이 자리를 떠나면(비상 정지 등) 감시가 끊겼음을 알리고 사람의 확인을 기다린다 |
 | → `FAILED` | 서버 | 갈 수 없음 · 로봇 없음 · 투척 실패(`ACTUATE_FAILED`). 경고는 열린 채로 둔다 |
+| 닫힌 뒤 → 새 사건 | 감지 보고(S3) | **닫는 것은 기록을 닫는 것이지 실제 상황의 종료가 아니다.** 사건을 닫은 뒤 `incident.reopen_grace_sec` 가 지나도 같은 감지(`detId`)가 계속 오면 새 사건으로 다시 연다(`REOPENED`, 이전 사건 번호를 남긴다). 그래서 robot-service 는 같은 감지도 15초마다 다시 넘긴다 |
 | 닫힐 때 | 서버 | 출동 미션 끝내기(S2 finish) → 그 로봇의 밀린 예약이 이어진다 |
 
-사건이 열려 있는 동안 대응 로봇의 예약 회차는 실행 버퍼에서 기다린다(대기 사유 "화재 대응 중").
+사건이 열려 있는 동안 대응 로봇의 예약 회차는 실행 버퍼에서 기다린다.
+
+**두 로봇의 역할:** 터틀봇은 투척 로봇이다 — 열원 지역에 가서 투척하고, 열원이 남아 있으면 그 지역을 계속 감시한다. 젯봇은 그동안 다른 지역의 순찰을 계속한다(사건에 묶이는 것은 대응 로봇뿐이다). 젯봇은 지금 시뮬레이션에 없다.
 
 ### F2 경고
 
@@ -644,6 +649,28 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 
 순찰 중 감지(`/patrol/detection`)는 이 순서와 무관하게 언제든 온다.
 
+### F4 두 로봇의 조정 (서버)
+
+두 로봇이 한 지도에서 움직일 때 일을 나누는 방식이다.
+
+| 층 | 하는 일 | 어디서 |
+| --- | --- | --- |
+| 임무 계획 | 누가 · 언제 · 어디로, 순서와 우선순위, **두 로봇 사이의 조정** | 서버 |
+| 경로 계획 | 목적지까지의 길, 장애물 우회(터틀봇: Nav2 가 비용 지도로 경로를 다시 짠다) | 로봇 |
+| 제어 | 속도 명령, 정지, 워치독 | 로봇 |
+
+서버는 목적지만 보내고(목표 계약), 길과 조종은 로봇이 맡는다. 실시간 장애물은 로봇 센서만 알고, 반응이 통신 지연을 기다릴 수 없기 때문이다.
+로봇은 서로의 계획을 모르고, 젯봇은 라이다가 없어 터틀봇을 피하기 어렵다. 그래서 두 로봇 사이의 조정은 서버가 한다.
+
+| 조정 | 방식 |
+| --- | --- |
+| 자리 예약 | 점검 지점 · 투척 위치 · 대기 구역 · 좁은 통로(구역으로 등록)를 한 번에 한 로봇만 차지한다. 목표를 보내기 전에 예약하고, 못 하면 그 로봇의 대기열에서 기다린다(지금의 예약 실행 버퍼와 같은 방식, 대기 사유 "다른 로봇이 사용 중") |
+| 우선순위 | 화재 출동(`RESPONSE`) > 점검 · 순찰. 출동 경로의 구역을 먼저 예약하고, 그 구역에 있는 다른 로봇은 비켜 설 자리(구역마다 등록)로 보낸다 |
+| 간격 유지 | 서버는 두 로봇의 지도 위 위치를 받고 있다. 거리가 `fleet.min_separation_m` 아래로 가까워지면 우선순위가 낮은 쪽의 목표를 멈추고(`goal_cancel`), 멀어지면 같은 목표를 다시 보낸다 |
+
+- 표: `zone`(이름 · 다각형 · 비켜 설 자리), `zone_lease`(구역 · 로봇 · 작업 · 시각). 설정: `fleet.min_separation_m`.
+- 터틀봇 한 대만 쓰는 지금의 시뮬레이션 구현에는 넣지 않았다. 젯봇이 붙을 때(구현 묶음 9) 함께 만든다.
+
 ---
 
 ## 8. 설정으로 열어 둔 것
@@ -660,6 +687,8 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 승인 재알림 간격 | 설정 `launch.approval_remind_sec` | 30 |
 | 출동시킬 로봇 | 설정 `incident.responder_robot_id`(비우면 자동 선택) | 비움 |
 | 가까운 감지를 한 사건으로 묶는 거리 | 설정 `incident.merge_radius_m` | 1.0 |
+| 투척 뒤 현장 감시 간격 · 종료 기준 | 설정 `incident.monitor_interval_sec`, `incident.monitor_clear_count` | 10, 2 |
+| 닫은 뒤에도 감지가 계속될 때 다시 여는 유예 | 설정 `incident.reopen_grace_sec` | 60 |
 | 열화상 인쇄물의 색상표 · 열원 기준 | 감지 설정 `detect.thermal`(= `THERMAL` 규칙의 `params` · `grading`) | `iron`, 3.3 의 예 |
 | 감지 보고에 필요한 연속 프레임 수 | 설정 `detect.report_frames` | 5 |
 | 계기판 · 표시등의 실제 대상, 눈금 · 색 | 규칙의 `params` | — (규칙을 만들 때 입력) |
@@ -672,6 +701,7 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 대상 기준 보정 한도 | 설정 `patrol.max_correction_m` | 0.5 |
 | 복귀 오차 경고 기준 | 설정 `patrol.closure_warn_m` | 0.3 |
 | 젯봇 도착 허용 오차, 카메라 화각 · 높이 | 로봇 설정 `arrival`, `camera` | 실측 뒤 입력 |
+| 두 로봇 사이 최소 간격 | 설정 `fleet.min_separation_m` | 0.8 |
 | 디바이스 쪽 토픽 이름 | 로봇 설정 `topics`, 브리지 파라미터 | 2장의 이름 |
 | 투척 기구의 시리얼 형식 | `launcher_bridge.py` 파라미터 | 2.2 의 줄 형식 |
 | 현업용 열화상 카메라 | 로봇 설정 `camera.frame = THERMAL` | `RGB` |
@@ -692,7 +722,14 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 사용자 · 관제 | 승인 대기 사건 띠(지금의 지연 안내 자리), 젯봇 표시 | A3 · A6 |
 | 대시보드 | 사건 패널, 사건 상세(`Ref` 에 `incident` 추가), 지점 핀 등급 색, 머리줄에 투척 모드, 지도에 젯봇 · 화재 위치 | A6 · A1 · A3 |
 
-대시보드는 조회만 한다. 승인 · 확인 · 해제는 사용자 화면에서 한다.
+대시보드는 조회만 한다. 단 **투척 승인은 대시보드에서도 한다**(투척 승인 팝업). 경고 확인 · 해제, 사건 닫기는 사용자 화면에서 한다.
+
+**팝업 두 가지** (사용자 영역의 모든 화면과 대시보드에 뜬다)
+
+| 팝업 | 뜨는 조건 | 내용 | 우선순위 |
+| --- | --- | --- | --- |
+| 투척 승인(`LaunchDialog`) | 사건이 `AWAITING_APPROVAL`(로봇이 투척 위치에 도착) | 대응 로봇의 실시간 카메라, 도착 후 재판독 결과(등급 · 열원 비율 · 조준), **투척 승인** 단추. "나중에"로 닫으면 30초 뒤 다시 뜬다 | 위 |
+| 비상(`EmergencyDialog`) | 등급이 비상인 열린 경고(화재 감지, 규칙 판독 비상 등). 경고(주황)는 띄우지 않는다 | 제목 · 위치 · 시각, **확인** 단추(눌러야 닫힌다) | 아래 |
 
 ---
 
