@@ -61,6 +61,15 @@ const SYMBOLS: Record<string, string> = {
   'arrow.uturn.backward': 'undo',
   'ellipsis': 'more_horiz',
   'checkmark.shield.fill': 'verified_user',
+  // 대시보드
+  'bell.fill': 'notifications',
+  'flame.fill': 'local_fire_department',
+  'arrow.up.left.and.arrow.down.right': 'fullscreen',
+  'wifi.slash': 'wifi_off',
+  'battery': 'battery_5_bar',
+  'bolt.fill': 'bolt',
+  'hourglass': 'hourglass_top',
+  'eye': 'visibility',
 };
 
 export function Icon({ name, size = 18, className = '', title }: { name: string; size?: number; className?: string; title?: string }) {

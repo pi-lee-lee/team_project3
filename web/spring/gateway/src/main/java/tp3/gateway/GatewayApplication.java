@@ -39,7 +39,7 @@ public class GatewayApplication {
                 .route("user", r -> r.path("/api/auth/**", "/api/admin/users/**", "/api/admin/roles",
                         "/api/admin/audit/**").uri(s.user()))
                 .route("inspection", r -> r.path("/api/points/**", "/api/admin/points/**", "/api/inspections/**",
-                        "/api/observations/**").uri(s.inspection()))
+                        "/api/observations/**", "/api/dashboard/**").uri(s.inspection()))
                 .route("robot", r -> r.path("/api/robots/**", "/api/admin/robots/**").uri(s.robot()))
                 .route("robot-ws", r -> r.path("/ws/robots/**").uri(robotWs))
                 .route("analysis", r -> r.path("/api/admin/analysis/**").uri(s.analysis()))

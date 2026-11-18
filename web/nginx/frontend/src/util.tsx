@@ -12,7 +12,7 @@ export const AuthContext = createContext<{ me: Me | null; setMe: (m: Me | null) 
 export const useAuth = () => useContext(AuthContext);
 
 export const ROLE_LABEL: Record<string, string> = {
-  ADMIN: 'ADMIN', SUPERVISOR: '1 관리자', MANAGER: '2 매니저', USER: '3 사용자',
+  ADMIN: 'ADMIN', SUPERVISOR: '1 관리자', MANAGER: '2 매니저', USER: '3 사용자', DASHBOARD: '대시보드',
 };
 
 export const STATUS_LABEL: Record<string, string> = {

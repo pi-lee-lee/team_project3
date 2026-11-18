@@ -30,10 +30,10 @@ import java.util.Map;
 public class AdminController {
 
     public record CreateUser(@NotBlank @Size(max = 50) String loginId, @NotBlank @Size(min = 8) String password,
-                             @NotBlank @Size(max = 50) String name, @NotNull @Min(0) @Max(3) Integer roleId) {
+                             @NotBlank @Size(max = 50) String name, @NotNull @Min(0) @Max(4) Integer roleId) {
     }
 
-    public record UpdateUser(@Size(max = 50) String name, @Min(0) @Max(3) Integer roleId,
+    public record UpdateUser(@Size(max = 50) String name, @Min(0) @Max(4) Integer roleId,
                              @Pattern(regexp = "ACTIVE|SUSPENDED") String status) {
     }
 

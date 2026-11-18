@@ -9,11 +9,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/** application.yml 의 gateway.rules 표. 위에서부터 처음 맞는 규칙을 적용한다. */
+/**
+ * application.yml 의 gateway.rules 표. 위에서부터 처음 맞는 규칙을 적용한다.
+ * 규칙에 methods 가 있으면 그 메서드일 때만 맞는 것으로 본다(없으면 모든 메서드).
+ */
 @ConfigurationProperties(prefix = "gateway")
 public class AccessPolicy {
 
-    public record Rule(String pattern, Set<String> roles) {
+    public record Rule(String pattern, Set<String> methods, Set<String> roles) {
+        boolean matchesMethod(String method) {
+            return methods == null || methods.isEmpty() || methods.contains(method);
+        }
     }
 
     private List<String> publicPaths = List.of();
@@ -25,13 +31,13 @@ public class AccessPolicy {
     }
 
     /** 맞는 규칙이 없으면 empty → 거부. */
-    public Optional<Boolean> allows(String path, String role) {
+    public Optional<Boolean> allows(String path, String method, String role) {
         if (compiled == null) {
             compiled = rules.stream().map(r -> PathPatternParser.defaultInstance.parse(r.pattern())).toList();
         }
         PathContainer pc = PathContainer.parsePath(path);
         for (int i = 0; i < rules.size(); i++) {
-            if (compiled.get(i).matches(pc)) {
+            if (compiled.get(i).matches(pc) && rules.get(i).matchesMethod(method)) {
                 return Optional.of(rules.get(i).roles().contains(role));
             }
         }

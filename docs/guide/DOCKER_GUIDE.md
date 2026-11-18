@@ -52,7 +52,7 @@ Windows 에서는 줄바꿈이 바뀌지 않도록 저장소에 `.gitattributes`
 | --- | --- | --- |
 | `WEB_PORT` | `8080` | 웹 접속 포트 |
 | `INITIAL_ADMIN_LOGIN` / `INITIAL_ADMIN_PASSWORD` | `admin` / `Admin1234!` | 웹사이트 admin 계정 |
-| `DEMO_USERS_PASSWORD` | `User1234!` | 시험 계정 sup1(1 관리자)·mgr1(2 매니저)·user1(3 사용자)의 비밀번호. 빈 값으로 두면 만들지 않는다 |
+| `DEMO_USERS_PASSWORD` | `User1234!` | 시험 계정 sup1(1 관리자)·mgr1(2 매니저)·user1(3 사용자)과 관제 대시보드 계정 dash1(4 대시보드, 조회만)의 비밀번호. 빈 값으로 두면 만들지 않는다 |
 | `JWT_SECRET` | `tp3-local-dev-jwt-secret-change-before-deploy` | 로그인 토큰 서명 키 (32자 이상) |
 | `POSTGRES_PASSWORD` / `SERVICE_DB_PASSWORD` | `tp3-postgres-local` / `tp3-service-local` | DB 비밀번호 |
 | `SIM_MODE` | `nav` | 시뮬레이터 모드 (`nav` 운영 / `slam` 지도 작성) |

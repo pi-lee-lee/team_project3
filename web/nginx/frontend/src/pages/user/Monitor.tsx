@@ -221,7 +221,7 @@ const WAFFLE = {
   camera: { x: 0.078, y: 0, w: 0.015, h: 0.03 },                       // Raspberry Pi 카메라
 };
 
-function drawRobot(g: CanvasRenderingContext2D, cx: number, cy: number, yaw: number, ppm: number) {
+export function drawRobot(g: CanvasRenderingContext2D, cx: number, cy: number, yaw: number, ppm: number) {
   const W = WAFFLE;
   g.save();
   g.translate(cx, cy);

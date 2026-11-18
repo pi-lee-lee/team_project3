@@ -43,6 +43,8 @@ export const httpApi: Api = {
   logout: () => post('/api/auth/logout'),
   me: () => get('/api/auth/me'),
 
+  dashboard: () => get('/api/dashboard/overview'),
+
   roles: () => get('/api/admin/roles'),
   users: () => get('/api/admin/users'),
   createUser: (u) => post('/api/admin/users', u),

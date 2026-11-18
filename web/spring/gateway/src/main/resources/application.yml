@@ -18,14 +18,22 @@ app:
     analysis: ${ANALYSIS_SERVICE_URL:http://analysis-service:8084}
 
 # 경로별 접근 정책. 위에서부터 처음 맞는 규칙을 적용하고, 맞는 규칙이 없으면 거부한다.
+# methods 를 적으면 그 메서드일 때만 맞는 규칙이다(없으면 모든 메서드).
 # 역할 1·2·3(SUPERVISOR·MANAGER·USER)의 세부 차이는 구현 단계에서 이 표에 줄을 추가해 정한다.
+# DASHBOARD(관제 대시보드 전용 계정)는 조회(GET)만 할 수 있다: 변경 요청·조종 WebSocket 은 맞는 규칙에 없어 거부된다.
 gateway:
   public-paths:
     - /api/auth/login
     - /api/auth/logout
   rules:
+    - pattern: /api/admin/system        # 시스템 상태는 대시보드에도 보인다
+      methods: [GET]
+      roles: [ADMIN, DASHBOARD]
     - pattern: /api/admin/**
       roles: [ADMIN]
+    - pattern: /api/**
+      methods: [GET]
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER, DASHBOARD]
     - pattern: /api/**
       roles: [ADMIN, SUPERVISOR, MANAGER, USER]
     - pattern: /ws/**

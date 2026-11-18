@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 /**
  * 첫 실행 시 계정 준비. 비밀번호는 SQL에 두지 않고 환경변수로 받는다.
  * - ADMIN 계정이 없으면 INITIAL_ADMIN_LOGIN / INITIAL_ADMIN_PASSWORD 로 만든다.
- * - DEMO_USERS_PASSWORD 가 있으면 역할 1·2·3 시험 계정(sup1, mgr1, user1)을 만든다.
+ * - DEMO_USERS_PASSWORD 가 있으면 역할 1·2·3 시험 계정(sup1, mgr1, user1)과
+ *   관제 대시보드 전용 계정(dash1, 역할 4: 조회만)을 만든다.
  */
 @Component
 public class Bootstrap implements ApplicationRunner {
@@ -49,6 +50,7 @@ public class Bootstrap implements ApplicationRunner {
             createIfAbsent("sup1", "시험 관리자", 1);
             createIfAbsent("mgr1", "시험 매니저", 2);
             createIfAbsent("user1", "시험 사용자", 3);
+            createIfAbsent("dash1", "관제 대시보드", 4);
         }
     }
 

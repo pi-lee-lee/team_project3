@@ -2,7 +2,7 @@
 // 화면은 이 인터페이스에만 의존하고, 실제 구현(http.ts)은 게이트웨이 REST API 를 호출한다.
 // 로봇이 시뮬레이션이든 실제든 화면 코드는 바뀌지 않는다(차이는 robot-service 의 어댑터가 흡수).
 
-export type Role = 'ADMIN' | 'SUPERVISOR' | 'MANAGER' | 'USER';
+export type Role = 'ADMIN' | 'SUPERVISOR' | 'MANAGER' | 'USER' | 'DASHBOARD';
 
 export interface Me {
   userId: number;
@@ -251,7 +251,34 @@ export interface SystemStatus {
   robots: { code: string; enabled: boolean; connected: boolean; ageMs: Record<string, number | null>; outboxPending: number }[];
 }
 
+/** 관제 대시보드 요약(inspection-service DashboardController) */
+export interface DashPoint {
+  point_id: number; code: string; name: string; x: number; y: number; yaw_deg: number;
+  observation_id: number | null; task_id: number | null; status: 'CAPTURED' | 'UNABLE' | null;
+  reason_code: string | null; captured_at: string | number | null; has_image: boolean | null;
+  verdict: 'OK' | 'RETAKE' | null; review_result: Review['result'] | null;
+}
+/** 주의할 일 한 줄. ref_kind 가 어떤 상세 창을 열지 정한다. */
+export interface DashAlert {
+  type: string; severity: 'CRITICAL' | 'WARNING';
+  at: string | number | null; ref_kind: string; ref_id: number | null; task_id: number | null;
+  detail: string | null; point_code: string | null; point_name: string | null;
+}
+export interface DashEvent extends TaskEvent { task_id: number; robot_code: string | null; task_status: TaskStatus }
+export interface DashOverview {
+  hours: number;
+  today: {
+    tasks: { total: number; active: number; completed: number; failed: number; cancelled: number };
+    observations: { total: number; unable: number; normal: number; abnormal: number; unreviewed: number; retake: number };
+  };
+  points: DashPoint[];
+  alerts: DashAlert[];
+  events: DashEvent[];
+}
+
 export interface Api {
+  // 관제 대시보드
+  dashboard(): Promise<DashOverview>;
   // 인증
   login(loginId: string, password: string): Promise<Me>;
   logout(): Promise<void>;

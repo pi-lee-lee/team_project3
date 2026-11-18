@@ -26,10 +26,11 @@ import PlanList from './pages/user/plans/PlanList';
 import PlanDetail from './pages/user/plans/PlanDetail';
 import PlanForm from './pages/user/plans/PlanForm';
 import DelayBanner from './pages/user/DelayBanner';
+import Dashboard from './pages/dashboard/Dashboard';
 
 const USER_ROLES: Role[] = ['SUPERVISOR', 'MANAGER', 'USER'];
 
-export const homeOf = (role: Role) => (role === 'ADMIN' ? '/admin/users' : '/app/monitor');
+export const homeOf = (role: Role) => (role === 'ADMIN' ? '/admin/users' : role === 'DASHBOARD' ? '/dashboard' : '/app/monitor');
 
 export default function App() {
   const api = useApi();
@@ -54,6 +55,8 @@ export default function App() {
     <AuthContext.Provider value={{ me, setMe }}>
       <Routes>
         <Route path="/login" element={<Login />} />
+        {/* 관제 대시보드: 메뉴 틀(Shell) 없이 화면 전체를 쓴다. 전용 계정(DASHBOARD)의 첫 화면이고, 다른 역할도 주소로 열 수 있다 */}
+        <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
         <Route element={<Shell area="admin" roles={['ADMIN']} />}>
           {/* 일 단위 화면: 목록 → 상세 → 폼 */}
           <Route path="/admin/users" element={<Users />} />

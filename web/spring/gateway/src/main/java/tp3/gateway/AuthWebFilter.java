@@ -76,7 +76,7 @@ public class AuthWebFilter implements WebFilter {
             if (!valid) {
                 return reject(ex, HttpStatus.UNAUTHORIZED);
             }
-            if (!policy.allows(path, claims.role()).orElse(false)) {
+            if (!policy.allows(path, ex.getRequest().getMethod().name(), claims.role()).orElse(false)) {
                 return reject(ex, HttpStatus.FORBIDDEN);
             }
             ServerHttpRequest withUser = ex.getRequest().mutate()

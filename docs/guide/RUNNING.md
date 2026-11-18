@@ -12,6 +12,7 @@ docker compose up -d --build
 ```
 
 - 접속: http://localhost:8080 — 기본 계정 admin / `Admin1234!`, 시험 계정 sup1·mgr1·user1 / `User1234!` (`.env` 로 바꿀 수 있다).
+- 관제 대시보드: 전용 계정 dash1(역할 4 대시보드, 비밀번호는 시험 계정과 같음)로 로그인하면 바로 열린다(`/dashboard`). 조회만 할 수 있는 계정이고, 16:9 모니터 전체 화면용(1920×1080 고정, 반응형 아님)이다. 구성은 `web/nginx/frontend/src/pages/dashboard/` — `data.ts`(불러오기·경고) → `panels.tsx`(패널) + `layout.ts`(배치표) → `details.tsx`(누르면 뜨는 상세).
 - 첫 실행은 각 Spring 서비스가 시작할 때 Maven 빌드를 하고, 시뮬레이터가 Nav2 를 올리므로 3~5분 걸린다.
 - 종단 간 시험: `python3 scripts/e2e_test.py` (장애물 시나리오 제외: `--skip-obstacles`)
 
@@ -43,7 +44,7 @@ scripts/                   E2E 시험
 | 폴더 | 컨테이너 | 내용 |
 | --- | --- | --- |
 | `web/spring/gateway/` | gateway | Spring Cloud Gateway: JWT 쿠키 검증, 세션 유효성, 경로별 역할 정책, 감사 기록, 시스템 상태 |
-| `web/spring/user-service/` | user-service | 로그인·사용자·역할(0 ADMIN, 1 관리자, 2 매니저, 3 사용자)·감사 로그 |
+| `web/spring/user-service/` | user-service | 로그인·사용자·역할(0 ADMIN, 1 관리자, 2 매니저, 3 사용자, 4 대시보드)·감사 로그 |
 | `web/spring/inspection-service/` | inspection-service | 점검 지점, 작업, 사건 기록, 관측 사진, 사람 판정, 재점검, 지점 이력, 점검 계획(즉시·예약 실행) |
 | `web/spring/robot-service/` | robot-service | 로봇 연결 계층: `RobotAdapter`(rosbridge·mock), 상태·제어권·조종·비상 정지·미션 실행·결과 재전송·영상 중계 |
 | `web/python/analysis-service/` | analysis-service | Python: 사진 품질 배치 분석(ROI 밝기·선명도 → 재촬영 후보) |
@@ -69,7 +70,7 @@ scripts/                   E2E 시험
 
 네트워크: `front`(cdn ↔ web, 외부 포트 8080 하나) · `edge`(web ↔ gateway) · `backend`(gateway ↔ 서비스 ↔ db) · `robot`(robot-service ↔ sim). rosbridge 는 robot-service 만 접근한다.
 
-권한: `web/spring/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.
+권한: `web/spring/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 규칙에 `methods` 를 적으면 그 메서드에만 맞는다 — 대시보드 역할(DASHBOARD)은 GET 만 허용되고 변경 요청·조종 WebSocket 은 거부된다. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.
 
 ## 시험 시설(시뮬레이션 월드)과 지도
 
