@@ -9,6 +9,7 @@
 | 계획 | [plan/ROADMAP.md](plan/ROADMAP.md) | 향후 프로젝트 계획: 1순위 analysis-service 소화기 AI 판독(구현 방식 · 데이터 · 단계 · 완료 기준) · 주행 제어기 개선(별도 작업: A* 계획을 따르며 실시간으로 장애물을 피하는 제어기) |
 | | [plan/SCENARIOS.md](plan/SCENARIOS.md) | 시나리오 수정 계획: 소화액 투척(젯봇 열화상 판독 → 터틀봇 출동 → 승인/자동 투척, 젯봇 위치 추정 방식) · 소방 관제(지점별 점검 규칙 → 정상·경고·비상). 지금 있는 것/없는 것, 서비스별 변경, 단계, 남은 확인 사항 |
 | | [plan/INTERFACES.md](plan/INTERFACES.md) | 상세 설계(인터페이스): 디바이스 토픽 계약(목표 · 투척 · 젯봇 정렬 · 감지), 카메라 판독 인터페이스(analysis-service), 서비스 사이 API, 화면 API, DB 표, 상태 흐름, 설정으로 열어 둔 미정 항목, 구현 작업 목록, 구현 후 실측 |
+| | [plan/SCHEDULE.md](plan/SCHEDULE.md) | 주간 계획서(2026-11-23 ~ 2027-01-22, 9주): 처음부터 만든다고 가정한 5명의 인원별 주차 계획, 단계 목표, 통합 테스트 주, 위험과 대응 |
 | 실행 안내 | [guide/RUNNING.md](guide/RUNNING.md) | 구성·폴더 구조·시험 시설과 지도·주행 설정·화면·알려진 한계 |
 | | [guide/DOCKER_GUIDE.md](guide/DOCKER_GUIDE.md) | 설치부터 실행·초기화·문제 해결까지 단계별 안내(macOS·Linux·Windows PowerShell) |
 | 스토리보드 | [storyboard/web_storyboard.svg](storyboard/web_storyboard.svg) | 화면 구조도·흐름도·화면 설계 |
