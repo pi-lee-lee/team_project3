@@ -32,6 +32,24 @@ async function call<T>(method: string, url: string, body?: unknown): Promise<T> 
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
+/** 파일을 함께 보내는 요청(multipart). 오류 처리는 call 과 같다. */
+async function upload<T>(url: string, form: FormData): Promise<T> {
+  const res = await fetch(url, { method: 'POST', credentials: 'same-origin', body: form });
+  if (res.status === 401) window.dispatchEvent(new Event('auth:expired'));
+  if (!res.ok) {
+    let msg = res.statusText || `HTTP ${res.status}`;
+    try {
+      const j = await res.json();
+      msg = j.message || j.detail || msg;
+    } catch {
+      /* 본문 없음 */
+    }
+    if (res.status === 403) msg = '권한이 없습니다';
+    throw new ApiError(res.status, msg);
+  }
+  return (await res.json()) as T;
+}
+
 const get = <T,>(u: string) => call<T>('GET', u);
 const post = <T,>(u: string, b?: unknown) => call<T>('POST', u, b ?? {});
 
@@ -44,6 +62,34 @@ export const httpApi: Api = {
   me: () => get('/api/auth/me'),
 
   dashboard: () => get('/api/dashboard/overview'),
+  demo: () => get('/api/admin/demo'),
+  runDemo: (key) => post(`/api/admin/demo/${key}/run`),
+  stopDemo: () => post('/api/admin/demo/stop'),
+
+  settings: () => get('/api/settings'),
+  saveSetting: (key, value) => call('PUT', `/api/settings/${encodeURIComponent(key)}`, { value }),
+  alerts: (state = 'OPEN,ACKED') => get(`/api/alerts?state=${state}`),
+  ackAlert: (id, comment) => post(`/api/alerts/${id}/ack`, { comment }),
+  resolveAlert: (id, comment) => post(`/api/alerts/${id}/resolve`, { comment }),
+  pointRules: (pointId) => get(`/api/points/${pointId}/rules`),
+  checkers: () => get('/api/admin/checkers'),
+  saveRule: (pointId, r, ruleId) =>
+    ruleId ? call('PUT', `/api/admin/rules/${ruleId}`, r) : post(`/api/admin/points/${pointId}/rules`, r),
+  deleteRule: (ruleId) => call('DELETE', `/api/admin/rules/${ruleId}`),
+  testRule: (image, r) => {
+    const form = new FormData();
+    form.append('image', image, 'test.jpg');
+    form.append('rule', new Blob([JSON.stringify({ ruleId: 0, ...r })], { type: 'application/json' }));
+    return upload('/api/admin/rules/test', form);
+  },
+  observationResults: (id) => get(`/api/observations/${id}/results`),
+  incidents: (openOnly) => get(`/api/incidents?state=${openOnly ? 'open' : 'all'}`),
+  incident: (id) => get(`/api/incidents/${id}`),
+  incidentImageUrl: (id, kind, version) => `/api/incidents/${id}/image?kind=${kind}${version ? `&v=${encodeURIComponent(String(version))}` : ''}`,
+  approveIncident: (id) => post(`/api/incidents/${id}/approve`),
+  launchIncident: (id) => post(`/api/incidents/${id}/launch`),
+  dismissIncident: (id, comment) => post(`/api/incidents/${id}/dismiss`, { comment }),
+  resolveIncident: (id, comment) => post(`/api/incidents/${id}/resolve`, { comment }),
 
   roles: () => get('/api/admin/roles'),
   users: () => get('/api/admin/users'),

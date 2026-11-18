@@ -7,6 +7,7 @@ import { Icon } from '../../Icon';
 import { mapGeo } from '../../mapGeo';
 import { drawRobot } from '../user/Monitor';
 import { EVENT_LABEL, eventText } from '../user/inspectionText';
+import { INCIDENT_STATE, LAUNCH_MODE, checkText } from '../user/scenarioText';
 import { POINT_STATE_TEXT, fmtDur, pointState, type DashData, type Ref } from './data';
 
 export interface PanelProps { d: DashData; open: (ref: Ref) => void }
@@ -162,6 +163,13 @@ function MapPanel({ d, open }: PanelProps) {
               </button>
             );
           })}
+          {/* 열린 사건: 화재 위치. 누르면 사건 상세 */}
+          {d.incidents.map((i) => (
+            <button key={`inc${i.incidentId}`} className="dz-fire" style={{ left: geo.toPx(i.x), top: geo.toPy(i.y) }}
+              title={`사건 #${i.incidentId} · ${INCIDENT_STATE[i.state]?.[0] ?? i.state}`} onClick={() => open({ kind: 'incident', id: i.incidentId })}>
+              <Icon name="flame.fill" size={20} /><span>사건 #{i.incidentId}</span>
+            </button>
+          ))}
         </div>
       )}
       <div className="dz-legend">
@@ -256,6 +264,32 @@ function Queue({ d, open }: PanelProps) {
   );
 }
 
+// ------------------------------------------------------------------ 사건(화재 대응)
+const INC_TONE: Record<string, string> = { blue: 'blue', red: 'red', orange: 'orange', purple: 'purple', green: 'green', gray: 'gray' };
+function Incidents({ d, open }: PanelProps) {
+  if (!d.incidents.length) return <Empty><Icon name="checkmark.circle.fill" size={28} className="ok-ink" /><br />진행 중인 화재 사건이 없습니다</Empty>;
+  return (
+    <div className="dz-list scroll">
+      {d.incidents.map((i) => {
+        const [label, tone] = INCIDENT_STATE[i.state] ?? [i.state, 'gray'];
+        const wait = i.state === 'AWAITING_APPROVAL';
+        return (
+          <button key={i.incidentId} className={`dz-item alert ${wait || i.state === 'FAILED' || i.state === 'DETECTED' ? 'red' : 'orange'}`}
+            onClick={() => open({ kind: 'incident', id: i.incidentId })}>
+            <Icon name="flame.fill" size={22} />
+            <span className="grow">
+              <b>사건 #{i.incidentId}</b> <span className="dim">({i.x.toFixed(1)}, {i.y.toFixed(1)}) · {LAUNCH_MODE[i.launchMode]}</span>
+              <span className="line dim">{i.recheck?.grade ? `재판독 ${checkText(i.recheck)}` : i.closeReason ?? `감지 ${ago(i.createdAt)}`}</span>
+            </span>
+            <Pill tone={INC_TONE[tone] ?? 'gray'}>{label}</Pill>
+            <span className="when">{ago(i.createdAt)}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ------------------------------------------------------------------ 점검 지점 현황
 function Points({ d, open }: PanelProps) {
   const pts = d.overview?.points ?? [];
@@ -312,5 +346,6 @@ export const PANELS: Record<string, PanelDef> = {
   events: { title: '최근 이벤트', icon: 'list.bullet', Body: Events },
   queue: { title: '진행 · 대기 작업', icon: 'checklist', Body: Queue, extra: (d) => <span className="dim">진행 {d.activeTasks.length} · 대기 {d.backlog?.total ?? 0}</span> },
   points: { title: '점검 지점 현황', icon: 'mappin.and.ellipse', Body: Points },
+  incidents: { title: '화재 사건', icon: 'flame.fill', Body: Incidents, extra: (d) => (d.incidents.length ? <Pill tone="red">{d.incidents.length}</Pill> : <span className="dim">없음</span>) },
   schedules: { title: '예정된 점검', icon: 'calendar.badge.clock', Body: Schedules },
 };

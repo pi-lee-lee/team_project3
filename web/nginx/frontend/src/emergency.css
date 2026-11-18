@@ -1,0 +1,89 @@
+/*
+ * 비상 경고 팝업. 반드시 눈에 띄어야 하므로 화면 전체를 붉게 덮고 큰 글씨로 띄운다.
+ * 크기는 화면 크기에 비례(vw · vh)시켜 어느 모니터에서나 화면의 대부분을 차지한다.
+ * 깜박임은 '움직임 줄이기'를 켠 기기에서는 끈다.
+ */
+.emg-scrim {
+  position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 3vh 3vw;
+  background: rgba(120, 0, 0, 0.82); backdrop-filter: blur(4px);
+  animation: emg-flash 1.2s ease-in-out infinite;
+}
+@keyframes emg-flash { 50% { background: rgba(200, 10, 10, 0.86); } }
+.emg-box {
+  width: min(1100px, 92vw); max-height: 92vh; overflow-y: auto; padding: clamp(24px, 4vh, 56px) clamp(24px, 4vw, 64px);
+  background: #1a0606; color: #fff; border: 6px solid #ff3b30; border-radius: 28px;
+  box-shadow: 0 0 0 10px rgba(255, 59, 48, 0.25), 0 40px 120px rgba(0, 0, 0, 0.7);
+  animation: emg-ring 1.2s ease-in-out infinite;
+}
+@keyframes emg-ring { 50% { box-shadow: 0 0 0 26px rgba(255, 59, 48, 0.12), 0 40px 120px rgba(0, 0, 0, 0.7); } }
+.emg-head { display: flex; align-items: center; gap: 24px; }
+.emg-icon { flex: none; width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; background: #ff3b30; color: #fff; }
+.emg-label { font-size: clamp(56px, 9vh, 104px); font-weight: 800; line-height: 1; letter-spacing: 0.06em; color: #ff453a; }
+.emg-count { margin-top: 8px; font-size: clamp(18px, 2.6vh, 26px); color: #ffb4ae; font-weight: 600; }
+.emg-box h1 { margin: clamp(20px, 4vh, 40px) 0 10px; font-size: clamp(30px, 5.2vh, 56px); font-weight: 800; line-height: 1.15; letter-spacing: 0; }
+.emg-detail { margin: 0 0 8px; font-size: clamp(20px, 3vh, 30px); color: #ffd9d6; }
+.emg-meta { margin: 0; font-size: clamp(16px, 2.2vh, 22px); color: #ff9d96; }
+.emg-actions { display: flex; gap: 16px; margin-top: clamp(24px, 4vh, 44px); }
+.emg-actions button {
+  flex: 1; height: clamp(64px, 9vh, 92px); border-radius: 18px; font-size: clamp(22px, 3.2vh, 32px); font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; border: none;
+}
+.emg-actions .emg-ok { background: #ff3b30; color: #fff; }
+.emg-actions .emg-ok:hover { background: #ff5449; }
+.emg-actions .emg-open { background: rgba(255, 255, 255, 0.12); color: #fff; border: 2px solid rgba(255, 255, 255, 0.35); }
+.emg-actions .emg-open:hover { background: rgba(255, 255, 255, 0.2); }
+.emg-actions button:disabled { opacity: 0.5; cursor: wait; }
+.emg-actions button:focus-visible { outline: 4px solid #fff; outline-offset: 3px; }
+.emg-rest { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255, 99, 90, 0.4); }
+.emg-rest-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 20px; }
+.emg-rest-head button { padding: 8px 18px; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.14); color: #fff; font-size: 17px; font-weight: 600; cursor: pointer; }
+.emg-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; margin-bottom: 6px; border: none; border-radius: 12px; background: rgba(255, 59, 48, 0.16); color: #fff; font-size: 19px; text-align: left; cursor: pointer; }
+.emg-row:hover { background: rgba(255, 59, 48, 0.3); }
+.emg-row span:nth-of-type(2) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emg-row .emg-when, .emg-more, .emg-note { color: #ff9d96; font-size: 16px; }
+.emg-note { margin: 20px 0 0; }
+@media (max-width: 743px) {
+  .emg-head { gap: 14px; }
+  .emg-icon { width: 76px; height: 76px; }
+  .emg-icon .icon { font-size: 44px !important; }
+  .emg-actions { flex-direction: column-reverse; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .emg-scrim, .emg-box { animation: none; }
+}
+
+/* ---------------------------------------------------------------- 투척 승인 팝업
+ * 비상 팝업보다 위에 뜬다(z-index). 카메라 화면을 크게 두고, 승인 단추를 가장 눈에 띄게 한다. */
+.lch-scrim { z-index: 10010; background: rgba(60, 0, 0, 0.9); animation: none; }
+.lch-box { width: min(1400px, 95vw); padding: clamp(18px, 3vh, 36px) clamp(18px, 3vw, 44px); }
+.lch-head { display: flex; align-items: center; gap: 18px; }
+.lch-icon { width: 84px; height: 84px; }
+.lch-titles { flex: 1; min-width: 0; }
+.lch-label { font-size: clamp(30px, 5vh, 54px); font-weight: 800; line-height: 1.05; color: #ff453a; letter-spacing: 0.02em; }
+.lch-box h1 { margin: 6px 0 0; font-size: clamp(18px, 2.8vh, 28px); font-weight: 600; color: #ffd9d6; }
+.lch-more { flex: none; padding: 6px 14px; border-radius: 999px; background: rgba(255, 59, 48, 0.25); font-size: 18px; font-weight: 700; }
+.lch-main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr); gap: clamp(14px, 2vw, 28px); margin-top: clamp(14px, 2.4vh, 26px); }
+.lch-camera { position: relative; aspect-ratio: 4 / 3; max-height: 56vh; border-radius: 16px; overflow: hidden; background: #000; border: 2px solid rgba(255, 99, 90, 0.6); display: grid; place-items: center; color: #ff9d96; }
+.lch-camera img { width: 100%; height: 100%; object-fit: contain; }
+.lch-live { position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 16px; font-weight: 600; }
+.lch-live i { width: 10px; height: 10px; border-radius: 50%; background: #ff3b30; animation: dz-live 1.2s ease-in-out infinite; }
+@keyframes dz-live { 50% { opacity: 0.25; } }
+.lch-info { display: flex; flex-direction: column; gap: 4px; font-size: clamp(17px, 2.3vh, 22px); }
+.lch-info > div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255, 99, 90, 0.3); }
+.lch-info span { color: #ff9d96; }
+.lch-info b.red { color: #ff453a; }
+.lch-info .orange, .lch-info b.orange { color: #ffb340; }
+.lch-info p { margin: 10px 0 0; font-size: clamp(15px, 2vh, 19px); color: #ffd9d6; }
+.lch-error { margin: 14px 0 0; padding: 10px 14px; border-radius: 10px; background: rgba(255, 255, 255, 0.12); font-size: 18px; }
+.lch-actions { margin-top: clamp(16px, 2.6vh, 28px); }
+.lch-actions button { flex: 1; font-size: clamp(18px, 2.5vh, 24px); height: clamp(58px, 8vh, 80px); }
+.lch-actions .lch-later { flex: 0.6; }
+.lch-actions .lch-approve { flex: 2; font-size: clamp(24px, 3.4vh, 34px); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); animation: lch-pulse 1.4s ease-out infinite; }
+@keyframes lch-pulse { 70% { box-shadow: 0 0 0 22px rgba(255, 59, 48, 0); } }
+@media (max-width: 900px) {
+  .lch-main { grid-template-columns: 1fr; }
+  .lch-actions { flex-wrap: wrap; flex-direction: row; }
+  .lch-actions button { flex: 1 1 40%; }
+  .lch-actions .lch-approve { flex: 1 1 100%; order: -1; }
+}
+@media (prefers-reduced-motion: reduce) { .lch-actions .lch-approve, .lch-live i { animation: none; } }

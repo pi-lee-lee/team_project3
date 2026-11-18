@@ -10,9 +10,9 @@
 //    │ 로봇  │              │ 카메라    │         │
 //  6 ├──────┤    지도       ├──────────┤  경고    │
 //    │ 진행  │              │ 점검 지점  │         │
-//  9 │ 대기  ├──────────────┴──────────┼─────────┤
-//    │ 작업  │ 예정된 점검               │ 이벤트   │
-// 12 └──────┴─────────────────────────┴─────────┘
+//  9 │ 대기  ├────────────┬─┴──────────┼─────────┤
+//    │ 작업  │ 사건(화재)  │ 예정된 점검  │ 이벤트   │
+// 12 └──────┴────────────┴────────────┴─────────┘
 export interface Slot { panel: string; col: number; row: number; w: number; h: number }
 
 export const COLS = 24;
@@ -25,7 +25,8 @@ export const LAYOUT: Slot[] = [
   { panel: 'map', col: 7, row: 3, w: 7, h: 7 },
   { panel: 'camera', col: 14, row: 3, w: 4, h: 3 },
   { panel: 'points', col: 14, row: 6, w: 4, h: 4 },
-  { panel: 'schedules', col: 7, row: 10, w: 11, h: 3 },
+  { panel: 'incidents', col: 7, row: 10, w: 6, h: 3 },
+  { panel: 'schedules', col: 13, row: 10, w: 5, h: 3 },
   { panel: 'alerts', col: 18, row: 3, w: 7, h: 5 },
   { panel: 'events', col: 18, row: 8, w: 7, h: 5 },
 ];

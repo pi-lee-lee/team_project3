@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROLE_LABEL, useApi, useAuth } from '../../util';
+import { LAUNCH_MODE } from '../user/scenarioText';
 import { Icon } from '../../Icon';
 import { useDashData, type DashData, type Ref } from './data';
 import { COLS, LAYOUT, ROWS } from './layout';
 import { PANELS } from './panels';
 import { DETAILS } from './details';
+import { EmergencyDialog } from '../../EmergencyDialog';
+import { LaunchDialog } from '../../LaunchDialog';
 import './dashboard.css';
 
 /** 설계 크기. 16:9 모니터 한 장을 가득 채우는 화면이고 반응형이 아니다 — 창 크기에 맞춰 통째로 확대·축소만 한다. */
@@ -17,6 +20,7 @@ const W = 1920, H = 1080;
  */
 export default function Dashboard() {
   const d = useDashData();
+  const { me } = useAuth();
   // 상세 창은 쌓인다: 상세 안에서 다른 상세로 넘어가면 뒤로 돌아올 수 있다
   const [stack, setStack] = useState<Ref[]>([]);
   const open = (r: Ref) => setStack((s) => [...s, r]);
@@ -57,6 +61,14 @@ export default function Dashboard() {
         </div>
         {top && <Detail r={top} d={d} open={open} close={close} back={stack.length > 1 ? back : undefined} />}
       </div>
+      {/* 투척 승인 팝업(비상 팝업보다 위). 대시보드 계정도 승인할 수 있다 — 조회 전용의 유일한 예외 */}
+      <LaunchDialog canDismiss={!!me && ['SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)}
+        onOpen={(id) => open({ kind: 'incident', id })} />
+      {/* 비상 등급 경고 팝업. 사용자 역할이면 확인을 서버에 남기고, 대시보드 전용 계정이면 이 화면에서만 닫는다 */}
+      <EmergencyDialog canAck={!!me && ['SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)} onOpen={(a) => open(
+        a.ref_kind === 'incident' ? { kind: 'incident', id: a.ref_id }
+          : a.ref_kind === 'observation' && a.task_id ? { kind: 'observation', id: a.ref_id, taskId: a.task_id }
+            : a.task_id ? { kind: 'task', id: a.task_id } : { kind: 'system' })} />
     </div>
   );
 }
@@ -103,6 +115,11 @@ function Header({ d, open }: { d: DashData; open: (r: Ref) => void }) {
       <div className={`dz-state ${d.error ? 'red' : critical ? 'red' : d.alerts.length ? 'orange' : 'green'}`}>
         <i />{d.error ? `서버 응답 없음 · ${d.error}` : critical ? '비상 · 즉시 확인' : d.alerts.length ? `경고 ${d.alerts.length}건` : '정상 운용 중'}
       </div>
+      {d.launchMode && (
+        <div className={`dz-mode ${d.launchMode === 'AUTO' ? 'purple' : 'blue'}`} title="화재 대응 시 투척을 시작하는 방식">
+          <Icon name="paperplane.fill" size={16} />투척 {LAUNCH_MODE[d.launchMode]}
+        </div>
+      )}
       <span className="grow" />
       <button className="dz-services" onClick={() => open({ kind: 'system' })} title="시스템 상태">
         <Icon name="server.rack" size={18} />

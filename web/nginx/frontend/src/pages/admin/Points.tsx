@@ -29,7 +29,7 @@ export default function Points() {
       <ErrorBox msg={points.error} />
       {points.data && points.data.length === 0 && <Empty icon="mappin.and.ellipse" title="등록된 지점이 없습니다" />}
       {!!points.data?.length && (
-        <Group className="admin-list" footer="비활성 지점은 새 요청에서 숨기고 지난 기록은 그대로 둡니다.">
+        <Group className="admin-list" footer="비활성 지점은 새 요청에서 숨기고 지난 기록은 그대로 둡니다. '규칙'에서 그 지점의 사진을 무엇으로 판독할지 정합니다.">
           {points.data.map((p) => (
             <Row key={p.point_id} to={`/admin/points/${p.point_id}/edit`} rich className={p.active ? '' : 'dim'}
               icon="mappin.and.ellipse" iconColor={p.active ? 'var(--teal)' : '#8e8e93'}
@@ -43,7 +43,10 @@ export default function Points() {
                   <Meta icon="location.fill">x {Number(p.x).toFixed(2)} · y {Number(p.y).toFixed(2)}</Meta>
                   <Heading deg={p.yaw_deg} />
                 </MetaLine>
-              </>} />
+              </>}
+              right={<button type="button" className="rules-link" title="이 지점의 점검 규칙"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); nav(`/admin/points/${p.point_id}/rules`); }}>
+                <Icon name="ruler" size={16} />규칙</button>} />
           ))}
         </Group>
       )}

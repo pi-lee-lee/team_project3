@@ -2,7 +2,7 @@
 // 패널은 여기서 만든 DashData 만 읽는다 — 새 정보가 필요하면 이 파일에 폴링 한 줄을 더하고 DashData 에 싣는다.
 import { useEffect, useMemo, useState } from 'react';
 import type {
-  Backlog, DashAlert, DashOverview, DashPoint, MapInfo, MapView, RobotStatus, Schedule, SystemStatus, TaskRow,
+  Backlog, DashAlert, DashOverview, DashPoint, Incident, LaunchMode, MapInfo, MapView, RobotStatus, Schedule, SystemStatus, TaskRow,
 } from '../../api/types';
 import { REASON_LABEL, useApi, usePoll } from '../../util';
 
@@ -13,6 +13,7 @@ export type Ref =
   | { kind: 'robot'; id: number }
   | { kind: 'schedule'; id: number }
   | { kind: 'point'; id: number }
+  | { kind: 'incident'; id: number }
   | { kind: 'tasks'; group: 'active' | 'done' | 'failed' }
   | { kind: 'system' };
 
@@ -28,6 +29,9 @@ export interface DashData {
   schedules: Schedule[];
   system: SystemStatus | null;
   alerts: Alert[];
+  /** 열린 사건(화재 대응)과 지금의 투척 모드 */
+  incidents: Incident[];
+  launchMode: LaunchMode | null;
   /** 지도·카메라에 보이는 로봇 */
   robotId: number | null;
   setRobotId: (id: number) => void;
@@ -87,6 +91,7 @@ export function useDashData(): DashData {
   return {
     overview: overview.data, robots: robots.data ?? [], activeTasks: activeTasks.data ?? [], backlog: backlog.data,
     schedules: schedules.data?.schedules ?? [], system: system.data, alerts,
+    incidents: overview.data?.incidents ?? [], launchMode: overview.data?.launchMode ?? null,
     robotId, setRobotId, map: map.data, view: view.data, clock,
     error: overview.error ?? robots.error,
   };
@@ -100,18 +105,25 @@ const ALERT_TEXT: Record<string, [string, string]> = {
   OBS_RETAKE: ['photo', '재촬영 후보'],
   TASK_FAILED: ['xmark.circle.fill', '작업 실패'],
   TASK_INTERRUPTED: ['exclamationmark.triangle.fill', '작업 중단(상태 불명)'],
+  // 경고 표에서 오는 것(확인 · 해제를 남긴다)
+  RULE_VIOLATION: ['ruler', '규칙 위반'],
+  FIRE_DETECTED: ['flame.fill', '화재 감지'],
+  HEAT_WARNING: ['flame.fill', '열원 감지'],
 };
 
 function fromServer(a: DashAlert): Alert {
   const [icon, label] = ALERT_TEXT[a.type] ?? ['exclamationmark.triangle.fill', a.type];
   const where = a.point_code ? `${a.point_code} ${a.point_name ?? ''}`.trim() : a.task_id ? `작업 #${a.task_id}` : '';
-  const ref: Ref = a.ref_kind === 'observation' && a.ref_id && a.task_id
-    ? { kind: 'observation', id: a.ref_id, taskId: a.task_id }
-    : { kind: 'task', id: a.task_id ?? a.ref_id ?? 0 };
+  const ref: Ref = a.ref_kind === 'incident' && a.ref_id ? { kind: 'incident', id: a.ref_id }
+    : a.ref_kind === 'observation' && a.ref_id && a.task_id ? { kind: 'observation', id: a.ref_id, taskId: a.task_id }
+      : a.ref_kind === 'robot' && a.ref_id ? { kind: 'robot', id: a.ref_id }
+        : { kind: 'task', id: a.task_id ?? a.ref_id ?? 0 };
   return {
-    key: `${a.type}-${a.ref_kind}-${a.ref_id}`, severity: a.severity, icon,
-    title: where ? `${where} · ${label}` : label,
-    detail: a.detail ? (REASON_LABEL[a.detail] ?? a.detail) : a.task_id && a.point_code ? `작업 #${a.task_id}` : '',
+    key: a.alert_id ? `alert-${a.alert_id}` : `${a.type}-${a.ref_kind}-${a.ref_id}`, severity: a.severity, icon,
+    // 경고 표에서 온 것은 제목이 이미 있다(지점 · 규칙 이름 등)
+    title: a.title ? a.title : where ? `${where} · ${label}` : label,
+    detail: a.title ? [a.detail, a.state === 'ACKED' ? '확인함' : ''].filter(Boolean).join(' · ')
+      : a.detail ? (REASON_LABEL[a.detail] ?? a.detail) : a.task_id && a.point_code ? `작업 #${a.task_id}` : '',
     at: a.at, ref,
   };
 }
@@ -149,11 +161,16 @@ export type PointState = 'ok' | 'bad' | 'warn' | 'wait' | 'none';
 /** 지점의 현재 상태: 가장 최근 관측과 그 판정으로 정한다. */
 export function pointState(p: DashPoint): PointState {
   if (!p.observation_id) return 'none';
+  // 사람 판정이 있으면 그것이 우선한다
   if (p.review_result === 'ABNORMAL') return 'bad';
   if (p.review_result === 'NORMAL') return 'ok';
+  // 규칙 등급: 3 비상 · 2 경고 · 1 판독 불가 · 0 정상
+  if (p.grade_rank === 3) return 'bad';
+  if (p.grade_rank === 2 || p.grade_rank === 1) return 'warn';
+  if (p.grade_rank === 0 && p.status === 'CAPTURED' && p.verdict !== 'RETAKE') return 'ok';
   if (p.status === 'UNABLE' || p.review_result === 'UNABLE' || p.verdict === 'RETAKE') return 'warn';
   return 'wait';
 }
 export const POINT_STATE_TEXT: Record<PointState, string> = {
-  ok: '정상', bad: '이상', warn: '확인 필요', wait: '판정 대기', none: '기록 없음',
+  ok: '정상', bad: '비상 · 이상', warn: '경고 · 확인 필요', wait: '판정 대기', none: '기록 없음',
 };

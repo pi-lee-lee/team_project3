@@ -68,3 +68,44 @@
 .ev-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .cell.rich .thumb-sm { margin-top: 2px; }
 .thumb .meta-line { margin-top: 2px; }
+
+/* ---------------------------------------------------------------- 시나리오: 규칙 결과 · 경고 · 사건 */
+/* 사진 위 사각형: 찾은 자리(초록 실선) · 기대 영역(파란 점선) */
+.photo-overlay { position: relative; margin: 0 0 22px; border-radius: var(--radius); overflow: hidden; background: #000; line-height: 0; }
+.photo-overlay img { width: 100%; display: block; }
+.ov-box { position: absolute; box-sizing: border-box; pointer-events: none; line-height: 1.2; }
+.ov-box.found { border: 2px solid #30d158; box-shadow: 0 0 0 1px rgba(0, 0, 0, .5); }
+.ov-box.expected { border: 2px dashed #0a84ff; }
+.ov-box b { position: absolute; left: -2px; top: -20px; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #fff; background: #1f9d3f; white-space: nowrap; }
+.ov-legend { display: flex; gap: 14px; margin: -14px 4px 18px; font-size: 12px; color: var(--label2); }
+.ov-legend i { display: inline-block; width: 14px; height: 10px; margin-right: 5px; vertical-align: -1px; border: 2px solid #30d158; }
+.ov-legend i.expected { border: 2px dashed #0a84ff; }
+
+/* 사건 띠(사용자 영역 맨 위): 열린 사건이 있으면 빨갛게 알린다 */
+.incident-banner { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--ink-red); border-radius: var(--radius); padding: 10px 14px; margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+.incident-banner.wait { background: var(--red); color: #fff; }
+.incident-banner a { color: inherit; text-decoration: underline; font-weight: 700; }
+.incident-banner .grow { flex: 1; }
+.incident-banner .item { font-weight: 400; }
+
+/* 사건 단계 */
+.inc-steps { list-style: none; display: flex; gap: 0; margin: 0 0 18px; padding: 12px 14px; background: var(--bg-grouped); border-radius: var(--radius); box-shadow: var(--surface-ring); overflow-x: auto; }
+.inc-steps li { flex: 1; min-width: 64px; position: relative; padding-top: 22px; text-align: center; font-size: 12px; color: var(--label3); white-space: nowrap; }
+.inc-steps li small { display: none; }
+.inc-steps li i { position: absolute; left: 50%; top: 2px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--fill); z-index: 1; }
+.inc-steps li::before { content: ''; position: absolute; left: -50%; right: 50%; top: 8px; height: 2px; background: var(--fill); }
+.inc-steps li:first-child::before { display: none; }
+.inc-steps li.done { color: var(--label2); }
+.inc-steps li.done i, .inc-steps li.done::before { background: var(--green); }
+.inc-steps li.now { color: var(--label); font-weight: 700; }
+.inc-steps li.now i { background: var(--blue); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 25%, transparent); }
+.inc-steps li.now::before { background: var(--green); }
+.inc-steps.failed li.now i { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 25%, transparent); }
+.inc-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 22px; }
+.inc-photos figure { margin: 0; }
+.inc-photos img, .inc-photos .ph { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--fill2); display: grid; place-items: center; color: var(--label3); font-size: 12px; }
+.inc-photos figcaption { font-size: 12px; color: var(--label2); margin-top: 4px; text-align: center; }
+@media (max-width: 743px) { .inc-photos { grid-template-columns: 1fr; } }
+.cell-actions { display: flex; gap: 6px; flex: none; }
+.cell-actions button { padding: 5px 10px; font-size: 13px; }
+button.danger { background: var(--red); color: #fff; }

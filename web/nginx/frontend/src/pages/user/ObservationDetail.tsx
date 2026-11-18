@@ -4,6 +4,7 @@ import type { Review } from '../../api/types';
 import { ErrorBox, ReasonBadge, fmtTime, useAction, useApi, usePoll } from '../../util';
 import { ActionBar, Empty, Field, Group, Notice, Page, Row, Segmented } from '../../ui';
 import { RESULT, ResultText } from './inspectionText';
+import { CHECKER_LABEL, GradeTag, PhotoOverlay, resultBoxes, valueText } from './scenarioText';
 import './user.css';
 
 type Choice = '' | Review['result'];
@@ -15,6 +16,8 @@ export default function ObservationDetail() {
   const api = useApi();
   const navigate = useNavigate();
   const task = usePoll(() => api.task(Number(id)), 5000, [id]);
+  // 규칙별 판독 결과(등급 · 읽은 값 · 찾은 자리). 분석이 끝나면 채워진다
+  const results = usePoll(() => api.observationResults(Number(obsId)).catch(() => []), 5000, [obsId]);
   const act = useAction();
   const [choice, setChoice] = useState<Choice>('');
   const [comment, setComment] = useState('');
@@ -30,6 +33,10 @@ export default function ObservationDetail() {
       </Page>
     );
   }
+
+  const rr = results.data ?? [];
+  // 기대 영역은 판독 당시 규칙의 것(터틀봇 사진 기준)
+  const boxes = resultBoxes(rr, Object.fromEntries(rr.map((r) => [r.ruleId, r.rule?.regions?.INSPECTOR])));
 
   const needComment = choice === 'UNABLE';
   const canSave = !!choice && !act.busy && (!needComment || !!comment.trim());
@@ -49,10 +56,30 @@ export default function ObservationDetail() {
       <div className="has-action-bar">
         <ErrorBox msg={act.error || task.error} />
         {o.has_image ? (
-          <a className="photo-link" href={api.imageUrl(o.observation_id)} target="_blank" rel="noreferrer" title="원본 열기">
-            <img className="photo-full" src={api.imageUrl(o.observation_id)} alt={`${o.point_code} 관측 사진`} />
-          </a>
+          boxes.length ? <>
+            <a href={api.imageUrl(o.observation_id)} target="_blank" rel="noreferrer" title="원본 열기">
+              <PhotoOverlay src={api.imageUrl(o.observation_id)} alt={`${o.point_code} 관측 사진`} boxes={boxes} />
+            </a>
+            <div className="ov-legend"><span><i />찾은 자리</span><span><i className="expected" />기대 영역</span></div>
+          </> : (
+            <a className="photo-link" href={api.imageUrl(o.observation_id)} target="_blank" rel="noreferrer" title="원본 열기">
+              <img className="photo-full" src={api.imageUrl(o.observation_id)} alt={`${o.point_code} 관측 사진`} />
+            </a>
+          )
         ) : <div className="novideo photo-empty">촬영 없음</div>}
+
+        {rr.length > 0 && (
+          <Group header="규칙 판독" footer="사진을 규칙의 판독기로 읽고 등급 기준으로 나눈 결과입니다. 사람 판정이 있으면 그것이 우선합니다.">
+            {rr.map((r) => (
+              <Row key={r.ruleId} rich
+                title={<>{r.rule?.name ?? `규칙 #${r.ruleId}`}<GradeTag grade={r.grade} /></>}
+                subtitle={<>
+                  {CHECKER_LABEL[r.rule?.kind ?? ''] ?? r.rule?.kind ?? ''} · 읽은 값 {valueText(r.value, r.unit)}
+                  {r.reason ? ` · ${r.reason}` : ''}
+                </>} />
+            ))}
+          </Group>
+        )}
 
         {o.status === 'UNABLE' ? (
           <Group header="확인 불가">

@@ -27,6 +27,16 @@ import PlanDetail from './pages/user/plans/PlanDetail';
 import PlanForm from './pages/user/plans/PlanForm';
 import DelayBanner from './pages/user/DelayBanner';
 import Dashboard from './pages/dashboard/Dashboard';
+import Rules from './pages/admin/Rules';
+import RuleForm from './pages/admin/RuleForm';
+import Settings from './pages/admin/Settings';
+import Alerts from './pages/user/Alerts';
+import Incidents from './pages/user/Incidents';
+import IncidentDetail from './pages/user/IncidentDetail';
+import IncidentBanner from './pages/user/IncidentBanner';
+import { EmergencyDialog } from './EmergencyDialog';
+import Demo from './pages/admin/Demo';
+import { LaunchDialog } from './LaunchDialog';
 
 const USER_ROLES: Role[] = ['SUPERVISOR', 'MANAGER', 'USER'];
 
@@ -69,9 +79,15 @@ export default function App() {
           <Route path="/admin/points" element={<Points />} />
           <Route path="/admin/points/new" element={<PointForm />} />
           <Route path="/admin/points/:id/edit" element={<PointForm />} />
+          {/* 점검 규칙: 지점마다 판독기 종류 · 설정 · 등급 기준 */}
+          <Route path="/admin/points/:id/rules" element={<Rules />} />
+          <Route path="/admin/points/:id/rules/new" element={<RuleForm />} />
+          <Route path="/admin/points/:id/rules/:ruleId/edit" element={<RuleForm />} />
+          <Route path="/admin/settings" element={<Settings />} />
           <Route path="/admin/analysis" element={<AnalysisCriteria />} />
           <Route path="/admin/audit" element={<Audit />} />
           <Route path="/admin/system" element={<SystemStatus />} />
+          <Route path="/admin/demo" element={<Demo />} />
         </Route>
         <Route element={<Shell area="user" roles={USER_ROLES} />}>
           <Route path="/app/monitor" element={<Monitor />} />
@@ -85,6 +101,9 @@ export default function App() {
           <Route path="/app/tasks" element={<Tasks />} />
           <Route path="/app/tasks/:id" element={<TaskDetail />} />
           <Route path="/app/tasks/:id/observations/:obsId" element={<ObservationDetail />} />
+          <Route path="/app/alerts" element={<Alerts />} />
+          <Route path="/app/incidents" element={<Incidents />} />
+          <Route path="/app/incidents/:id" element={<IncidentDetail />} />
           <Route path="/app/history" element={<History />} />
           <Route path="/app/history/:pointId" element={<PointHistory />} />
         </Route>
@@ -99,10 +118,11 @@ const MENUS: Record<'admin' | 'user', [string, string, string][]> = {
   admin: [
     ['/admin/users', '사용자', 'person.2'], ['/admin/robots', '로봇', 'cpu'], ['/admin/points', '점검 지점', 'mappin.and.ellipse'],
     ['/admin/analysis', '분석 기준', 'slider.horizontal.3'], ['/admin/audit', '감사 로그', 'list.bullet.clipboard'],
-    ['/admin/system', '시스템', 'server.rack'],
+    ['/admin/demo', '시연', 'play.fill'], ['/admin/settings', '설정', 'gearshape'], ['/admin/system', '시스템', 'server.rack'],
   ],
   user: [
     ['/app/monitor', '관제', 'video'], ['/app/plans', '점검', 'calendar.badge.clock'], ['/app/tasks', '작업', 'checklist'],
+    ['/app/alerts', '경고', 'bell.fill'], ['/app/incidents', '사건', 'flame.fill'],
     ['/app/history', '지점 이력', 'clock.arrow.circlepath'],
   ],
 };
@@ -140,6 +160,16 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
         </div>
       </aside>
       <main>
+        {/* 비상 등급 경고는 어느 화면에 있든 큰 팝업으로 띄운다 */}
+        {area === 'user' && (
+          <EmergencyDialog canAck onOpen={(a) => navigate(
+            a.ref_kind === 'incident' ? `/app/incidents/${a.ref_id}`
+              : a.ref_kind === 'observation' && a.task_id ? `/app/tasks/${a.task_id}/observations/${a.ref_id}`
+                : '/app/alerts')} />
+        )}
+        {/* 투척 승인 팝업: 로봇이 투척 위치에 도착해 승인을 기다리면 카메라 화면과 함께 띄운다(비상 팝업보다 위) */}
+        {area === 'user' && <LaunchDialog canDismiss onOpen={(id) => navigate(`/app/incidents/${id}`)} />}
+        {area === 'user' && <IncidentBanner />}
         {area === 'user' && <DelayBanner />}
         <Outlet />
         {/* 스마트폰: 사이드바가 없으므로 사용자 영역(이름·서버 시간)을 화면 맨 아래에 둔다 */}

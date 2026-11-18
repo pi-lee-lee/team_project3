@@ -70,6 +70,17 @@ const SYMBOLS: Record<string, string> = {
   'bolt.fill': 'bolt',
   'hourglass': 'hourglass_top',
   'eye': 'visibility',
+  // 시나리오: 규칙 · 경고 · 사건 · 설정
+  'gearshape': 'settings',
+  'ruler': 'rule',
+  'target': 'adjust',
+  'paperplane.fill': 'send',
+  'checkmark.seal.fill': 'verified',
+  'hand.thumbsup.fill': 'thumb_up',
+  'bell.slash': 'notifications_off',
+  'viewfinder': 'center_focus_strong',
+  'flask': 'science',
+  'gauge.needle': 'speed',
 };
 
 export function Icon({ name, size = 18, className = '', title }: { name: string; size?: number; className?: string; title?: string }) {

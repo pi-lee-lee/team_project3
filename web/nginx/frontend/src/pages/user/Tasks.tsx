@@ -34,7 +34,8 @@ export default function Tasks() {
                 {t.schedule_id ? (t.note?.startsWith('예약 점검')
                   ? <Tag tone="orange" icon="calendar.badge.clock">예약</Tag>
                   : <Tag tone="indigo" icon="checklist">계획</Tag>) : null}
-                {t.recheck_of ? <Tag tone="purple" icon="arrow.uturn.backward">재점검</Tag> : null}</>}
+                {t.recheck_of ? <Tag tone="purple" icon="arrow.uturn.backward">재점검</Tag> : null}
+                {t.kind === 'RESPONSE' ? <Tag tone="red" icon="flame.fill">화재 출동</Tag> : null}</>}
               subtitle={<>
                 <MetaLine><RobotChip code={t.robot_code} /><RouteChips points={t.points} /></MetaLine>
                 <MetaLine>

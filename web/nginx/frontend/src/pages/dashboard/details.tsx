@@ -5,6 +5,10 @@ import type { Observation } from '../../api/types';
 import { REASON_LABEL, ago, fmtTime, useApi, usePoll } from '../../util';
 import { Icon } from '../../Icon';
 import { EVENT_LABEL, RESULT, SOURCE, eventText } from '../user/inspectionText';
+import {
+  CHECKER_LABEL, GRADE, INCIDENT_EVENT, INCIDENT_STATE, IncidentSteps, LAUNCH_MODE, PhotoOverlay, checkText, gradeText,
+  incidentEventText, resultBoxes, valueText,
+} from '../user/scenarioText';
 import { fmtDur, type DashData, type Ref } from './data';
 import { Dot, Pill, TaskPill, robotActivity } from './panels';
 
@@ -87,16 +91,30 @@ function TaskDetail({ r, open }: DetailProps<'task'>) {
 function ObservationDetail({ r, open }: DetailProps<'observation'>) {
   const api = useApi();
   const q = usePoll(() => api.task(r.taskId), 5000, [r.taskId]);
+  const res = usePoll(() => api.observationResults(r.id).catch(() => []), 5000, [r.id]);
+  const rr = res.data ?? [];
   const o = q.data?.observations.find((x) => x.observation_id === r.id);
   if (!q.data) return <Loading error={q.error} />;
   if (!o) return <div className="dz-empty">관측을 찾을 수 없습니다</div>;
   return (
     <div className="dz-cols photo">
       <div className="dz-photo">
-        {o.has_image ? <img src={api.imageUrl(o.observation_id)} alt={`${o.point_code} 사진`} />
+        {o.has_image
+          ? <PhotoOverlay className="dz-ov" src={api.imageUrl(o.observation_id)} alt={`${o.point_code} 사진`}
+            boxes={resultBoxes(rr, Object.fromEntries(rr.map((x) => [x.ruleId, x.rule?.regions?.INSPECTOR])))} />
           : <span className="noimg"><Icon name="nosign" size={48} />사진 없음</span>}
       </div>
       <div>
+        {rr.length > 0 && (
+          <Section title="규칙 판독 (초록 = 찾은 자리, 파란 점선 = 기대 영역)">
+            {rr.map((x) => (
+              <KV key={x.ruleId} k={x.rule?.name ?? `규칙 #${x.ruleId}`}>
+                <Pill tone={GRADE[x.grade]?.[1]}>{gradeText(x.grade)}</Pill>{' '}
+                <span className="dim">{CHECKER_LABEL[x.rule?.kind ?? ''] ?? ''} · 읽은 값 {valueText(x.value, x.unit)}{x.reason ? ` · ${x.reason}` : ''}</span>
+              </KV>
+            ))}
+          </Section>
+        )}
         <Section title="관측">
           <KV k="지점"><button className="dz-link" onClick={() => open({ kind: 'point', id: o.point_id })}>{o.point_code} {o.point_name}</button></KV>
           <KV k="촬영">{fmtTime(o.captured_at)} ({ago(o.captured_at)})</KV>
@@ -147,6 +165,10 @@ function RobotDetail({ r, d, open }: DetailProps<'robot'>) {
           <KV k="제어권">{s.control ? `${s.control.kind === 'MISSION' ? '점검 임무' : '사용자'} · ${s.control.login} · ${ago(s.control.since)}` : '없음'}</KV>
           {s.mission && <KV k="임무"><button className="dz-link" onClick={() => open({ kind: 'task', id: s.mission!.missionId })}>작업 #{s.mission.missionId} 보기</button></KV>}
           {back && back.count > 0 && <KV k="대기 예약">{back.count}건 · 최대 {fmtDur(back.maxDelaySec)} 지연</KV>}
+          <KV k="투척 기구">{s.launcher
+            ? <><Pill tone={s.launcher.ready ? 'green' : 'red'}>{s.launcher.ready ? '준비됨' : '준비 안 됨'}</Pill>{' '}
+              <span className="dim">{s.launcher.remaining >= 0 ? `남은 수 ${s.launcher.remaining}` : '남은 수 모름'}{s.launcher.fault ? ` · ${s.launcher.fault}` : ''}</span></>
+            : <span className="dim">없음 또는 응답 없음</span>}</KV>
         </Section>
         {s.capabilities && (
           <Section title="제공 기능">
@@ -160,6 +182,63 @@ function RobotDetail({ r, d, open }: DetailProps<'robot'>) {
         )}
       </div>
     </div>
+  );
+}
+
+// ------------------------------------------------------------------ 사건(화재 대응)
+function IncidentDetail({ r, d, open }: DetailProps<'incident'>) {
+  const api = useApi();
+  const q = usePoll(() => api.incident(r.id), 3000, [r.id]);
+  const i = q.data;
+  if (!i) return <Loading error={q.error} />;
+  const robot = (id: number | null) => (id == null ? '-' : d.robots.find((x) => x.robotId === id)?.code ?? `로봇 #${id}`);
+  const [label, tone] = INCIDENT_STATE[i.state] ?? [i.state, 'gray'];
+  const photos: ['detection' | 'recheck' | 'after', string][] = [['detection', '감지 사진'], ['recheck', '도착 후'], ['after', '투척 후']];
+  return (
+    <>
+      <IncidentSteps incident={i} className="dz-steps" />
+      <div className="dz-cols">
+        <div>
+          <Section title="사건">
+            <KV k="상태"><Pill tone={tone}>{label}</Pill> {i.closeReason && <span className="dim">{i.closeReason}</span>}</KV>
+            <KV k="투척 모드">{LAUNCH_MODE[i.launchMode]}</KV>
+            <KV k="위치">x {i.x.toFixed(2)} · y {i.y.toFixed(2)}</KV>
+            <KV k="감지">{robot(i.detectedBy)} · {fmtTime(i.createdAt)} ({ago(i.createdAt)})</KV>
+            <KV k="대응 로봇">
+              {i.responderId != null ? <button className="dz-link" onClick={() => open({ kind: 'robot', id: i.responderId! })}>{robot(i.responderId)}</button> : '-'}
+            </KV>
+            <KV k="출동 작업">{i.taskId ? <button className="dz-link" onClick={() => open({ kind: 'task', id: i.taskId! })}>작업 #{i.taskId} 보기</button> : '아직 없음'}</KV>
+            <KV k="도착 후 재판독">{checkText(i.recheck)}</KV>
+            <KV k="투척 후 판독">{checkText(i.afterCheck)}</KV>
+            {i.approvedBy && <KV k="승인">{i.approvedBy} · {fmtTime(i.approvedAt)}</KV>}
+          </Section>
+          <Section title="사진">
+            <div className="dz-obs-grid three">
+              {photos.map(([kind, name]) => (
+                <div key={kind} className="dz-obs static">
+                  {i.images[kind] ? <img src={api.incidentImageUrl(i.incidentId, kind, String(i.updatedAt))} alt={name} />
+                    : <span className="noimg"><Icon name="photo" size={28} />없음</span>}
+                  <span className="cap"><b>{name}</b></span>
+                </div>
+              ))}
+            </div>
+          </Section>
+        </div>
+        <Section title="사건 기록">
+          <div className="dz-timeline">
+            {(i.events ?? []).map((e) => (
+              <div key={e.event_id}>
+                <span className="mono dim">{fmtTime(e.occurred_at, false)}</span>
+                <Dot tone={e.source === 'USER' ? 'purple' : e.source === 'ROBOT' ? 'green' : 'blue'} />
+                <span><b>{INCIDENT_EVENT[e.type] ?? e.type}</b> <span className="dim">{incidentEventText(e)}</span></span>
+                <span className="dim">{SOURCE[e.source]}{e.actor ? ` · ${e.actor}` : ''}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      </div>
+      {i.state === 'AWAITING_APPROVAL' && <div className="dz-note">투척 승인은 사용자 화면의 "사건"에서 합니다(이 화면은 조회 전용).</div>}
+    </>
   );
 }
 
@@ -280,6 +359,7 @@ export const DETAILS: DetailTable = {
   robot: { title: () => '로봇 상세', icon: 'cpu', Body: RobotDetail },
   schedule: { title: (r) => `점검 계획 #${r.id}`, icon: 'calendar.badge.clock', Body: ScheduleDetail },
   point: { title: () => '점검 지점', icon: 'mappin.and.ellipse', Body: PointDetail },
+  incident: { title: (r) => `화재 사건 #${r.id}`, icon: 'flame.fill', Body: IncidentDetail },
   tasks: { title: (r) => GROUP[r.group], icon: 'checklist', Body: TaskList },
   system: { title: () => '시스템 상태', icon: 'server.rack', Body: SystemDetail },
 };

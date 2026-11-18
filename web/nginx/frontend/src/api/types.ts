@@ -57,6 +57,10 @@ export interface RobotStatus extends RobotSummary {
   frontObstacleM?: number | null;
   ageMs?: Record<string, number | null>;
   capabilities?: Record<string, string>;
+  /** 지도 위 위치(지도 좌표). pose 는 주행계(odom) 기준이다 */
+  mapPose?: Pose | null;
+  /** 투척 기구 상태. 기구가 없거나 응답이 없으면 null. remaining -1 = 모름 */
+  launcher?: { ready: boolean; remaining: number; fault: string } | null;
 }
 
 export interface Point {
@@ -82,6 +86,9 @@ export interface TaskRow {
   note: string | null;
   recheck_of: number | null;
   schedule_id?: number | null;
+  /** INSPECTION(점검) / RESPONSE(화재 출동) */
+  kind?: 'INSPECTION' | 'RESPONSE';
+  incident_id?: number | null;
   status: TaskStatus;
   status_reason: string | null;
   created_at: string | number;
@@ -251,18 +258,100 @@ export interface SystemStatus {
   robots: { code: string; enabled: boolean; connected: boolean; ageMs: Record<string, number | null>; outboxPending: number }[];
 }
 
+// ------------------------------------------------------------------ 시나리오: 규칙 · 경고 · 사건 · 설정 (docs/plan/INTERFACES.md)
+export type Grade = 'NORMAL' | 'WARNING' | 'EMERGENCY' | 'UNKNOWN';
+export type LaunchMode = 'APPROVAL' | 'AUTO';
+
+/** 판독기 종류(analysis-service GET /checkers). paramsSchema 로 규칙 입력 폼을 그린다 */
+export interface SchemaProp {
+  type?: string; title?: string; description?: string; default?: unknown; enum?: unknown[];
+  minimum?: number; maximum?: number;
+}
+export interface CheckerInfo {
+  kind: string; version: string; valueType: 'number' | 'label';
+  paramsSchema: { properties?: Record<string, SchemaProp> }; labels: string[];
+}
+
+export interface RuleTarget { x: number | null; y: number | null; yaw: number | null; sizeM: number | null; useAsReference: boolean }
+export interface RuleInput {
+  ruleId?: number;
+  name: string; kind: string; enabled: boolean;
+  params: Record<string, unknown>;
+  /** 로봇 종류별 기대 영역 [x0, y0, x1, y1] (사진 크기 대비 비율) */
+  regions: Record<string, number[]>;
+  grading: Record<string, unknown>;
+  target: RuleTarget;
+}
+export interface Rule extends RuleInput {
+  ruleId: number; pointId: number; pointCode?: string; pointName?: string; updatedAt?: string | number;
+  latest?: RuleResult | null;
+}
+export interface RuleResult {
+  resultId?: number; observationId?: number; ruleId: number; kind?: string;
+  grade: Grade; value: number | string | null; unit: string | null; confidence: number | null;
+  located: { bbox?: number[]; relative?: { bearing: number; distance: number } } | null;
+  evidence: Record<string, unknown> | null; reason: string | null;
+  checkerVersion?: string | null; analyzedAt?: string | number;
+  /** 판독 당시의 규칙 */
+  rule?: Rule | null;
+}
+export interface CheckResponse {
+  quality: { brightness: number; sharpness: number; verdict: 'OK' | 'RETAKE'; reasons: string };
+  results: RuleResult[];
+}
+
+export interface AlertRow {
+  alert_id: number; type: string; grade: 'WARNING' | 'EMERGENCY'; state: 'OPEN' | 'ACKED' | 'RESOLVED';
+  title: string; detail: string | null;
+  point_id: number | null; point_code: string | null; point_name: string | null; x: number | null; y: number | null;
+  ref_kind: string; ref_id: number; task_id: number | null; evidence: Record<string, unknown> | null;
+  opened_at: string | number; updated_at: string | number;
+  acked_by: string | null; acked_at: string | number | null;
+  resolved_by: string | null; resolved_at: string | number | null; comment: string | null;
+}
+
+export type IncidentState =
+  | 'DETECTED' | 'DISPATCHED' | 'ARRIVED' | 'AWAITING_APPROVAL' | 'LAUNCHING' | 'LAUNCHED' | 'MONITORING'
+  | 'RESOLVED' | 'DISMISSED' | 'FAILED';
+/** 도착 후 · 투척 후 로봇 카메라로 다시 본 결과 */
+export interface IncidentCheck {
+  grade?: Grade; value?: number; reason?: string; bearingDeg?: number; aimed?: boolean; attempt?: number; at?: string; bbox?: number[];
+}
+export interface IncidentEvent {
+  event_id: number; source: 'USER' | 'ROBOT' | 'SYSTEM'; type: string; detail: Record<string, unknown>;
+  actor: string | null; occurred_at: string | number;
+}
+export interface Incident {
+  incidentId: number; type: string; state: IncidentState; grade: Grade;
+  x: number; y: number; poseQuality: number | null; detectedBy: number;
+  launchMode: LaunchMode; responderId: number | null; taskId: number | null;
+  standoff: { x: number; y: number; yaw: number }[] | null;
+  recheck: IncidentCheck | null; afterCheck: IncidentCheck | null;
+  images: { detection: boolean; recheck: boolean; after: boolean };
+  approvedBy: string | null; approvedAt: string | number | null;
+  closedBy: string | null; closedAt: string | number | null; closeReason: string | null;
+  createdAt: string | number; updatedAt: string | number;
+  events?: IncidentEvent[];
+}
+export type IncidentImageKind = 'detection' | 'recheck' | 'after';
+export type Settings = Record<string, unknown>;
+
 /** 관제 대시보드 요약(inspection-service DashboardController) */
 export interface DashPoint {
   point_id: number; code: string; name: string; x: number; y: number; yaw_deg: number;
   observation_id: number | null; task_id: number | null; status: 'CAPTURED' | 'UNABLE' | null;
   reason_code: string | null; captured_at: string | number | null; has_image: boolean | null;
   verdict: 'OK' | 'RETAKE' | null; review_result: Review['result'] | null;
+  /** 규칙 등급: 3 비상 · 2 경고 · 1 판독 불가 · 0 정상 · null 규칙/결과 없음 */
+  grade_rank?: number | null;
 }
 /** 주의할 일 한 줄. ref_kind 가 어떤 상세 창을 열지 정한다. */
 export interface DashAlert {
   type: string; severity: 'CRITICAL' | 'WARNING';
   at: string | number | null; ref_kind: string; ref_id: number | null; task_id: number | null;
   detail: string | null; point_code: string | null; point_name: string | null;
+  /** 경고 표에서 온 것만: 제목 · 번호 · 상태 · 위치 */
+  title?: string | null; alert_id?: number | null; state?: 'OPEN' | 'ACKED' | null; x?: number | null; y?: number | null;
 }
 export interface DashEvent extends TaskEvent { task_id: number; robot_code: string | null; task_status: TaskStatus }
 export interface DashOverview {
@@ -274,11 +363,50 @@ export interface DashOverview {
   points: DashPoint[];
   alerts: DashAlert[];
   events: DashEvent[];
+  /** 열린 사건(화재 대응) */
+  incidents?: Incident[];
+  launchMode?: LaunchMode;
+}
+
+/** 시연 시나리오 실행(관리자 "시연" 화면) */
+export interface DemoStatus {
+  scenarios: { key: string; name: string; description: string; group: string }[];
+  run: {
+    key: string; name: string; by: string; state: 'RUNNING' | 'DONE' | 'FAILED' | 'STOPPED';
+    startedAt: string; endedAt: string | null;
+    log: { at: string; level: 'step' | 'wait' | 'info' | 'ok' | 'warn' | 'error'; text: string }[];
+  } | null;
 }
 
 export interface Api {
+  // 시연(시뮬레이션 전용)
+  demo(): Promise<DemoStatus>;
+  runDemo(key: string): Promise<DemoStatus>;
+  stopDemo(): Promise<DemoStatus>;
   // 관제 대시보드
   dashboard(): Promise<DashOverview>;
+  // 설정
+  settings(): Promise<Settings>;
+  saveSetting(key: string, value: unknown): Promise<Settings>;
+  // 경고
+  alerts(state?: string): Promise<AlertRow[]>;
+  ackAlert(id: number, comment?: string): Promise<AlertRow>;
+  resolveAlert(id: number, comment?: string): Promise<AlertRow>;
+  // 점검 규칙
+  pointRules(pointId: number): Promise<Rule[]>;
+  checkers(): Promise<CheckerInfo[]>;
+  saveRule(pointId: number, r: RuleInput, ruleId?: number): Promise<Rule>;
+  deleteRule(ruleId: number): Promise<void>;
+  testRule(image: Blob, r: RuleInput): Promise<CheckResponse>;
+  observationResults(observationId: number): Promise<RuleResult[]>;
+  // 사건(화재 대응)
+  incidents(openOnly?: boolean): Promise<Incident[]>;
+  incident(id: number): Promise<Incident>;
+  incidentImageUrl(id: number, kind: IncidentImageKind, version?: string | number): string;
+  approveIncident(id: number): Promise<Incident>;
+  launchIncident(id: number): Promise<Incident>;
+  dismissIncident(id: number, comment?: string): Promise<Incident>;
+  resolveIncident(id: number, comment?: string): Promise<Incident>;
   // 인증
   login(loginId: string, password: string): Promise<Me>;
   logout(): Promise<void>;

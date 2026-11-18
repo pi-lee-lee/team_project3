@@ -29,6 +29,9 @@ export default function TaskDetail() {
         {t.note && <Row title="메모" detail={t.note} />}
         {t.recheck_of != null && <Row title="재점검" detail={`관측 #${t.recheck_of} 다시 보기`} />}
         {t.schedule_id != null && <Row title="예약 점검" detail={`예약 #${t.schedule_id} 이 만든 작업`} />}
+        {t.kind === 'RESPONSE' && (t.incident_id != null
+          ? <Row title={<>종류<Tag tone="red" icon="flame.fill">화재 출동</Tag></>} detail={`사건 #${t.incident_id}`} to={`/app/incidents/${t.incident_id}`} />
+          : <Row title="종류" right={<Tag tone="red" icon="flame.fill">화재 출동</Tag>} />)}
       </Group>
       <Group footer={cancellable ? '로봇이 지금 하는 이동을 멈추고 작업을 끝냅니다.' : undefined}>
         {cancellable ? (

@@ -10,7 +10,13 @@ export const EVENT_LABEL: Record<string, string> = {
   COMPLETED: '완료', CANCEL_REQUESTED: '취소 요청', CANCELLED: '취소됨', CANCEL_NOT_APPLIED: '취소 미적용',
   CANCEL_SEND_FAILED: '취소 전달 실패', MISSION_FAILED: '실패', MISSION_INTERRUPTED: '중단(상태 불명)',
   EMERGENCY_STOP: '비상 정지', REVIEWED: '사람 판정',
+  // 시나리오: 규칙 판독 · 화재 출동
+  RULES_CHECKED: '규칙 판독', PREEMPTED: '화재 출동으로 중단', HOLDING: '투척 위치 도착 · 대기',
+  ACTUATED: '투척 완료', ACTUATE_FAILED: '투척 실패',
 };
+
+/** 규칙 등급 이름 */
+const GRADE_KO: Record<string, string> = { NORMAL: '정상', WARNING: '경고', EMERGENCY: '비상', UNKNOWN: '판독 불가' };
 
 export const SOURCE: Record<TaskEvent['source'], string> = { USER: '사용자', ROBOT: '로봇', SYSTEM: '시스템' };
 
@@ -23,6 +29,8 @@ export function eventText(e: TaskEvent) {
   if (d.code || d.pointCode) parts.push(String(d.code ?? d.pointCode));
   if (Array.isArray(d.points)) parts.push((d.points as string[]).join(', '));
   if (d.result) parts.push(RESULT[String(d.result)]?.[0] ?? String(d.result));
+  if (d.grade) parts.push(GRADE_KO[String(d.grade)] ?? String(d.grade));
+  if (typeof d.launched === 'number') parts.push(`${d.launched}발`);
   if (d.reason) parts.push(String(d.reason));
   if (d.recoveries) parts.push(`복구 동작 ${d.recoveries}회`);
   if (Array.isArray(d.reasons)) parts.push((d.reasons as string[]).join(', '));
