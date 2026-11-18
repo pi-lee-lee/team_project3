@@ -206,20 +206,37 @@
     </model>
     <model name="target_green">
       <static>true</static>
-      <pose>7.650 7.000 0.300 0 0 0</pose>
+      <pose>7.650 7.000 0.100 0 0 0</pose>
       <link name="link">
-        <collision name="c"><geometry><box><size>0.500 0.200 0.600</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.500 0.200 0.600</size></box></geometry>
+        <collision name="c"><geometry><box><size>0.500 0.200 0.200</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.500 0.200 0.200</size></box></geometry>
           <material><ambient>0.1 0.7 0.2 1</ambient><diffuse>0.1 0.7 0.2 1</diffuse></material></visual>
       </link>
     </model>
     <model name="target_yellow">
       <static>true</static>
-      <pose>-0.800 4.600 0.300 0 0 0</pose>
+      <pose>-0.800 4.600 0.100 0 0 0</pose>
       <link name="link">
-        <collision name="c"><geometry><box><size>0.300 0.600 0.600</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.300 0.600 0.600</size></box></geometry>
+        <collision name="c"><geometry><box><size>0.300 0.600 0.200</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.300 0.600 0.200</size></box></geometry>
           <material><ambient>0.9 0.8 0.1 1</ambient><diffuse>0.9 0.8 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="target_gauge">
+      <static>true</static>
+      <pose>-0.950 4.600 0.410 0 0 0.00000</pose>
+      <link name="link">
+        <visual name="rim"><pose>0.0030 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.1300</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 0.0000 0.0000 1</emissive></material></visual>
+        <visual name="face"><pose>0.0060 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.1200</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>1.0000 1.0000 1.0000 1</emissive></material></visual>
+        <visual name="needle"><pose>0.010 0.0494 0.0078 0.15708 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.1 0.015</size></box></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>1.0000 0.0000 0.0000 1</emissive></material></visual>
+        <visual name="hub"><pose>0.0130 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.0200</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 0.0000 1.0000 1</emissive></material></visual>
+      </link>
+    </model>
+    <model name="target_lamp">
+      <static>true</static>
+      <pose>7.650 7.100 0.360 0 0 0.00000</pose>
+      <link name="link">
+        <visual name="bulb"><pose>0 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><sphere><radius>0.05</radius></sphere></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 1.0000 0.0000 1</emissive></material></visual>
       </link>
     </model>
   </world>

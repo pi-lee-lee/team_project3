@@ -3,6 +3,7 @@
 SIM_MODE=nav  (기본) : 저장된 지도 + AMCL 위치 추정 + Nav2 — 실제 운영과 같은 구성
 SIM_MODE=slam        : slam_toolbox 로 지도를 만들면서 Nav2 로 이동 — 지도 작성 단계
 공통: Gazebo 서버(헤드리스) + TurtleBot3 + rosbridge + rosapi + 영상 서버 + 로봇 측 노드(목표 브리지, 워치독)
+SIM_LAUNCHER=mock (기본) : 모의 투척 기구(/robot/mock_launcher.py)를 띄운다. none 이면 띄우지 않는다(투척 기구 없는 로봇)
 """
 import os
 import re
@@ -77,9 +78,16 @@ def generate_launch_description():
     bridge = ExecuteProcess(cmd=['python3', '/robot/nav2_goal_bridge.py'], output='screen',
                             additional_env={'SIM_MODE': mode})
     watchdog = ExecuteProcess(cmd=['python3', '/robot/cmd_vel_watchdog.py'], output='screen')
+    # 시뮬레이션 터틀봇에는 투척 기구가 없다 → 같은 토픽 계약에 답하는 모의 노드(실로봇은 launcher_bridge.py)
+    launcher_mode = os.environ.get('SIM_LAUNCHER', 'mock')
+    if launcher_mode not in ('mock', 'none'):
+        raise RuntimeError(f'SIM_LAUNCHER 는 mock 또는 none 이어야 합니다: {launcher_mode}')
+    launcher = [ExecuteProcess(cmd=['python3', '/robot/mock_launcher.py'], output='screen')] if launcher_mode == 'mock' else []
+    # 시뮬레이션 명령 노드: 웹의 "시연" 화면이 토픽으로 시뮬레이션 도구(fire · target)를 실행한다(시뮬레이션 전용)
+    launcher.append(ExecuteProcess(cmd=['python3', '/sim/tools/sim_control.py'], output='screen'))
 
     return LaunchDescription([
-        gzserver, state_publisher, spawn, rosbridge, rosapi, video, watchdog,
+        gzserver, state_publisher, spawn, rosbridge, rosapi, video, watchdog, *launcher,
         TimerAction(period=15.0, actions=[nav]),        # Gazebo·로봇이 뜬 뒤 Nav2 시작
         TimerAction(period=20.0, actions=[bridge]),
     ])
