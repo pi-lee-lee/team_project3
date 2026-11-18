@@ -36,7 +36,8 @@ public class MissionService {
     private static final Logger log = LoggerFactory.getLogger(MissionService.class);
     private static final long GOAL_TIMEOUT_MS = 300_000;
 
-    public record Waypoint(long pointId, String code, double x, double y, double yaw) {
+    /** action: CAPTURE(도착해 촬영, 기본) / HOLD(출동: 도착만 알리고 기다린다) */
+    public record Waypoint(long pointId, String code, double x, double y, double yaw, String action) {
     }
 
     private static final class Running {
@@ -46,6 +47,9 @@ public class MissionService {
         volatile String cancelReason;
         volatile String currentGoal;
         volatile Long currentPoint;
+        volatile boolean holding;
+        /** 출동 미션을 끝내라는 신호: [결과(COMPLETED/FAILED), 사유] */
+        final CompletableFuture<String[]> finish = new CompletableFuture<>();
         final Map<String, CompletableFuture<RobotAdapter.GoalStatus>> waits = new ConcurrentHashMap<>();
         final Map<String, Boolean> activeSeen = new ConcurrentHashMap<>();
 
@@ -91,7 +95,8 @@ public class MissionService {
     }
 
     // ------------------------------------------------------------- 요청
-    public synchronized Map<String, Object> submit(long missionId, long robotId, List<Waypoint> waypoints) {
+    public synchronized Map<String, Object> submit(long missionId, long robotId, String kind, List<Waypoint> waypoints) {
+        boolean response = "RESPONSE".equals(kind);
         var existing = repo.mission(missionId);
         if (existing.isPresent()) {
             return Map.of("missionId", missionId, "state", existing.get().state(), "duplicate", true);
@@ -104,12 +109,16 @@ public class MissionService {
         if (!adapter.state().connected()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "로봇과 연결되어 있지 않습니다");
         }
+        if (response) {
+            cancelManual(robotId);
+            control.revoke(robotId);      // 화재 출동은 사용자 조종보다 먼저다
+        }
         if (!control.takeForMission(robotId)) {
             var h = control.holder(robotId);
             throw new ResponseStatusException(HttpStatus.CONFLICT, (h == null ? "다른 사용자" : h.login()) + " 님이 조종 중입니다");
         }
         try {
-            repo.insertMission(missionId, robotId, om.writeValueAsString(waypoints));
+            repo.insertMission(missionId, robotId, om.writeValueAsString(waypoints), response ? "RESPONSE" : "INSPECTION");
         } catch (Exception e) {
             control.releaseMission(robotId);
             throw new IllegalStateException(e);
@@ -117,7 +126,11 @@ public class MissionService {
         Running run = new Running(missionId, robotId);
         runningByRobot.put(robotId, run);
         event(missionId, "ACCEPTED", Map.of("robotId", robotId, "points", waypoints.size()));
-        pool.submit(() -> execute(run, adapter, waypoints));
+        if (response) {
+            pool.submit(() -> executeResponse(run, adapter, waypoints));
+        } else {
+            pool.submit(() -> execute(run, adapter, waypoints));
+        }
         return Map.of("missionId", missionId, "state", "ACCEPTED", "duplicate", false);
     }
 
@@ -139,6 +152,7 @@ public class MissionService {
             log.warn("cancel send failed: {}", e.toString());
         }
         run.waits.values().forEach(f -> f.complete(new RobotAdapter.GoalStatus(g, "CANCELED", reason)));
+        run.finish.complete(new String[]{"CANCELLED", reason});
         return Map.of("applied", true, "state", "CANCELLING");
     }
 
@@ -163,6 +177,7 @@ public class MissionService {
         m.put("missionId", run.missionId);
         m.put("currentPointId", run.currentPoint);
         m.put("cancelRequested", run.cancelRequested);
+        m.put("holding", run.holding);
         return m;
     }
 
@@ -262,6 +277,154 @@ public class MissionService {
             runningByRobot.remove(run.robotId, run);
             control.releaseMission(run.robotId);
         }
+    }
+
+    /**
+     * 화재 출동: 투척 위치 후보(가까운 순)를 차례로 시도해 도착하면 HOLDING 으로 기다린다.
+     * 기다리는 동안 inspection-service 가 사진을 받아 판독하고 투척을 명령한다. finish()·cancel() 이 오면 끝낸다.
+     */
+    private void executeResponse(Running run, RobotAdapter a, List<Waypoint> wps) {
+        long id = run.missionId;
+        String finalState = "FAILED";
+        String finalReason = null;
+        try {
+            repo.missionState(id, "RUNNING", null);
+            List<String> problems = preflight(a);
+            if (!problems.isEmpty()) {
+                event(id, "PREFLIGHT_FAILED", Map.of("reasons", problems));
+                finalReason = "출발 전 검사 실패: " + String.join(", ", problems);
+                return;
+            }
+            event(id, "PREFLIGHT_OK", Map.of());
+            event(id, "STARTED", Map.of("kind", "RESPONSE"));
+            Waypoint arrived = null;
+            boolean lastWasCancel = false;
+            for (int i = 0; i < wps.size() && arrived == null && !run.cancelRequested; i++) {
+                Waypoint wp = wps.get(i);
+                event(id, "MOVING", Map.of("code", wp.code(), "seq", i + 1, "x", wp.x(), "y", wp.y()));
+                RobotAdapter.GoalStatus result = goTo(run, a, id + "-r" + (i + 1), wp);
+                if (run.cancelRequested || "CANCELED".equals(result.state())) {
+                    lastWasCancel = !run.cancelRequested;
+                    break;
+                }
+                if ("SUCCEEDED".equals(result.state())) {
+                    arrived = wp;
+                } else {
+                    String code = result.code() == null || result.code().isBlank() ? "NAV_FAILED" : result.code();
+                    event(id, "BLOCKED_NO_PATH".equals(code) ? "ARRIVAL_BLOCKED" : "ARRIVAL_FAILED",
+                            Map.of("code", wp.code(), "reasonCode", code,
+                                    "reason", "투척 위치 " + (i + 1) + " 에 갈 수 없음: " + result.reason()));
+                }
+            }
+            if (run.cancelRequested) {
+                finalState = "CANCELLED";
+                finalReason = run.cancelReason;
+                event(id, "CANCELLED", Map.of("reason", String.valueOf(run.cancelReason)));
+                return;
+            }
+            if (arrived == null) {
+                finalReason = lastWasCancel ? "이동 목표가 밖에서 취소되었습니다(다른 쪽에서 로봇에 정지 · 취소를 보냄)"
+                        : "투척 위치에 갈 수 없습니다(후보 " + wps.size() + "곳)";
+                return;
+            }
+            Thread.sleep(1500);   // 정지 후 영상 안정화
+            run.holding = true;
+            repo.missionState(id, "HOLDING", null);
+            event(id, "HOLDING", Map.of("x", arrived.x(), "y", arrived.y(), "yaw", arrived.yaw(), "code", arrived.code()));
+            String[] fin = run.finish.get();     // inspection-service 가 끝내라고 할 때까지
+            if ("CANCELLED".equals(fin[0])) {
+                finalState = "CANCELLED";
+                finalReason = fin[1];
+                event(id, "CANCELLED", Map.of("reason", String.valueOf(fin[1])));
+            } else if ("COMPLETED".equals(fin[0])) {
+                finalState = "COMPLETED";
+                event(id, "COMPLETED", Map.of("reason", String.valueOf(fin[1])));
+            } else {
+                finalReason = fin[1];
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            finalReason = "interrupted";
+        } catch (Exception e) {
+            log.warn("response mission {} failed", id, e);
+            finalReason = String.valueOf(e.getMessage());
+        } finally {
+            if ("FAILED".equals(finalState) && finalReason != null && !finalReason.equals("interrupted")) {
+                event(id, "MISSION_FAILED", Map.of("reason", finalReason));
+            }
+            try {
+                a.teleop(0, 0);
+            } catch (Exception ignored) {
+                // 연결이 끊긴 경우
+            }
+            repo.missionState(id, finalState, finalReason);
+            runningByRobot.remove(run.robotId, run);
+            control.releaseMission(run.robotId);
+        }
+    }
+
+    /** HOLDING 중인 출동 미션을 끝낸다. result: COMPLETED / FAILED. */
+    public Map<String, Object> finish(long missionId, String result, String reason) {
+        var m = repo.mission(missionId).orElse(null);
+        Running run = m == null ? null : runningByRobot.get(m.robotId());
+        if (run == null || run.missionId != missionId) {
+            return Map.of("applied", false, "state", m == null ? "UNKNOWN" : m.state());
+        }
+        if (!run.holding) {
+            // 아직 투척 위치로 가는 중이다: 사건이 닫혔으므로 이동을 멈춘다(취소와 같은 경로)
+            return cancel(missionId, reason);
+        }
+        run.finish.complete(new String[]{"COMPLETED".equals(result) ? "COMPLETED" : "FAILED", reason});
+        return Map.of("applied", true);
+    }
+
+    /**
+     * 조준 보정: 투척 위치에서 기다리는(HOLDING) 로봇을 제자리에서 deltaRad 만큼 돌린다(+ = 반시계).
+     * Nav2 의 도착 방향 허용 오차(0.15rad)보다 작은 보정이라 목표로 보내지 않고, 회전 명령을 직접 내며
+     * 오도메트리의 방향이 그만큼 바뀔 때까지 돈다(최대 8초). 실제로 돈 각도를 돌려준다.
+     */
+    public Map<String, Object> aim(long missionId, double deltaRad) {
+        var m = repo.mission(missionId).orElse(null);
+        Running run = m == null ? null : runningByRobot.get(m.robotId());
+        if (run == null || run.missionId != missionId || !run.holding) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "투척 위치에서 대기 중인 미션이 아닙니다");
+        }
+        RobotAdapter a = registry.adapter(run.robotId);
+        var start = a.state().pose();
+        if (start == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "로봇 방향(odom)을 알 수 없습니다");
+        }
+        double target = Math.max(-0.6, Math.min(0.6, deltaRad));       // 한 번에 최대 약 34°
+        double turned = 0;
+        long end = System.currentTimeMillis() + 8000;
+        try {
+            while (System.currentTimeMillis() < end && !run.cancelRequested) {
+                var p = a.state().pose();
+                turned = Math.atan2(Math.sin(p.yaw() - start.yaw()), Math.cos(p.yaw() - start.yaw()));
+                double left = target - turned;
+                if (Math.abs(left) < 0.02) {
+                    break;
+                }
+                a.teleop(0, Math.signum(left) * Math.max(0.12, Math.min(0.4, Math.abs(left) * 1.5)));
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            a.teleop(0, 0);
+        }
+        return Map.of("requestedRad", target, "turnedRad", Math.round(turned * 1000) / 1000.0);
+    }
+
+    /** 로봇이 지금 하는 미션 ID(없으면 null). 투척 결과를 그 미션의 사건 기록으로 보낼 때 쓴다. */
+    public Long activeMissionId(long robotId) {
+        Running run = runningByRobot.get(robotId);
+        return run == null ? null : run.missionId;
+    }
+
+    /** 미션의 사건 기록을 보고한다(outbox 경유). */
+    public void report(long missionId, String type, Map<String, ?> detail) {
+        event(missionId, type, detail);
     }
 
     private List<String> preflight(RobotAdapter a) {
@@ -399,7 +562,8 @@ public class MissionService {
     public static List<Waypoint> parseWaypoints(JsonNode arr) {
         List<Waypoint> list = new ArrayList<>();
         arr.forEach(n -> list.add(new Waypoint(n.path("pointId").asLong(), n.path("code").asText(""),
-                n.path("x").asDouble(), n.path("y").asDouble(), n.path("yaw").asDouble())));
+                n.path("x").asDouble(), n.path("y").asDouble(), n.path("yaw").asDouble(),
+                n.path("action").asText("CAPTURE"))));
         return list;
     }
 }

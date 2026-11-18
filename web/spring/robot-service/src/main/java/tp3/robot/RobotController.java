@@ -57,6 +57,9 @@ public class RobotController {
             m.put("frontObstacleM", s.frontObstacleM());
             m.put("ageMs", s.ageMs());
             m.put("capabilities", a.capabilities());
+            m.put("mapPose", a.mapView().pose());
+            var ls = a.actuatorState();
+            m.put("launcher", ls == null ? null : Map.of("ready", ls.ready(), "remaining", ls.remaining() == null ? -1 : ls.remaining(), "fault", ls.fault()));
         }
         return m;
     }

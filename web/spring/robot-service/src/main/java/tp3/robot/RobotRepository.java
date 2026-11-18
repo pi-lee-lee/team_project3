@@ -14,7 +14,7 @@ public class RobotRepository {
     public record Robot(long robotId, String code, String name, String adapterType, String config, boolean enabled) {
     }
 
-    public record Mission(long missionId, long robotId, String waypoints, String state, String reason) {
+    public record Mission(long missionId, long robotId, String waypoints, String state, String reason, String kind) {
     }
 
     public record Report(UUID reportId, long missionId, String kind, String payload, byte[] image, int attempts) {
@@ -52,19 +52,41 @@ public class RobotRepository {
     }
 
     // ---- mission
-    private static final String MISSION = "SELECT mission_id, robot_id, waypoints::text AS waypoints, state, reason FROM mission";
+    private static final String MISSION = "SELECT mission_id, robot_id, waypoints::text AS waypoints, state, reason, kind FROM mission";
 
     public Optional<Mission> mission(long id) {
         return jdbc.sql(MISSION + " WHERE mission_id = ?").param(id).query(Mission.class).optional();
     }
 
     public List<Mission> unfinishedMissions() {
-        return jdbc.sql(MISSION + " WHERE state IN ('ACCEPTED', 'RUNNING')").query(Mission.class).list();
+        return jdbc.sql(MISSION + " WHERE state IN ('ACCEPTED', 'RUNNING', 'HOLDING')").query(Mission.class).list();
     }
 
-    public void insertMission(long id, long robotId, String waypoints) {
-        jdbc.sql("INSERT INTO mission (mission_id, robot_id, waypoints, state) VALUES (?, ?, CAST(? AS jsonb), 'ACCEPTED')")
-                .params(id, robotId, waypoints).update();
+    public void insertMission(long id, long robotId, String waypoints, String kind) {
+        jdbc.sql("INSERT INTO mission (mission_id, robot_id, waypoints, state, kind) VALUES (?, ?, CAST(? AS jsonb), 'ACCEPTED', ?)")
+                .params(id, robotId, waypoints, kind).update();
+    }
+
+    // ---- 투척 명령
+    public Optional<Map<String, Object>> actuatorCommand(String commandId) {
+        return jdbc.sql("SELECT command_id, robot_id, mission_id, kind, state, result::text AS result FROM actuator_command WHERE command_id = ?")
+                .param(commandId).query().listOfRows().stream().findFirst();
+    }
+
+    /** 이미 있는 command_id 면 false. */
+    public boolean insertActuatorCommand(String commandId, long robotId, Long missionId, String kind, String request) {
+        return jdbc.sql("""
+                        INSERT INTO actuator_command (command_id, robot_id, mission_id, kind, request, state)
+                        VALUES (?, ?, ?, ?, CAST(? AS jsonb), 'SENT') ON CONFLICT (command_id) DO NOTHING""")
+                .params(commandId, robotId, missionId, kind, request).update() > 0;
+    }
+
+    /** 끝난 명령(DONE·FAILED)은 바꾸지 않는다. 바뀌었으면 true. */
+    public boolean actuatorState(String commandId, String state, String result) {
+        return jdbc.sql("""
+                        UPDATE actuator_command SET state = ?, result = coalesce(CAST(? AS jsonb), result), updated_at = now()
+                        WHERE command_id = ? AND state NOT IN ('DONE', 'FAILED')""")
+                .params(state, result, commandId).update() > 0;
     }
 
     public void missionState(long id, String state, String reason) {

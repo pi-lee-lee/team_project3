@@ -89,7 +89,7 @@ public class Store {
             where += " AND t.requested_by = " + userId.longValue();
         }
         return jdbc.sql("""
-                        SELECT t.task_id, t.robot_id, t.robot_code, t.requester_login, t.note, t.recheck_of, t.schedule_id, t.status,
+                        SELECT t.task_id, t.robot_id, t.robot_code, t.requester_login, t.note, t.recheck_of, t.schedule_id, t.kind, t.incident_id, t.status,
                                t.status_reason, t.created_at, t.updated_at,
                                (SELECT string_agg(p.code, ', ' ORDER BY tp.seq) FROM task_point tp
                                   JOIN inspection_point p USING (point_id) WHERE tp.task_id = t.task_id) AS points,

@@ -30,12 +30,16 @@ public class InternalController {
 
     private final Store store;
     private final TaskService tasks;
+    private final RuleService rules;
+    private final IncidentService incidents;
     private final Path photoDir;
     private final ObjectMapper om = new ObjectMapper();
 
-    public InternalController(Store store, TaskService tasks, @Value("${app.photo-dir}") String photoDir) throws Exception {
+    public InternalController(Store store, TaskService tasks, RuleService rules, IncidentService incidents, @Value("${app.photo-dir}") String photoDir) throws Exception {
         this.store = store;
         this.tasks = tasks;
+        this.rules = rules;
+        this.incidents = incidents;
         this.photoDir = Path.of(photoDir);
         Files.createDirectories(this.photoDir);
     }
@@ -78,6 +82,17 @@ public class InternalController {
         return Map.of("ok", true, "duplicate", obsId.isEmpty());
     }
 
+    /**
+     * 로봇이 스스로 감지해 보낸 것(robot-service 가 넘겨 준다). meta: {"robotId","detId","kind","grade","x","y",...}
+     * 비상이면 사건을 만들고 경고를 연다. 같은 detId · 가까운 열린 사건은 하나로 합친다.
+     */
+    @PostMapping(value = "/detections", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, Object> detection(@RequestPart("meta") String metaText,
+                                         @RequestPart(value = "image", required = false) MultipartFile image)
+            throws Exception {
+        return incidents.detect(om.readTree(metaText), image == null || image.isEmpty() ? null : image.getBytes());
+    }
+
     @GetMapping("/observations/{id}/image")
     public ResponseEntity<byte[]> image(@PathVariable long id) throws Exception {
         String p = store.imagePath(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -87,11 +102,21 @@ public class InternalController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(Files.readAllBytes(Path.of(p)));
     }
 
-    /** body: {"brightness":132.1,"sharpness":210.5,"verdict":"OK","reasons":"","criteria":{...}} */
+    /** 그 관측의 지점에 걸린 규칙(analysis-service 가 판독 전에 받아 간다). */
+    @GetMapping("/observations/{id}/rules")
+    public Map<String, Object> rules(@PathVariable long id) {
+        return rules.rulesForObservation(id);
+    }
+
+    /**
+     * body: {"brightness":132.1,"sharpness":210.5,"verdict":"OK","reasons":"","criteria":{...}, "results":[규칙별 결과…]}
+     * results 가 있으면 규칙별 등급을 저장하고 경고를 열거나 푼다.
+     */
     @PostMapping("/observations/{id}/analysis")
     public Map<String, Object> analysis(@PathVariable long id, @RequestBody JsonNode b) {
         store.insertAnalysis(id, num(b, "brightness"), num(b, "sharpness"), b.path("verdict").asText("OK"),
                 b.path("reasons").asText(""), b.path("criteria").toString());
+        rules.saveResults(id, b.path("results"));
         return Map.of("ok", true);
     }
 

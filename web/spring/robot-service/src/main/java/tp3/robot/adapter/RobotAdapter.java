@@ -45,6 +45,18 @@ public interface RobotAdapter extends AutoCloseable {
     record MapView(Pose pose, java.util.List<double[]> scan, java.util.List<double[]> path) {
     }
 
+    /** 투척 명령의 결과. state: ACCEPTED / DONE / FAILED. code: NOT_READY, EMPTY, JAMMED, TIMEOUT, ESTOP, UNSUPPORTED. */
+    record ActuatorStatus(String commandId, String state, String code, String reason, int launched) {
+    }
+
+    /** 투척 기구 상태(1초마다 받는 값). 기구가 없으면 어댑터가 null 을 돌려준다. */
+    record ActuatorState(boolean ready, Integer remaining, String fault) {
+    }
+
+    /** 원본 점유 격자(-1 모름, 0 빈 칸, 100 막힘). 투척 위치 후보 계산에 쓴다. */
+    record Grid(int width, int height, double resolution, double originX, double originY, int[] cells) {
+    }
+
     void start();
 
     @Override
@@ -77,4 +89,39 @@ public interface RobotAdapter extends AutoCloseable {
     byte[] mapPng();
 
     MapView mapView();
+
+    // ------------------------------------------------------------- 투척 · 감지 (없는 로봇은 기본 동작 그대로)
+    /** 투척 명령을 보낸다. 같은 commandId 는 로봇 쪽에서 한 번만 실행한다. */
+    default void actuate(String commandId, String kind, int count, String paramsJson) {
+        throw new UnsupportedOperationException("투척 기구가 없는 로봇입니다");
+    }
+
+    default void onActuatorStatus(Consumer<ActuatorStatus> listener) {
+    }
+
+    /** 투척 기구가 없거나 상태를 받은 적이 없으면 null. */
+    default ActuatorState actuatorState() {
+        return null;
+    }
+
+    /** 로봇이 스스로 감지해 보낸 것(/patrol/detection 의 JSON 글자). */
+    default void onDetection(Consumer<String> listener) {
+    }
+
+    /**
+     * 시뮬레이션 전용: 시뮬레이션 도구(fire · target)를 실행하게 한다(sim 의 sim_control.py 가 받는다).
+     * 결과는 onSimStatus 로 온다. 시뮬레이션이 아닌 로봇은 지원하지 않는다.
+     */
+    default void simCommand(String id, String tool, java.util.List<String> args) {
+        throw new UnsupportedOperationException("시뮬레이션 로봇이 아닙니다");
+    }
+
+    /** 결과 JSON 글자: {"id", "ok", "code", "output"} */
+    default void onSimStatus(Consumer<String> listener) {
+    }
+
+    /** 지도가 아직 없으면 null. */
+    default Grid grid() {
+        return null;
+    }
 }

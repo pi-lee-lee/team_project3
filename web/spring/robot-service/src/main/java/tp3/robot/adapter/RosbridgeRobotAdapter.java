@@ -61,6 +61,12 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     private final StringBuilder buf = new StringBuilder();
     private final Map<String, Long> lastMsg = new ConcurrentHashMap<>();
     private final List<Consumer<GoalStatus>> goalListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<ActuatorStatus>> actuatorListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<String>> detectionListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<String>> simListeners = new CopyOnWriteArrayList<>();
+    private volatile ActuatorState actuatorState;
+    private volatile long actuatorStateAt;
+    private volatile Grid grid;
 
     private volatile WebSocket ws;
     private volatile boolean closed;
@@ -105,6 +111,12 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         defaults.put("map", "/inspection/map");       // 로봇 측 브리지가 /map 을 주기적으로 다시 발행
         defaults.put("plan", "/plan");
         defaults.put("mapPose", "/inspection/map_pose");
+        defaults.put("actuator", "/inspection/actuator");             // 투척 명령(INTERFACES.md 2.2)
+        defaults.put("actuatorStatus", "/inspection/actuator_status");
+        defaults.put("actuatorState", "/inspection/actuator_state");
+        defaults.put("simCommand", "/sim/command");                   // 시뮬레이션 전용: 시연 화면이 시뮬레이션 도구를 실행
+        defaults.put("simStatus", "/sim/command_status");
+        defaults.put("detection", "/patrol/detection");               // 로봇이 스스로 감지해 보내는 것(2.3)
         defaults.put("scanMap", "/inspection/scan_map");   // 로봇 측에서 스캔 시각의 TF 로 지도 좌표로 바꾼 라이다 점
         topics.putAll(defaults);
         config.path("topics").fields().forEachRemaining(e -> topics.put(e.getKey(), e.getValue().asText()));
@@ -160,6 +172,12 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             subscribe("plan", "nav_msgs/msg/Path", 1000);
             subscribe("scanMap", "std_msgs/msg/String", 0);
             subscribe("map", "nav_msgs/msg/OccupancyGrid", 0);
+            subscribe("actuatorStatus", "std_msgs/msg/String", 0);
+            subscribe("actuatorState", "std_msgs/msg/String", 0);
+            subscribe("detection", "std_msgs/msg/String", 0);
+            subscribe("simStatus", "std_msgs/msg/String", 0);
+            advertise("simCommand", "std_msgs/msg/String");
+            advertise("actuator", "std_msgs/msg/String");
             advertise("teleop", "geometry_msgs/msg/Twist");
             advertise("goal", "std_msgs/msg/String");
             advertise("goalCancel", "std_msgs/msg/String");
@@ -263,6 +281,38 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         JsonNode msg = n.path("msg");
         if (topic.equals(topics.get("map"))) {
             onMap(msg);
+            return;
+        }
+        if (topic.equals(topics.get("actuatorStatus"))) {
+            try {
+                JsonNode s = om.readTree(msg.path("data").asText());
+                ActuatorStatus st = new ActuatorStatus(s.path("commandId").asText(), s.path("state").asText(),
+                        s.path("code").asText(""), s.path("reason").asText(""), s.path("launched").asInt(0));
+                actuatorListeners.forEach(l -> l.accept(st));
+            } catch (Exception e) {
+                log.debug("[{}] bad actuator status", code);
+            }
+            return;
+        }
+        if (topic.equals(topics.get("actuatorState"))) {
+            try {
+                JsonNode s = om.readTree(msg.path("data").asText());
+                actuatorState = new ActuatorState(s.path("ready").asBoolean(false),
+                        s.hasNonNull("remaining") ? s.path("remaining").asInt() : null, s.path("fault").asText(""));
+                actuatorStateAt = System.currentTimeMillis();
+            } catch (Exception e) {
+                log.debug("[{}] bad actuator state", code);
+            }
+            return;
+        }
+        if (topic.equals(topics.get("simStatus"))) {
+            String data = msg.path("data").asText();
+            simListeners.forEach(l -> l.accept(data));
+            return;
+        }
+        if (topic.equals(topics.get("detection"))) {
+            String data = msg.path("data").asText();
+            detectionListeners.forEach(l -> l.accept(data));
             return;
         }
         if (topic.equals(topics.get("mapPose"))) {
@@ -376,6 +426,8 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             byte[] png = MapRenderer.render(w, h, info.path("resolution").asDouble(0.05), cells);   // 화면 표시용으로 다듬은 그림
             JsonNode o = info.path("origin").path("position");
             synchronized (this) {
+                grid = new Grid(w, h, info.path("resolution").asDouble(0.05), o.path("x").asDouble(),
+                        o.path("y").asDouble(), cells);
                 mapVersion++;
                 mapPng = png;
                 mapInfo = new MapInfo(w, h, info.path("resolution").asDouble(), o.path("x").asDouble(),
@@ -384,6 +436,57 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         } catch (Exception e) {
             log.debug("[{}] bad map: {}", code, e.toString());
         }
+    }
+
+    @Override
+    public Grid grid() {
+        return grid;
+    }
+
+    @Override
+    public void actuate(String commandId, String kind, int count, String paramsJson) {
+        ObjectNode data = om.createObjectNode().put("commandId", commandId).put("kind", kind).put("count", count);
+        try {
+            data.set("params", om.readTree(paramsJson == null ? "{}" : paramsJson));
+        } catch (Exception e) {
+            data.putObject("params");
+        }
+        publishString("actuator", data.toString());
+    }
+
+    @Override
+    public void onActuatorStatus(Consumer<ActuatorStatus> listener) {
+        actuatorListeners.add(listener);
+    }
+
+    /** 3초 안에 상태를 받았을 때만 돌려준다(기구가 없거나 응답이 끊기면 null). */
+    @Override
+    public ActuatorState actuatorState() {
+        return System.currentTimeMillis() - actuatorStateAt < 3000 ? actuatorState : null;
+    }
+
+    @Override
+    public void simCommand(String id, String tool, java.util.List<String> args) {
+        ObjectNode data = om.createObjectNode().put("id", id).put("tool", tool);
+        var arr = data.putArray("args");
+        args.forEach(arr::add);
+        publishString("simCommand", data.toString());
+    }
+
+    @Override
+    public void onSimStatus(Consumer<String> listener) {
+        simListeners.add(listener);
+    }
+
+    /** 시뮬레이션 명령 노드(sim_control.py)가 떠 있는 로봇인가 — 토픽 목록으로 판단한다. */
+    public boolean isSimulation() {
+        Set<String> tl = topicList;
+        return tl != null && tl.contains(topics.get("simStatus"));
+    }
+
+    @Override
+    public void onDetection(Consumer<String> listener) {
+        detectionListeners.add(listener);
     }
 
     @Override
@@ -478,6 +581,9 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
                 caps.put(k, "UNSUPPORTED");
             }
         }
+        // 투척 기구: 상태 토픽을 받고 있으면 있음, 토픽만 있으면 응답 없음, 토픽도 없으면 미지원
+        caps.put("launcher", actuatorState() != null ? "VERIFIED"
+                : tl == null ? "UNKNOWN" : tl.contains(topics.get("actuatorState")) ? "STALE" : "UNSUPPORTED");
         return caps;
     }
 

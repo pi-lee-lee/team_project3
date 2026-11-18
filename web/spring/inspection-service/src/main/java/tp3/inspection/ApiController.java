@@ -30,10 +30,12 @@ public class ApiController {
 
     private final Store store;
     private final TaskService tasks;
+    private final AlertService alerts;
 
-    public ApiController(Store store, TaskService tasks) {
+    public ApiController(Store store, TaskService tasks, AlertService alerts) {
         this.store = store;
         this.tasks = tasks;
+        this.alerts = alerts;
     }
 
     // ------------------------------------------------------------- 지점
@@ -135,6 +137,7 @@ public class ApiController {
         var obs = store.observation(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         var u = CurrentUser.from(req);
         store.insertReview(id, result, comment.isEmpty() ? null : comment, u.id(), u.login());
+        alerts.onReview(id, result, u.login());
         tasks.userEvent(((Number) obs.get("task_id")).longValue(), "REVIEWED",
                 Map.of("observationId", id, "pointCode", obs.get("point_code"), "result", result), u.login());
         return store.observation(id).orElseThrow();

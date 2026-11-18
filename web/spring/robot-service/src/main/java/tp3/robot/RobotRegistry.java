@@ -32,6 +32,12 @@ public class RobotRegistry {
     private final String simVideo;
     private BiConsumer<Long, RobotAdapter.GoalStatus> goalListener = (id, s) -> {
     };
+    private BiConsumer<Long, RobotAdapter.ActuatorStatus> actuatorListener = (id, s) -> {
+    };
+    private BiConsumer<Long, String> detectionListener = (id, s) -> {
+    };
+    private BiConsumer<Long, String> simListener = (id, s) -> {
+    };
 
     public RobotRegistry(RobotRepository repo, @Value("${app.sim-rosbridge-url}") String simRosbridge,
                          @Value("${app.sim-video-url}") String simVideo) {
@@ -42,6 +48,18 @@ public class RobotRegistry {
 
     public void setGoalListener(BiConsumer<Long, RobotAdapter.GoalStatus> l) {
         this.goalListener = l;
+    }
+
+    public void setActuatorListener(BiConsumer<Long, RobotAdapter.ActuatorStatus> l) {
+        this.actuatorListener = l;
+    }
+
+    public void setSimListener(BiConsumer<Long, String> l) {
+        this.simListener = l;
+    }
+
+    public void setDetectionListener(BiConsumer<Long, String> l) {
+        this.detectionListener = l;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -72,6 +90,9 @@ public class RobotRegistry {
                 default -> throw new IllegalArgumentException("unknown adapter " + r.adapterType());
             };
             a.onGoalStatus(s -> goalListener.accept(r.robotId(), s));
+            a.onActuatorStatus(s -> actuatorListener.accept(r.robotId(), s));
+            a.onDetection(s -> detectionListener.accept(r.robotId(), s));
+            a.onSimStatus(s -> simListener.accept(r.robotId(), s));
             a.start();
             adapters.put(r.robotId(), a);
         } catch (Exception e) {

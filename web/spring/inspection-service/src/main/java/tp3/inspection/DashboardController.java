@@ -25,10 +25,14 @@ import java.util.Map;
 public class DashboardController {
 
     private final JdbcClient jdbc;
+    private final IncidentService incidents;
+    private final SettingsService settings;
     private final ObjectMapper om = new ObjectMapper();
 
-    public DashboardController(JdbcClient jdbc) {
+    public DashboardController(JdbcClient jdbc, IncidentService incidents, SettingsService settings) {
         this.jdbc = jdbc;
+        this.incidents = incidents;
+        this.settings = settings;
     }
 
     /** 관측 한 건의 현재 상태(최근 분석·최근 판정을 붙인 것) */
@@ -50,7 +54,12 @@ public class DashboardController {
         out.put("hours", h);
         out.put("today", today());
         out.put("points", points());
-        out.put("alerts", alerts(h));
+        // 경고: 경고 표(규칙 위반 · 화재 등, 확인/해제를 남기는 것) + 관측·작업에서 그때그때 계산하는 것
+        List<Map<String, Object>> all = new ArrayList<>(storedAlerts());
+        all.addAll(alerts(h));
+        out.put("alerts", all);
+        out.put("incidents", incidents.list(true, 20));
+        out.put("launchMode", settings.text("launch.mode"));
         out.put("events", events(Math.max(1, Math.min(events, 200))));
         return out;
     }
@@ -76,7 +85,12 @@ public class DashboardController {
     private List<Map<String, Object>> points() {
         return jdbc.sql("SELECT p.point_id, p.code, p.name, p.x, p.y, p.yaw_deg,"
                 + " s.observation_id, s.task_id, s.status, s.reason_code, s.captured_at, s.has_image, s.verdict,"
-                + " s.review_result"
+                + " s.review_result,"
+                // 규칙 등급: 그 지점의 켜진 규칙마다 가장 최근 결과 가운데 가장 나쁜 것(3 비상 2 경고 1 판독 불가 0 정상, 규칙·결과가 없으면 null)
+                + " (SELECT max(CASE x.grade WHEN 'EMERGENCY' THEN 3 WHEN 'WARNING' THEN 2 WHEN 'UNKNOWN' THEN 1 ELSE 0 END)"
+                + "    FROM inspection_rule r JOIN LATERAL (SELECT grade FROM rule_result WHERE rule_id = r.rule_id"
+                + "                                         ORDER BY result_id DESC LIMIT 1) x ON true"
+                + "   WHERE r.point_id = p.point_id AND r.enabled AND r.deleted_at IS NULL) AS grade_rank"
                 + " FROM inspection_point p LEFT JOIN LATERAL (" + OBS_STATE
                 + " WHERE o.point_id = p.point_id ORDER BY o.captured_at DESC LIMIT 1) s ON true"
                 + " WHERE p.active ORDER BY p.code").query().listOfRows();
@@ -111,6 +125,17 @@ public class DashboardController {
                 FROM a LEFT JOIN inspection_point p USING (point_id)
                 ORDER BY (a.severity = 'CRITICAL') DESC, a.at DESC LIMIT 60""")
                 .params(hours, hours).query().listOfRows();
+    }
+
+    /** 경고 표의 열린 경고. 화면이 받는 모양은 계산한 경고와 같고, title · alert_id · state 가 더 있다. */
+    private List<Map<String, Object>> storedAlerts() {
+        return jdbc.sql("""
+                SELECT a.alert_id, a.state, a.type, CASE a.grade WHEN 'EMERGENCY' THEN 'CRITICAL' ELSE 'WARNING' END AS severity,
+                       a.updated_at AS at, a.ref_kind, a.ref_id, a.task_id, a.title, a.detail, a.x, a.y,
+                       p.code AS point_code, p.name AS point_name
+                FROM alert a LEFT JOIN inspection_point p USING (point_id)
+                WHERE a.state <> 'RESOLVED'
+                ORDER BY (a.grade = 'EMERGENCY') DESC, a.updated_at DESC LIMIT 60""").query().listOfRows();
     }
 
     private List<Map<String, Object>> events(int limit) {

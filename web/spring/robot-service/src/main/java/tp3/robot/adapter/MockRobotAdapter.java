@@ -74,6 +74,30 @@ public class MockRobotAdapter implements RobotAdapter {
         }
     }
 
+    // 가짜 투척 기구: 받으면 1초 뒤 성공으로 답한다
+    private final List<Consumer<ActuatorStatus>> actuatorListeners = new CopyOnWriteArrayList<>();
+    private final java.util.Set<String> launched = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    @Override
+    public void actuate(String commandId, String kind, int count, String paramsJson) {
+        if (!launched.add(commandId)) {
+            return;
+        }
+        actuatorListeners.forEach(l -> l.accept(new ActuatorStatus(commandId, "ACCEPTED", "", "", 0)));
+        sched.schedule(() -> actuatorListeners.forEach(l -> l.accept(new ActuatorStatus(commandId, "DONE", "", "", count))),
+                1, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onActuatorStatus(Consumer<ActuatorStatus> listener) {
+        actuatorListeners.add(listener);
+    }
+
+    @Override
+    public ActuatorState actuatorState() {
+        return new ActuatorState(true, null, "");
+    }
+
     private void emit(String id, String state, String reason) {
         GoalStatus s = new GoalStatus(id, state, reason);
         listeners.forEach(l -> l.accept(s));
