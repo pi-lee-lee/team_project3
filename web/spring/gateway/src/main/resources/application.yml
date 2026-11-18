@@ -1,0 +1,57 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  jwt-secret: ${JWT_SECRET}
+  services:
+    user: ${USER_SERVICE_URL:http://user-service:8081}
+    inspection: ${INSPECTION_SERVICE_URL:http://inspection-service:8082}
+    robot: ${ROBOT_SERVICE_URL:http://robot-service:8083}
+    analysis: ${ANALYSIS_SERVICE_URL:http://analysis-service:8084}
+
+# 경로별 접근 정책. 위에서부터 처음 맞는 규칙을 적용하고, 맞는 규칙이 없으면 거부한다.
+# methods 를 적으면 그 메서드일 때만 맞는 규칙이다(없으면 모든 메서드).
+# 역할 1·2·3(SUPERVISOR·MANAGER·USER)의 세부 차이는 구현 단계에서 이 표에 줄을 추가해 정한다.
+# DASHBOARD(관제 대시보드 전용 계정)는 조회(GET)만 할 수 있다: 변경 요청·조종 WebSocket 은 맞는 규칙에 없어 거부된다.
+# 예외 하나: 투척 승인(/api/incidents/*/approve)은 대시보드 계정도 할 수 있다 — 상황실 화면에서 바로 승인하기 위해서다.
+gateway:
+  public-paths:
+    - /api/auth/login
+    - /api/auth/logout
+  rules:
+    - pattern: /api/admin/system        # 시스템 상태는 대시보드에도 보인다
+      methods: [GET]
+      roles: [ADMIN, DASHBOARD]
+    - pattern: /api/admin/**
+      roles: [ADMIN]
+    # 시나리오: 설정 변경 · 수동 투척 · 사건/경고 해제는 1 관리자 · 2 매니저까지
+    - pattern: /api/settings/**
+      methods: [PUT]
+      roles: [ADMIN, SUPERVISOR]
+    - pattern: /api/incidents/*/approve
+      methods: [POST]
+      roles: [SUPERVISOR, MANAGER, USER, DASHBOARD]
+    - pattern: /api/incidents/*/launch
+      methods: [POST]
+      roles: [SUPERVISOR, MANAGER]
+    - pattern: /api/incidents/*/resolve
+      methods: [POST]
+      roles: [SUPERVISOR, MANAGER]
+    - pattern: /api/alerts/*/resolve
+      methods: [POST]
+      roles: [SUPERVISOR, MANAGER]
+    - pattern: /api/**
+      methods: [GET]
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER, DASHBOARD]
+    - pattern: /api/**
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER]
+    - pattern: /ws/**
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER]

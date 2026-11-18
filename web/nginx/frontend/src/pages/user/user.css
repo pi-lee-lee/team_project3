@@ -1,0 +1,111 @@
+/* 사용자 영역 화면(작업·관측·지점 이력·관제) 전용 스타일. 공통 부품은 styles.css 의 "공통 화면 부품". */
+
+/* 목록 칸 제목 옆 작은 꼬리표(예약·재점검) */
+.tag-sm { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 6px; background: var(--fill); color: var(--label2); vertical-align: 1px; }
+
+/* 누를 수 없는 상태의 칸(예: 이미 끝난 작업의 취소) */
+.cell.is-disabled { opacity: .4; cursor: default; }
+
+/* 진행 기록 칸 앞의 출처 점 */
+.ev-dot { flex: none; width: 10px; height: 10px; border-radius: 5px; background: var(--green); }
+.ev-dot.src-USER { background: var(--blue); }
+.ev-dot.src-SYSTEM { background: var(--label3); }
+
+/* 관측 사진 */
+.photo-link { display: block; margin: 0 0 22px; }
+.photo-empty { aspect-ratio: 4 / 3; margin: 0 0 22px; }
+.thumb-sm.ph { font-size: 11px; }
+
+/* 판정 고르기는 칸 하나를 꽉 채운다 */
+.cell .segmented.full { width: 100%; }
+
+/* 스마트폰에서 아래쪽 고정 동작 버튼에 내용이 가리지 않게 */
+@media (max-width: 743px) { .has-action-bar { padding-bottom: 72px; } }
+
+/* 관제: 좁은 화면에서 격자가 넘치지 않게 (main.tsx 가 styles.css 를 나중에 불러오므로 선택자를 한 단계 높인다) */
+.page .monitor { grid-template-columns: minmax(0, 1fr) 320px; }
+@media (max-width: 1000px) { .page .monitor { grid-template-columns: minmax(0, 1fr); } }
+.monitor-bar { margin: 0 0 14px; }
+.monitor-bar .segmented { margin: 0; }
+.monitor-bar select { max-width: 100%; min-width: 0; }
+.camera-view, .map-view { min-width: 0; }
+
+/* 관제 카메라 모드: 방향키를 영상 안 아래 가운데에 반투명(유리 질감)으로 겹친다 */
+.page .monitor .video .drive-hint { top: 12px; bottom: auto; max-width: calc(100% - 24px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.page .monitor .video .pad-overlay {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 2;
+  display: grid; grid-template-columns: repeat(3, 52px); gap: 6px; pointer-events: none;
+}
+.page .monitor .video .pad-overlay span { pointer-events: none; }
+.page .monitor .video .pad-overlay button {
+  pointer-events: auto; height: 46px; padding: 0; border-radius: 14px; touch-action: none;
+  color: rgba(255, 255, 255, .95); background: rgba(0, 0, 0, .28);
+  border: 0.5px solid rgba(255, 255, 255, .22);
+  backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+  opacity: .78; transition: opacity .15s, background .15s;
+}
+.page .monitor .video:hover .pad-overlay button, .page .monitor .video .pad-overlay.holding button { opacity: .95; }
+.page .monitor .video .pad-overlay button:hover { background: rgba(0, 0, 0, .4); }
+.page .monitor .video .pad-overlay button.pressed { background: color-mix(in srgb, var(--blue) 75%, transparent); opacity: 1; }
+.teleop-msg { margin-top: 8px; }
+@media (max-width: 743px) {
+  .page .monitor .video .pad-overlay { grid-template-columns: repeat(3, 44px); gap: 5px; bottom: 8px; }
+  .page .monitor .video .pad-overlay button { height: 38px; border-radius: 12px; }
+  .page .monitor .video .drive-hint { top: 8px; font-size: 12px; padding: 4px 10px; }
+}
+
+/* 관제 상단 줄: 카메라/지도 세그먼트와 로봇 고르기(Picker)를 같은 높이(36px)·같은 모양으로 */
+.monitor-bar { gap: 12px; align-items: center; }
+.monitor-bar .segmented button { height: 32px; padding: 0 18px; font-size: 14px; }
+@media (max-width: 743px) {
+  .monitor-bar .segmented { flex: 1 1 100%; }
+  .monitor-bar .segmented button { flex: 1; }
+  .monitor-bar .picker { flex: 1 1 100%; }
+  .monitor-bar .picker-btn { min-width: 0; }
+}
+
+/* 진행 기록 제목 옆 출처 꼬리표 */
+.ev-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cell.rich .thumb-sm { margin-top: 2px; }
+.thumb .meta-line { margin-top: 2px; }
+
+/* ---------------------------------------------------------------- 시나리오: 규칙 결과 · 경고 · 사건 */
+/* 사진 위 사각형: 찾은 자리(초록 실선) · 기대 영역(파란 점선) */
+.photo-overlay { position: relative; margin: 0 0 22px; border-radius: var(--radius); overflow: hidden; background: #000; line-height: 0; }
+.photo-overlay img { width: 100%; display: block; }
+.ov-box { position: absolute; box-sizing: border-box; pointer-events: none; line-height: 1.2; }
+.ov-box.found { border: 2px solid #30d158; box-shadow: 0 0 0 1px rgba(0, 0, 0, .5); }
+.ov-box.expected { border: 2px dashed #0a84ff; }
+.ov-box b { position: absolute; left: -2px; top: -20px; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; color: #fff; background: #1f9d3f; white-space: nowrap; }
+.ov-legend { display: flex; gap: 14px; margin: -14px 4px 18px; font-size: 12px; color: var(--label2); }
+.ov-legend i { display: inline-block; width: 14px; height: 10px; margin-right: 5px; vertical-align: -1px; border: 2px solid #30d158; }
+.ov-legend i.expected { border: 2px dashed #0a84ff; }
+
+/* 사건 띠(사용자 영역 맨 위): 열린 사건이 있으면 빨갛게 알린다 */
+.incident-banner { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--ink-red); border-radius: var(--radius); padding: 10px 14px; margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+.incident-banner.wait { background: var(--red); color: #fff; }
+.incident-banner a { color: inherit; text-decoration: underline; font-weight: 700; }
+.incident-banner .grow { flex: 1; }
+.incident-banner .item { font-weight: 400; }
+
+/* 사건 단계 */
+.inc-steps { list-style: none; display: flex; gap: 0; margin: 0 0 18px; padding: 12px 14px; background: var(--bg-grouped); border-radius: var(--radius); box-shadow: var(--surface-ring); overflow-x: auto; }
+.inc-steps li { flex: 1; min-width: 64px; position: relative; padding-top: 22px; text-align: center; font-size: 12px; color: var(--label3); white-space: nowrap; }
+.inc-steps li small { display: none; }
+.inc-steps li i { position: absolute; left: 50%; top: 2px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--fill); z-index: 1; }
+.inc-steps li::before { content: ''; position: absolute; left: -50%; right: 50%; top: 8px; height: 2px; background: var(--fill); }
+.inc-steps li:first-child::before { display: none; }
+.inc-steps li.done { color: var(--label2); }
+.inc-steps li.done i, .inc-steps li.done::before { background: var(--green); }
+.inc-steps li.now { color: var(--label); font-weight: 700; }
+.inc-steps li.now i { background: var(--blue); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 25%, transparent); }
+.inc-steps li.now::before { background: var(--green); }
+.inc-steps.failed li.now i { background: var(--red); box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 25%, transparent); }
+.inc-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 22px; }
+.inc-photos figure { margin: 0; }
+.inc-photos img, .inc-photos .ph { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--fill2); display: grid; place-items: center; color: var(--label3); font-size: 12px; }
+.inc-photos figcaption { font-size: 12px; color: var(--label2); margin-top: 4px; text-align: center; }
+@media (max-width: 743px) { .inc-photos { grid-template-columns: 1fr; } }
+.cell-actions { display: flex; gap: 6px; flex: none; }
+.cell-actions button { padding: 5px 10px; font-size: 13px; }
+button.danger { background: var(--red); color: #fff; }

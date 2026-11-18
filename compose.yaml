@@ -1,0 +1,221 @@
+# 화재 점검 로봇 서비스 — 전체 구동
+#   (선택) cp .env.example .env   — 없으면 아래에 적은 로컬 개발용 기본값으로 실행된다. 공개 서버에서는 반드시 바꾼다.
+#   docker compose up -d --build
+#   http://localhost:8080
+#
+# 폴더 구조 = 아키텍처 계층(web: 서버 쪽 / ros: 로봇 쪽) > 컨테이너(서비스)마다 폴더 하나
+#   web/nginx/             정문 cdn(cdn/default.conf) + 원본 서버 web(web/default.conf) + React 화면(frontend/)
+#   web/spring/<서비스>/   Spring 서비스: src + 빌드 파일 + Dockerfile — 서비스 하나가 독립적으로 빌드·구동된다
+#   web/spring/common/     서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 — common-build 가 m2 볼륨에 설치
+#   web/python/            Python 서비스(analysis-service) / web/postgres/ DB 초기화
+#   ros/sim/        시뮬레이션(Gazebo·Nav2·SLAM) / ros/robot/ 로봇 측 노드(실제 로봇에도 같은 코드) / ros/maps/ 지도
+# 이미지에는 실행 환경만 있고, 코드는 각 폴더를 볼륨으로 연결해 구동한다. 코드를 고친 뒤:
+#   Spring 서비스 : docker compose restart <서비스>          (시작할 때 다시 빌드한다)
+#   common 변경   : docker compose run --rm common-build && docker compose restart gateway user-service inspection-service robot-service
+#   화면          : docker compose run --rm frontend-build   (web·cdn 은 그대로 — index.html 은 캐시하지 않고, 나머지는 파일 이름이 바뀐다)
+#   분석·ROS      : docker compose restart analysis-service | sim
+#
+# 네트워크
+#   front   : cdn ↔ web                       — 외부에 여는 포트는 cdn 의 8080 하나
+#   edge    : web(nginx) ↔ gateway
+#   backend : gateway ↔ 서비스들 ↔ db
+#   robot   : robot-service ↔ sim(rosbridge)  — rosbridge 는 robot-service 만 접근
+#
+# 시간대: 모든 컨테이너(프로그램·로그·DB 표시)를 APP_TZ(기본 Asia/Seoul)로 맞춘다. 저장되는 시각(timestamptz)은 시간대와 무관한 절대 시각이다.
+name: tp3
+
+x-spring: &spring
+  restart: unless-stopped
+  mem_limit: 1g                 # 시작할 때 Maven 빌드까지 하므로 여유를 둔다
+  networks: [backend]
+  environment: &spring-env
+    TZ: ${APP_TZ:-Asia/Seoul}
+    JWT_SECRET: ${JWT_SECRET:-tp3-local-dev-jwt-secret-change-before-deploy}
+    DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
+  healthcheck:
+    test: ["CMD-SHELL", "curl -fs http://localhost:$${SERVER_PORT}/actuator/health"]
+    interval: 10s
+    timeout: 3s
+    start_period: 180s
+    retries: 10
+
+x-after-common: &after-common
+  common-build: { condition: service_completed_successfully }
+  db: { condition: service_healthy }
+
+services:
+  # ================================================================ web (서버 쪽)
+  common-build:                 # 공유 라이브러리를 로컬 Maven 저장소(m2 볼륨)에 설치하고 끝난다
+    image: maven:3.9-eclipse-temurin-21
+    working_dir: /workspace
+    command: ["mvn", "-q", "-B", "install", "-DskipTests"]
+    volumes:
+      - ./web/spring/common:/workspace
+      - m2:/root/.m2
+    restart: "no"
+
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    # 서버 시간대: initdb 때 postgresql.conf 에 UTC 로 굳어 있으므로 시작 옵션으로 덮는다(세션 표시·로그 시각)
+    command: ["postgres", "-c", "timezone=${APP_TZ:-Asia/Seoul}", "-c", "log_timezone=${APP_TZ:-Asia/Seoul}"]
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tp3-postgres-local}
+      SERVICE_DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./web/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks: [backend]
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  user-service:
+    <<: *spring
+    build: ./web/spring/user-service
+    volumes:
+      - ./web/spring/user-service:/workspace
+      - m2:/root/.m2
+    environment:
+      <<: *spring-env
+      SERVER_PORT: 8081
+      INITIAL_ADMIN_LOGIN: ${INITIAL_ADMIN_LOGIN:-admin}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-Admin1234!}
+      DEMO_USERS_PASSWORD: ${DEMO_USERS_PASSWORD-User1234!}   # .env 에 빈 값으로 두면 시험 계정을 만들지 않는다
+    depends_on: *after-common
+
+  inspection-service:
+    <<: *spring
+    build: ./web/spring/inspection-service
+    volumes:
+      - ./web/spring/inspection-service:/workspace
+      - m2:/root/.m2
+      - photos:/data/photos
+    environment:
+      <<: *spring-env
+      SERVER_PORT: 8082
+      SCHEDULE_ZONE: ${SCHEDULE_ZONE:-${APP_TZ:-Asia/Seoul}}   # 예약 점검 시각 기준
+    depends_on: *after-common
+
+  robot-service:
+    <<: *spring
+    build: ./web/spring/robot-service
+    volumes:
+      - ./web/spring/robot-service:/workspace
+      - m2:/root/.m2
+    environment:
+      <<: *spring-env
+      SERVER_PORT: 8083
+      SIM_ROSBRIDGE_URL: ws://sim:9090
+      SIM_VIDEO_URL: http://sim:8080
+    networks: [backend, robot]
+    depends_on: *after-common
+
+  gateway:
+    <<: *spring
+    build: ./web/spring/gateway
+    volumes:
+      - ./web/spring/gateway:/workspace
+      - m2:/root/.m2
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+      JWT_SECRET: ${JWT_SECRET:-tp3-local-dev-jwt-secret-change-before-deploy}
+      SERVER_PORT: 8080
+      SCHEDULE_ZONE: ${SCHEDULE_ZONE:-${APP_TZ:-Asia/Seoul}}   # 서버 시간 표시 기준(예약 점검과 같은 시간대)
+    networks: [edge, backend]
+    depends_on:
+      common-build: { condition: service_completed_successfully }
+
+  analysis-service:
+    build: ./web/python/analysis-service
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+      DB_URL: postgresql://analysis_svc@db:5432/analysisdb
+      DB_PASSWORD: ${SERVICE_DB_PASSWORD:-tp3-service-local}
+    volumes:
+      - ./web/python/analysis-service/src:/app:ro
+    networks: [backend]
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8084/health')"]
+      interval: 10s
+      timeout: 3s
+      start_period: 20s
+      retries: 10
+
+  frontend-build:               # React 화면을 web/nginx/frontend/dist 로 빌드하고 끝난다
+    image: node:20-alpine
+    working_dir: /app
+    command: ["sh", "-c", "npm install --no-audit --no-fund && npm run build"]
+    volumes:
+      - ./web/nginx/frontend:/app
+      - frontend_modules:/app/node_modules
+    restart: "no"
+
+  web:                          # 원본 서버: 화면 파일 제공 + /api·/ws 를 gateway 로 전달 (밖에서는 cdn 을 거쳐서만 닿는다)
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./web/nginx/web:/etc/nginx/conf.d:ro   # 폴더 마운트: 파일을 새로 써도 새 파일이 보인다(반영은 nginx -s reload)
+      - ./web/nginx/frontend/dist:/usr/share/nginx/html:ro
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+    networks: [front, edge]
+    depends_on:
+      frontend-build: { condition: service_completed_successfully }
+      gateway: { condition: service_started }
+
+  cdn:                          # 정문(CDN 엣지 역할): 화면 파일을 보관해 두고 대신 내준다. /api·/ws 는 보관 없이 통과
+    image: nginx:1.27-alpine    # 보관본은 컨테이너 안에만 있다 → 비우려면 docker compose up -d --force-recreate cdn
+    restart: unless-stopped
+    mem_limit: 128m
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./web/nginx/cdn:/etc/nginx/conf.d:ro   # 폴더 마운트(위와 같음)
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+    networks: [front]
+    depends_on:
+      web: { condition: service_started }
+
+  # ================================================================ ros (로봇 쪽)
+  # TurtleBot3 시뮬레이션. Gazebo Classic 이 amd64 전용이라 Apple Silicon 에서는 에뮬레이션으로 실행된다.
+  # SIM_MODE=nav (기본): 저장 지도(ros/maps/site.yaml, 없으면 reference.yaml) + AMCL + Nav2
+  # SIM_MODE=slam      : slam_toolbox 로 지도 작성 → /sim/tools/explore.sh → /sim/tools/save_map.sh
+  # 실제 로봇으로 바꿀 때는 이 서비스를 빼고 실행한다: docker compose up -d --scale sim=0
+  sim:
+    build: ./ros/sim
+    platform: linux/amd64
+    restart: unless-stopped
+    mem_limit: 3500m
+    environment:
+      TZ: ${APP_TZ:-Asia/Seoul}
+      SIM_MODE: ${SIM_MODE:-nav}
+      TURTLEBOT3_MODEL: ${TURTLEBOT3_MODEL:-waffle_pi}   # waffle_pi(보유 장비, Pi 카메라) / waffle(RealSense) — 둘 다 /camera/image_raw
+      LIDAR_MAX_RANGE: ${LIDAR_MAX_RANGE:-8.0}         # 시뮬레이션 라이다 최대 거리(m). 실물 라이다에 맞춘다
+      SIM_LAUNCHER: ${SIM_LAUNCHER:-mock}              # 투척 기구: mock(모의 노드가 투척 명령에 답함) / none(기구 없음)
+    volumes:
+      - ./ros/sim/src:/sim:ro
+      - ./ros/robot/src:/robot:ro
+      - ./ros/maps:/maps
+    networks: [robot]
+
+networks:
+  front:
+  edge:
+  backend:
+  robot:
+
+volumes:
+  pgdata:
+  photos:
+  m2:
+  frontend_modules:

@@ -1,0 +1,255 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1870" height="2242" viewBox="0 0 1870 2242" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a0071a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0071a4"/></marker><marker id="a007aff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#007aff"/></marker><marker id="a248a3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#248a3d"/></marker><marker id="a5856d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5856d6"/></marker><marker id="a8944ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8944ab"/></marker><marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker><marker id="ac93400" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c93400"/></marker></defs>
+<rect width="1870" height="2242" fill="#f2f2f7"/>
+<text x="24.0" y="44.0" font-size="24" font-weight="700" fill="#1c1c1e" text-anchor="start">화재 점검 로봇 서비스 — React SPA 사이클 (화면이 만들어지는 과정)</text>
+<text x="24.0" y="70.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">세로 줄 = 일하는 주체, 화살표 = 호출 · 응답(번호 순서), 동그라미 = 그 안에서 하는 일. 예시 화면은 작업 목록(/app/tasks). 다른 화면도 같은 순서로 돈다.</text>
+<rect x="16.0" y="92.0" width="840.0" height="156.0" rx="14" fill="#ffffff" stroke="#5856d6" stroke-width="1.4"/>
+<text x="34.0" y="118.0" font-size="14" font-weight="700" fill="#5856d6" text-anchor="start">cdn 이 내주는 것 — frontend-build 가 미리 만들어 둔 dist/ 파일 4개가 전부다</text>
+<text x="34.0" y="146.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">index.html</text>
+<text x="394.0" y="146.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">빈 껍데기: &lt;div id="root"&gt; 와 아래 JS · CSS 의 주소</text>
+<text x="838.0" y="146.0" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="end">no-cache (매번 확인)</text>
+<text x="34.0" y="172.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">assets/index-&lt;해시&gt;.js</text>
+<text x="394.0" y="172.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">React + React Router + 모든 화면 코드 한 묶음 · 약 218KB</text>
+<text x="838.0" y="172.0" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="end">1년 · immutable</text>
+<text x="34.0" y="198.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">assets/index-&lt;해시&gt;.css</text>
+<text x="394.0" y="198.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">스타일 · 약 14KB</text>
+<text x="838.0" y="198.0" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="end">1년 · immutable</text>
+<text x="34.0" y="224.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">assets/material-symbols-rounded-&lt;해시&gt;.woff2</text>
+<text x="394.0" y="224.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">아이콘 글꼴 · 약 4.6MB</text>
+<text x="838.0" y="224.0" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="end">1년 · immutable</text>
+<rect x="870.0" y="92.0" width="984.0" height="156.0" rx="14" fill="#ffffff" stroke="#007aff" stroke-width="1.4"/>
+<text x="888.0" y="118.0" font-size="14" font-weight="700" fill="#007aff" text-anchor="start">일반 웹과 다른 점</text>
+<text x="888.0" y="146.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="start">일반 웹</text>
+<text x="984.0" y="146.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">주소마다 서버가 완성된 HTML 을 만들어 보낸다. 화면을 옮길 때마다 문서를 새로 받는다.</text>
+<text x="888.0" y="172.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="start">이 화면(SPA)</text>
+<text x="984.0" y="172.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">서버(cdn)는 어떤 주소에도 같은 빈 HTML 과 JS 묶음을 준다. 화면은 브라우저에서 JS 가 만든다.</text>
+<text x="888.0" y="198.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="start">그 뒤의 통신</text>
+<text x="984.0" y="198.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">서버와 주고받는 것은 데이터(JSON)뿐이다. 화면 이동은 주소창만 바뀌고 문서 요청이 없다.</text>
+<text x="888.0" y="224.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="start">권한</text>
+<text x="984.0" y="224.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">JS 는 누구나 받을 수 있다. 화면에서 메뉴를 막는 것은 편의이고, 실제 확인은 gateway 가 요청마다 한다.</text>
+<rect x="474.0" y="262.0" width="760.0" height="1960.0" rx="16" fill="#eaf3ff" stroke="#007aff" stroke-width="1.2" stroke-dasharray="6 5" opacity="0.5"/>
+<text x="854.0" y="282.0" font-size="12.5" font-weight="700" fill="#007aff" text-anchor="middle">브라우저 안 (사용자 PC) — 화면은 여기서 만들어진다</text>
+<rect x="1260.0" y="262.0" width="498.0" height="1960.0" rx="16" fill="#efeefc" stroke="#5856d6" stroke-width="1.2" stroke-dasharray="6 5" opacity="0.5"/>
+<text x="1509.0" y="282.0" font-size="12.5" font-weight="700" fill="#5856d6" text-anchor="middle">서버 (Docker 호스트) — 파일과 데이터만 준다</text>
+<rect x="224.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.6"/>
+<text x="330.0" y="317.0" font-size="14" font-weight="700" fill="#3a3a3c" text-anchor="middle">사용자</text>
+<text x="330.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">주소 입력 · 클릭 · 키 입력</text>
+<line x1="330" y1="348" x2="330" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="486.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="1.6"/>
+<text x="592.0" y="317.0" font-size="14" font-weight="700" fill="#007aff" text-anchor="middle">브라우저</text>
+<text x="592.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">문서 · DOM · 주소창 · HTTP 캐시</text>
+<line x1="592" y1="348" x2="592" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="748.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.6"/>
+<text x="854.0" y="317.0" font-size="14" font-weight="700" fill="#8944ab" text-anchor="middle">React 앱</text>
+<text x="854.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">main.tsx · App · Router · Shell</text>
+<line x1="854" y1="348" x2="854" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1010.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.6"/>
+<text x="1116.0" y="317.0" font-size="14" font-weight="700" fill="#8944ab" text-anchor="middle">화면 컴포넌트</text>
+<text x="1116.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">pages/* · state · usePoll</text>
+<line x1="1116" y1="348" x2="1116" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1272.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="1378.0" y="317.0" font-size="14" font-weight="700" fill="#5856d6" text-anchor="middle">cdn · web</text>
+<text x="1378.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">화면 파일 (정적)</text>
+<line x1="1378" y1="348" x2="1378" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="1534.0" y="294.0" width="212.0" height="54.0" rx="12" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="1640.0" y="317.0" font-size="14" font-weight="700" fill="#248a3d" text-anchor="middle">gateway → 서비스</text>
+<text x="1640.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="middle">데이터 /api · /ws (JSON)</text>
+<line x1="1640" y1="348" x2="1640" y2="2212" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="4 5"/>
+<rect x="16.0" y="368.0" width="1838.0" height="286.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="368.0" width="8.0" height="286.0" rx="4" fill="#5856d6" stroke="#5856d6" stroke-width="1.0"/>
+<text x="40.0" y="396.0" font-size="16" font-weight="700" fill="#5856d6" text-anchor="start">A  첫 접속 — 빈 껍데기와 묶음 파일 받기</text>
+<text x="40.0" y="415.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">어떤 주소로 들어와도 같은 index.html 을 받는다. 이 단계가 끝나도 화면에는 아직 아무것도 없다</text>
+<circle cx="54" cy="445.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="449.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A1</text>
+<circle cx="54" cy="483.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="487.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A2</text>
+<circle cx="54" cy="521.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="525.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A3</text>
+<circle cx="54" cy="559.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="563.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A4</text>
+<circle cx="54" cy="597.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="601.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A5</text>
+<circle cx="54" cy="635.0" r="13" fill="#5856d6"/>
+<text x="54.0" y="639.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A6</text>
+<rect x="16.0" y="668.0" width="1838.0" height="324.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="668.0" width="8.0" height="324.0" rx="4" fill="#8944ab" stroke="#8944ab" stroke-width="1.0"/>
+<text x="40.0" y="696.0" font-size="16" font-weight="700" fill="#8944ab" text-anchor="start">B  화면 조립 — 브라우저 안에서 React 가 그린다</text>
+<text x="40.0" y="715.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">서버는 화면을 만들지 않는다. 받은 JS 가 주소를 읽고, 로그인 상태를 묻고, 맞는 화면을 #root 안에 만든다</text>
+<circle cx="54" cy="745.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="749.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B1</text>
+<circle cx="54" cy="783.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="787.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B2</text>
+<circle cx="54" cy="821.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="825.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B3</text>
+<circle cx="54" cy="859.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="863.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B4</text>
+<circle cx="54" cy="897.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="901.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B5</text>
+<circle cx="54" cy="935.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="939.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B6</text>
+<circle cx="54" cy="973.0" r="13" fill="#8944ab"/>
+<text x="54.0" y="977.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B7</text>
+<rect x="16.0" y="1006.0" width="1838.0" height="248.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="1006.0" width="8.0" height="248.0" rx="4" fill="#248a3d" stroke="#248a3d" stroke-width="1.0"/>
+<text x="40.0" y="1034.0" font-size="16" font-weight="700" fill="#248a3d" text-anchor="start">C  데이터 채우기 — 화면은 틀, 내용은 JSON</text>
+<text x="40.0" y="1053.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">화면마다 자기 데이터를 직접 요청한다. /api 는 cdn · web 이 보관 없이 gateway 로 넘긴다</text>
+<circle cx="54" cy="1083.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="1087.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C1</text>
+<circle cx="54" cy="1121.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="1125.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C2</text>
+<circle cx="54" cy="1159.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="1163.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C3</text>
+<circle cx="54" cy="1197.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="1201.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C4</text>
+<circle cx="54" cy="1235.0" r="13" fill="#248a3d"/>
+<text x="54.0" y="1239.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C5</text>
+<rect x="16.0" y="1268.0" width="1838.0" height="286.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="1268.0" width="8.0" height="286.0" rx="4" fill="#007aff" stroke="#007aff" stroke-width="1.0"/>
+<text x="40.0" y="1296.0" font-size="16" font-weight="700" fill="#007aff" text-anchor="start">D  화면 이동 — 서버에 가지 않는다</text>
+<text x="40.0" y="1315.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">일반 웹과 가장 다른 부분. 주소는 바뀌지만 문서 요청이 없고, 이미 받은 JS 가 화면을 바꾼다</text>
+<circle cx="54" cy="1345.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1349.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D1</text>
+<circle cx="54" cy="1383.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1387.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D2</text>
+<circle cx="54" cy="1421.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1425.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D3</text>
+<circle cx="54" cy="1459.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1463.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D4</text>
+<circle cx="54" cy="1497.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1501.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D5</text>
+<circle cx="54" cy="1535.0" r="13" fill="#007aff"/>
+<text x="54.0" y="1539.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D6</text>
+<rect x="16.0" y="1568.0" width="1838.0" height="210.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="1568.0" width="8.0" height="210.0" rx="4" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="40.0" y="1596.0" font-size="16" font-weight="700" fill="#b25000" text-anchor="start">E  입력 → 변경 요청</text>
+<text x="40.0" y="1615.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">입력값은 컴포넌트 state 로 브라우저 메모리에만 있다가, 제출할 때 JSON 으로 나간다</text>
+<circle cx="54" cy="1645.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1649.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E1</text>
+<circle cx="54" cy="1683.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1687.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E2</text>
+<circle cx="54" cy="1721.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1725.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E3</text>
+<circle cx="54" cy="1759.0" r="13" fill="#b25000"/>
+<text x="54.0" y="1763.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E4</text>
+<rect x="16.0" y="1792.0" width="1838.0" height="210.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="1792.0" width="8.0" height="210.0" rx="4" fill="#0071a4" stroke="#0071a4" stroke-width="1.0"/>
+<text x="40.0" y="1820.0" font-size="16" font-weight="700" fill="#0071a4" text-anchor="start">F  실시간 화면(관제) — React 렌더를 거치지 않는 통로</text>
+<text x="40.0" y="1839.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">영상 · 조종 · 지도는 state 로 다시 그리기에는 너무 빠르다. 브라우저 기능을 직접 쓴다</text>
+<circle cx="54" cy="1869.0" r="13" fill="#0071a4"/>
+<text x="54.0" y="1873.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F1</text>
+<circle cx="54" cy="1907.0" r="13" fill="#0071a4"/>
+<text x="54.0" y="1911.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F2</text>
+<circle cx="54" cy="1945.0" r="13" fill="#0071a4"/>
+<text x="54.0" y="1949.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F3</text>
+<circle cx="54" cy="1983.0" r="13" fill="#0071a4"/>
+<text x="54.0" y="1987.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">F4</text>
+<rect x="16.0" y="2016.0" width="1838.0" height="172.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.6"/>
+<rect x="16.0" y="2016.0" width="8.0" height="172.0" rx="4" fill="#c93400" stroke="#c93400" stroke-width="1.0"/>
+<text x="40.0" y="2044.0" font-size="16" font-weight="700" fill="#c93400" text-anchor="start">G  새 빌드 반영</text>
+<text x="40.0" y="2063.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">docker compose run --rm frontend-build 뒤. cdn 을 비울 필요가 없다</text>
+<circle cx="54" cy="2093.0" r="13" fill="#c93400"/>
+<text x="54.0" y="2097.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">G1</text>
+<circle cx="54" cy="2131.0" r="13" fill="#c93400"/>
+<text x="54.0" y="2135.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">G2</text>
+<circle cx="54" cy="2169.0" r="13" fill="#c93400"/>
+<text x="54.0" y="2173.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">G3</text>
+<circle cx="330" cy="445.0" r="4" fill="#5856d6"/>
+<path d="M330.0 445.0 L590.0 445.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="340.0" y="439.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">주소 입력 http://localhost:8080/app/tasks</text>
+<circle cx="592" cy="483.0" r="4" fill="#5856d6"/>
+<path d="M592.0 483.0 L1376.0 483.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="602.0" y="477.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">GET /app/tasks — 그런 파일은 없다 → web 의 try_files 가 index.html 을 대신 응답(no-cache, cdn 은 보관 안 함)</text>
+<circle cx="1378" cy="521.0" r="4" fill="#5856d6"/>
+<path d="M1378.0 521.0 L594.0 521.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="602.0" y="515.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">index.html: &lt;div id="root"&gt;&lt;/div&gt; 와 &lt;script src="/assets/index-&lt;해시&gt;.js"&gt; · &lt;link css&gt; 뿐 — 화면 내용 없음</text>
+<circle cx="592" cy="559.0" r="4" fill="#5856d6"/>
+<path d="M592.0 559.0 L1376.0 559.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="602.0" y="553.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">GET /assets/index-&lt;해시&gt;.js · .css — cdn 보관본(HIT · gzip). 전에 받았으면 브라우저 캐시에서 꺼내고 요청하지 않는다</text>
+<circle cx="592" cy="597.0" r="7" fill="#ffffff" stroke="#5856d6" stroke-width="2.4"/>
+<text x="606.0" y="601.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">CSS 적용 → JS 모듈 실행 시작. React · Router · 모든 화면 코드가 이 한 파일에 들어 있다</text>
+<circle cx="592" cy="635.0" r="4" fill="#5856d6"/>
+<path d="M592.0 635.0 L1376.0 635.0" fill="none" stroke="#5856d6" stroke-width="2" marker-end="url(#a5856d6)"/>
+<text x="602.0" y="629.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">GET /assets/material-symbols-rounded-&lt;해시&gt;.woff2 — 아이콘 글꼴. CSS 가 처음 쓸 때 받는다</text>
+<circle cx="592" cy="745.0" r="4" fill="#8944ab"/>
+<path d="M592.0 745.0 L852.0 745.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="602.0" y="739.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">main.tsx: createRoot(#root).render(&lt;BrowserRouter&gt;&lt;App/&gt;&lt;/BrowserRouter&gt;)</text>
+<circle cx="854" cy="783.0" r="7" fill="#ffffff" stroke="#8944ab" stroke-width="2.4"/>
+<text x="868.0" y="787.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">App 첫 렌더: checked=false → "불러오는 중…" 만 표시</text>
+<circle cx="854" cy="821.0" r="4" fill="#8944ab"/>
+<path d="M854.0 821.0 L1638.0 821.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="864.0" y="815.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">useEffect: api.me() → fetch GET /api/auth/me — HttpOnly 쿠키는 브라우저가 자동으로 붙인다(JS 는 읽지 못한다)</text>
+<circle cx="1640" cy="859.0" r="4" fill="#8944ab"/>
+<path d="M1640.0 859.0 L856.0 859.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="864.0" y="853.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">200 Me{이름 · 역할} → setMe / 401 → me=null. setChecked(true) → App 다시 렌더</text>
+<circle cx="854" cy="897.0" r="7" fill="#ffffff" stroke="#8944ab" stroke-width="2.4"/>
+<text x="868.0" y="901.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">Routes 가 주소창 경로와 맞는 Route 를 고른다 → Shell: me 없으면 /login, 역할이 다르면 자기 홈으로 Navigate</text>
+<circle cx="854" cy="935.0" r="4" fill="#8944ab"/>
+<path d="M854.0 935.0 L1114.0 935.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="864.0" y="929.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">Shell(사이드바 · 탭 바)의 &lt;Outlet/&gt; 자리에 화면 컴포넌트(Tasks)를 마운트</text>
+<circle cx="1116" cy="973.0" r="4" fill="#8944ab"/>
+<path d="M1116.0 973.0 L594.0 973.0" fill="none" stroke="#8944ab" stroke-width="2" marker-end="url(#a8944ab)"/>
+<text x="602.0" y="967.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">React 가 컴포넌트 결과(가상 DOM)를 실제 DOM 으로 반영 → 이때 처음 화면이 보인다(표는 아직 비어 있음)</text>
+<circle cx="1116" cy="1083.0" r="4" fill="#248a3d"/>
+<path d="M1116.0 1083.0 L1638.0 1083.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1126.0" y="1077.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">usePoll(() =&gt; api.tasks(group), 2000): 마운트 직후 1회 + 2초마다 fetch GET /api/inspections</text>
+<circle cx="1640" cy="1121.0" r="4" fill="#248a3d"/>
+<path d="M1640.0 1121.0 L1118.0 1121.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="1126.0" y="1115.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">JSON 배열 → setData → 그 컴포넌트만 다시 렌더</text>
+<circle cx="1116" cy="1159.0" r="4" fill="#248a3d"/>
+<path d="M1116.0 1159.0 L594.0 1159.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="602.0" y="1153.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">React 가 이전 결과와 비교해 바뀐 DOM(표의 행)만 고친다 — 문서를 다시 받지 않는다</text>
+<circle cx="1116" cy="1197.0" r="7" fill="#ffffff" stroke="#248a3d" stroke-width="2.4"/>
+<text x="1130.0" y="1201.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">실패하면 error 상태 → ErrorBox 표시. 다음 주기에 다시 시도</text>
+<circle cx="1640" cy="1235.0" r="4" fill="#248a3d"/>
+<path d="M1640.0 1235.0 L856.0 1235.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
+<text x="864.0" y="1229.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">401 이면 http.ts 가 window 이벤트 auth:expired → App 이 me=null · navigate("/login")</text>
+<circle cx="330" cy="1345.0" r="4" fill="#007aff"/>
+<path d="M330.0 1345.0 L1114.0 1345.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="340.0" y="1339.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">메뉴(NavLink) 클릭 · 표의 행 클릭 → navigate("/app/tasks/12")</text>
+<circle cx="854" cy="1383.0" r="4" fill="#007aff"/>
+<path d="M854.0 1383.0 L594.0 1383.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="602.0" y="1377.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">history.pushState 로 주소창만 바꾼다 — cdn · web 으로 가는 요청 없음</text>
+<circle cx="854" cy="1421.0" r="4" fill="#007aff"/>
+<path d="M854.0 1421.0 L1114.0 1421.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="864.0" y="1415.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">Routes 다시 매칭 → 이전 화면 언마운트(폴링 타이머 clearInterval · WebSocket close) → 새 화면(TaskDetail) 마운트</text>
+<circle cx="1116" cy="1459.0" r="4" fill="#007aff"/>
+<path d="M1116.0 1459.0 L1638.0 1459.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="1126.0" y="1453.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">새 화면이 자기 데이터 요청 GET /api/inspections/12 (2초마다) → C 사이클</text>
+<circle cx="330" cy="1497.0" r="4" fill="#007aff"/>
+<path d="M330.0 1497.0 L590.0 1497.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="340.0" y="1491.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">뒤로 가기: popstate → Router 가 다시 매칭 — 역시 서버 요청 없음</text>
+<circle cx="330" cy="1535.0" r="4" fill="#007aff"/>
+<path d="M330.0 1535.0 L1376.0 1535.0" fill="none" stroke="#007aff" stroke-width="2" marker-end="url(#a007aff)"/>
+<text x="340.0" y="1529.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">새로고침 · 주소 직접 입력: A1 부터 다시. 메모리의 상태(me · 목록)는 사라지고 쿠키로 B3 에서 로그인 상태를 되찾는다</text>
+<circle cx="330" cy="1645.0" r="4" fill="#b25000"/>
+<path d="M330.0 1645.0 L1114.0 1645.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="340.0" y="1639.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">로그인 폼 입력: onChange → setState → 다시 렌더(글자마다)</text>
+<circle cx="1116" cy="1683.0" r="4" fill="#b25000"/>
+<path d="M1116.0 1683.0 L1638.0 1683.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="1126.0" y="1677.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">submit → useAction.run: api.login POST /api/auth/login {loginId, password} — 요청 중에는 버튼 비활성(busy)</text>
+<circle cx="1640" cy="1721.0" r="4" fill="#b25000"/>
+<path d="M1640.0 1721.0 L856.0 1721.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="864.0" y="1715.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">200 + Set-Cookie(HttpOnly) · 본문 Me → setMe(AuthContext) → navigate(홈) → D2 처럼 화면만 바뀐다</text>
+<circle cx="1116" cy="1759.0" r="4" fill="#b25000"/>
+<path d="M1116.0 1759.0 L1638.0 1759.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<text x="1126.0" y="1753.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">그 밖의 변경(점검 실행 · 판정 · 취소): POST → 성공하면 reload() 나 navigate, 실패하면 ErrorBox</text>
+<circle cx="1116" cy="1869.0" r="4" fill="#0071a4"/>
+<path d="M1116.0 1869.0 L1638.0 1869.0" fill="none" stroke="#0071a4" stroke-width="2" marker-end="url(#a0071a4)"/>
+<text x="1126.0" y="1863.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">폴링: 로봇 상태 1초 · 지도 위치(mapview) 0.2초 · 지도 정보 10초 — 화면을 떠나면 모두 멈춘다</text>
+<circle cx="1640" cy="1907.0" r="4" fill="#0071a4"/>
+<path d="M1640.0 1907.0 L594.0 1907.0" fill="none" stroke="#0071a4" stroke-width="2" marker-end="url(#a0071a4)"/>
+<text x="602.0" y="1901.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">영상: &lt;img src="/api/robots/{id}/stream"&gt; — MJPEG 를 브라우저가 직접 받아 그린다(JS · state 를 거치지 않음)</text>
+<circle cx="1116" cy="1945.0" r="4" fill="#0071a4"/>
+<path d="M1116.0 1945.0 L1638.0 1945.0" fill="none" stroke="#0071a4" stroke-width="2" marker-end="url(#a0071a4)"/>
+<text x="1126.0" y="1939.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">조종: new WebSocket("/ws/robots/{id}/teleop") — 제어권이 있는 동안 열어 두고, 누르는 동안 100ms 마다 속도 전송</text>
+<circle cx="1116" cy="1983.0" r="4" fill="#0071a4"/>
+<path d="M1116.0 1983.0 L594.0 1983.0" fill="none" stroke="#0071a4" stroke-width="2" marker-end="url(#a0071a4)"/>
+<text x="602.0" y="1977.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지도: &lt;canvas&gt; 에 직접 그린다 — map.png?v=버전 + requestAnimationFrame 으로 0.2초 사이의 로봇 위치를 보간</text>
+<circle cx="1378" cy="2093.0" r="7" fill="#ffffff" stroke="#c93400" stroke-width="2.4"/>
+<text x="1364.0" y="2097.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">빌드하면 JS · CSS 파일 이름의 해시가 바뀌고, index.html 이 새 이름을 가리킨다</text>
+<circle cx="592" cy="2131.0" r="7" fill="#ffffff" stroke="#c93400" stroke-width="2.4"/>
+<text x="606.0" y="2135.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">이미 열려 있는 탭은 메모리의 옛 JS 로 계속 동작한다(화면 이동을 해도 문서를 받지 않으므로)</text>
+<circle cx="330" cy="2169.0" r="4" fill="#c93400"/>
+<path d="M330.0 2169.0 L1376.0 2169.0" fill="none" stroke="#c93400" stroke-width="2" marker-end="url(#ac93400)"/>
+<text x="340.0" y="2163.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">새로고침하면 index.html(no-cache)을 다시 받아 새 파일 이름을 알게 되고, 새 JS 를 받는다 → A1</text>
+</svg>
