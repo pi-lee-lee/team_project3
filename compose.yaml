@@ -4,7 +4,7 @@
 #   http://localhost:8080
 #
 # 폴더 구조 = 아키텍처 계층(web: 서버 쪽 / ros: 로봇 쪽) > 컨테이너(서비스)마다 폴더 하나
-#   web/nginx/             정문 cdn(cdn.conf) + 원본 서버 web(nginx.conf) + React 화면(frontend/)
+#   web/nginx/             정문 cdn(cdn/default.conf) + 원본 서버 web(web/default.conf) + React 화면(frontend/)
 #   web/spring/<서비스>/   Spring 서비스: src + 빌드 파일 + Dockerfile — 서비스 하나가 독립적으로 빌드·구동된다
 #   web/spring/common/     서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 — common-build 가 m2 볼륨에 설치
 #   web/python/            Python 서비스(analysis-service) / web/postgres/ DB 초기화
@@ -163,7 +163,7 @@ services:
     image: nginx:1.27-alpine
     restart: unless-stopped
     volumes:
-      - ./web/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/nginx/web:/etc/nginx/conf.d:ro   # 폴더 마운트: 파일을 새로 써도 새 파일이 보인다(반영은 nginx -s reload)
       - ./web/nginx/frontend/dist:/usr/share/nginx/html:ro
     environment:
       TZ: ${APP_TZ:-Asia/Seoul}
@@ -179,7 +179,7 @@ services:
     ports:
       - "${WEB_PORT:-8080}:80"
     volumes:
-      - ./web/nginx/cdn.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web/nginx/cdn:/etc/nginx/conf.d:ro   # 폴더 마운트(위와 같음)
     environment:
       TZ: ${APP_TZ:-Asia/Seoul}
     networks: [front]

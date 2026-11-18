@@ -5,7 +5,7 @@
   web/nginx/frontend/src — main.tsx(createRoot · BrowserRouter) · App.tsx(api.me · Routes · Shell) ·
   util.tsx(usePoll · useAction · AuthContext) · api/http.ts(fetch · auth:expired) · pages/*(화면별 폴링 주기) ·
   pages/user/Monitor.tsx(상태 1초 · mapview 0.2초 · 지도 정보 10초 · 조종 100ms)
-  web/nginx/nginx.conf(try_files · Cache-Control) · cdn.conf(보관·통과 경로)
+  web/nginx/web/default.conf(try_files · Cache-Control) · cdn/default.conf(보관·통과 경로)
 파일 크기는 dist/assets 의 현재 빌드 기준(해시와 크기는 빌드마다 달라진다).
 실행: python3 docs/architecture/build_spa_cycle.py  →  docs/architecture/spa_cycle.svg
 """

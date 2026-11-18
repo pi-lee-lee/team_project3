@@ -19,7 +19,7 @@ docker compose up -d --build
 
 ```
 web/                       서버 쪽
-  nginx/                   정문 cdn(cdn.conf) + 원본 서버 web(nginx.conf) + React 화면(frontend/)
+  nginx/                   정문 cdn(cdn/default.conf) + 원본 서버 web(web/default.conf) + React 화면(frontend/)
   spring/                  Spring 서비스: gateway, user-service, inspection-service, robot-service, common(공유 라이브러리)
   python/                  Python 서비스: analysis-service
   postgres/                DB 초기화(init/)
@@ -47,7 +47,7 @@ scripts/                   E2E 시험
 | `web/spring/inspection-service/` | inspection-service | 점검 지점, 작업, 사건 기록, 관측 사진, 사람 판정, 재점검, 지점 이력, 점검 계획(즉시·예약 실행) |
 | `web/spring/robot-service/` | robot-service | 로봇 연결 계층: `RobotAdapter`(rosbridge·mock), 상태·제어권·조종·비상 정지·미션 실행·결과 재전송·영상 중계 |
 | `web/python/analysis-service/` | analysis-service | Python: 사진 품질 배치 분석(ROI 밝기·선명도 → 재촬영 후보) |
-| `web/nginx/` | cdn · web (nginx) · frontend-build | 정문 `cdn.conf`(CDN 엣지 역할: 화면 파일을 보관해 대신 제공, `/api`·`/ws` 는 통과) + 원본 서버 `nginx.conf`(화면 제공, 캐시 기간 지시, 게이트웨이 프록시) + React 화면 `frontend/`(frontend-build 가 빌드) |
+| `web/nginx/` | cdn · web (nginx) · frontend-build | 정문 `cdn/default.conf`(CDN 엣지 역할: 화면 파일을 보관해 대신 제공, `/api`·`/ws` 는 통과) + 원본 서버 `web/default.conf`(화면 제공, 캐시 기간 지시, 게이트웨이 프록시) + React 화면 `frontend/`(frontend-build 가 빌드) |
 | `web/postgres/init/` | db | PostgreSQL 17 초기화: 서비스마다 DB·계정 분리 |
 | `web/spring/common/` | common-build | 서비스 간 계약(JWT·사용자 헤더) 공유 라이브러리 |
 | `ros/sim/` | sim | Gazebo 월드·SLAM/Nav2 실행·시험 도구 |

@@ -3,7 +3,7 @@
 값(주기·시간·코드)은 코드에서 확인한 것이다:
   SessionChecker 10초 캐시 · OutboxSender 1초 · AnalysisTrigger 5초(60초 재요청) · TeleopHandler 100ms/0.5초 ·
   cmd_vel_watchdog 0.5초 · 제어권 2분 · 출발 전 검사(odom 2초 · 카메라 5초 · Nav2 · 위치 추정) · 도착 후 1.5초 촬영(3회) ·
-  bridge map 5초 · map_pose 5Hz · 지도 화면 0.2초 · cdn 보관 기간(web/nginx/nginx.conf 의 Cache-Control, cdn.conf).
+  bridge map 5초 · map_pose 5Hz · 지도 화면 0.2초 · cdn 보관 기간(web/nginx/web/default.conf 의 Cache-Control, cdn/default.conf).
 실행: python3 docs/architecture/build_cycle.py  →  docs/architecture/system_cycle.svg
 """
 from pathlib import Path
