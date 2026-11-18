@@ -3,11 +3,16 @@
 - POST /jobs {"observationId": 12}  : 작업을 큐(analysis_job 테이블)에 넣고 NOTIFY 로 워커를 깨운다.
 - 워커: LISTEN 으로 깨어나 FOR UPDATE SKIP LOCKED 로 작업을 하나씩 가져가 처리한다.
   사진은 inspection-service 에서 받고, 결과도 inspection-service 로 보낸다.
+  품질 분석 뒤 그 관측에 걸린 규칙(GET /internal/observations/{id}/rules)이 있으면 판독해 결과에 "results" 로 더한다.
 - GET/PUT /api/admin/analysis/criteria : 판정 기준(밝기·선명도·관심 영역). 게이트웨이가 ADMIN 으로 제한한다.
+- GET /checkers : 판독기 목록(종류·설정 모양). 관리자 화면이 규칙 입력 폼을 이것으로 만든다.
+- POST /check   : 사진 한 장 + 규칙 목록을 바로 판독한다(도착 후 재판독, 규칙 시험).
 
 판정: 관심 영역(ROI)의 평균 밝기와 선명도(라플라시안 분산)가 기준 밖이면 RETAKE(재촬영 후보).
+판독: 규칙마다 판독기(checkers/)가 대상을 찾아 값을 읽고, 공통 코드가 설정(grading)으로 등급을 매긴다.
 """
 import io
+import json
 import logging
 import os
 import threading
@@ -16,9 +21,11 @@ import time
 import httpx
 import numpy as np
 import psycopg
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from PIL import Image
 from pydantic import BaseModel, Field
+
+import checkers
 
 DB_URL = os.environ.get('DB_URL', 'postgresql://analysis_svc@db:5432/analysisdb')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
@@ -90,8 +97,40 @@ def analyze(jpeg: bytes, c: dict) -> dict:
         reasons.append(f'너무 밝음 ({brightness:.0f} > {c["maxBrightness"]:.0f})')
     if sharpness < c['minSharpness']:
         reasons.append(f'흐림 (선명도 {sharpness:.0f} < {c["minSharpness"]:.0f})')
+    # exposureBad: 너무 어둡거나 밝아 색 · 모양을 볼 수 없는 사진. 규칙 판독을 건너뛰는 기준은 이것뿐이다.
+    # "흐림"만으로는 건너뛰지 않는다 — 대상이 사라져 빈 벽만 찍힌 사진도 선명도가 낮게 나오는데,
+    # 그것이 바로 "없음"으로 판독해야 하는 경우다.
+    exposure_bad = brightness < c['minBrightness'] or brightness > c['maxBrightness']
     return {'brightness': round(brightness, 1), 'sharpness': round(sharpness, 1),
-            'verdict': 'RETAKE' if reasons else 'OK', 'reasons': ', '.join(reasons), 'criteria': c}
+            'verdict': 'RETAKE' if reasons else 'OK', 'reasons': ', '.join(reasons), 'criteria': c,
+            'exposureBad': exposure_bad}
+
+
+RETAKE_REASON = '사진 품질 불량(너무 어둡거나 밝음)'
+
+
+def check_rules(jpeg: bytes, spec: dict, verdict: str, skip_on_retake: bool) -> list:
+    """규칙 목록을 판독한다. spec = {"rules", "robotKind", "cameraFrame", "camera"}."""
+    rules = spec.get('rules') or []
+    if not rules:
+        return []
+    if skip_on_retake and verdict == 'RETAKE':
+        return checkers.unknown_results(rules, RETAKE_REASON)
+    frame = checkers.Frame.from_bytes(jpeg, spec.get('cameraFrame') or 'RGB', spec.get('camera'))
+    return checkers.run_rules(frame, rules, spec.get('robotKind'))
+
+
+def fetch_rules(http: httpx.Client, obs_id: int) -> dict | None:
+    """그 관측에 걸린 규칙. 없거나(404) 받지 못하면 None — 품질 결과만 보낸다."""
+    try:
+        r = http.get(f'{INSPECTION_URL}/internal/observations/{obs_id}/rules')
+        if r.status_code != 200:
+            return None
+        spec = r.json()
+        return spec if isinstance(spec, dict) and spec.get('rules') else None
+    except Exception as e:  # noqa: BLE001
+        log.info('observation %s: 규칙을 받지 못함(%s) - 품질 결과만 보낸다', obs_id, e)
+        return None
 
 
 def process_one(conn, http: httpx.Client) -> bool:
@@ -108,9 +147,15 @@ def process_one(conn, http: httpx.Client) -> bool:
         r = http.get(f'{INSPECTION_URL}/internal/observations/{obs_id}/image')
         r.raise_for_status()
         result = analyze(r.content, load_criteria(conn))
+        spec = fetch_rules(http, obs_id)
+        if spec:
+            # 너무 어둡거나 밝은 사진은 판독하지 않고 모든 규칙을 UNKNOWN 으로 낸다(흐림만으로는 건너뛰지 않는다)
+            result['results'] = check_rules(r.content, spec, 'RETAKE' if result['exposureBad'] else 'OK',
+                                            skip_on_retake=True)
         http.post(f'{INSPECTION_URL}/internal/observations/{obs_id}/analysis', json=result).raise_for_status()
         conn.execute("UPDATE analysis_job SET status = 'DONE', finished_at = now() WHERE job_id = %s", (job_id,))
-        log.info('observation %s -> %s %s', obs_id, result['verdict'], result['reasons'])
+        log.info('observation %s -> %s %s %s', obs_id, result['verdict'], result['reasons'],
+                 [(x['ruleId'], x['grade']) for x in result.get('results', [])])
     except Exception as e:  # noqa: BLE001 - 실패는 기록하고 다음 작업으로
         conn.execute("UPDATE analysis_job SET status = 'FAILED', error = %s, finished_at = now() WHERE job_id = %s",
                      (str(e)[:500], job_id))
@@ -193,6 +238,31 @@ def put_criteria(body: Criteria):
                      roi = %s, updated_at = now() WHERE id = 1""",
                   (body.minBrightness, body.maxBrightness, body.minSharpness, body.roi))
         return load_criteria(c)
+
+
+@app.get('/checkers')
+def list_checkers():
+    return checkers.describe()
+
+
+@app.post('/check')
+def check(image: UploadFile = File(...), request: str = Form(...)):
+    """사진 한 장을 바로 판독한다. 품질이 RETAKE 여도 판독은 계속한다(요청에 "skipOnRetake": true 면 전부 UNKNOWN)."""
+    try:
+        spec = json.loads(request)
+    except ValueError:
+        raise HTTPException(400, 'request 는 JSON 이어야 합니다')
+    if not isinstance(spec, dict) or not isinstance(spec.get('rules') or [], list):
+        raise HTTPException(400, 'request 는 {"rules": [...], "robotKind", "cameraFrame", "camera"} 모양이어야 합니다')
+    jpeg = image.file.read()
+    try:
+        with connect() as c:
+            quality = analyze(jpeg, load_criteria(c))
+        results = check_rules(jpeg, spec, quality['verdict'], bool(spec.get('skipOnRetake')))
+    except OSError:  # Pillow 가 읽지 못한 파일
+        raise HTTPException(400, 'image 를 사진으로 읽을 수 없습니다')
+    quality.pop('criteria', None)
+    return {'quality': quality, 'results': results}
 
 
 @app.get('/api/admin/analysis/jobs')
