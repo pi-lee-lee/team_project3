@@ -1,5 +1,7 @@
 # 향후 프로젝트 계획
 
+> **이 문서의 위치:** 소화기 판독은 [SCENARIOS.md](SCENARIOS.md) 의 시나리오 2(소방 관제)에 `OBJECT` 판독기로 들어갔다. 판정 체계(정상 · 경고 · 비상), 규칙 · 결과의 모양, 서비스별 변경은 [SCENARIOS.md](SCENARIOS.md) 와 [INTERFACES.md](INTERFACES.md) 가 기준이다. 아래 내용 가운데 **모델 학습 방식과 학습 데이터**는 그대로 유효하고, "판정 규칙"(비치됨 · 위치 이탈 · 미비치)은 `OBJECT` 판독기가 읽는 값(`IN_REGION` · `OUT_OF_REGION` · `MISSING`)과 등급 설정으로 바뀌었다.
+
 현재 구현 범위와 한계는 [guide/RUNNING.md](../guide/RUNNING.md), 구조는 [architecture/system_architecture.svg](../architecture/system_architecture.svg) 를 본다.
 
 ---
