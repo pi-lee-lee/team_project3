@@ -158,6 +158,89 @@ def obstacle_scenarios(user, rid, by):
     obstacle('clear')
 
 
+ZONE = {'name': 'e2e 공사 중', 'x1': 3.05, 'y1': 4.7, 'x2': 4.0, 'y2': 5.0}    # 전기실 문 바로 아래 골목(서쪽 벽 ↔ 랙 1)
+
+
+def drive_watch(user, rid, point_id, note, tick=None, timeout=600):
+    """점검 작업을 시작해 끝날 때까지 로봇 위치를 0.3초마다 모은다. tick(view) 가 있으면 매번 부른다(주행 중에 할 일)."""
+    s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [point_id], 'note': note})
+    check(s == 201, f"작업 #{t.get('task_id')} 생성 ({note})", str(t))
+    poses, end = [], time.time() + timeout
+    while time.time() < end:
+        v = user.get(f'/api/robots/{rid}/mapview')[1] or {}
+        if v.get('pose'):
+            poses.append((v['pose']['x'], v['pose']['y']))
+        if tick:
+            tick(v)
+        if len(poses) % 10 == 0:
+            s, d = user.get(f"/api/inspections/{t['task_id']}")
+            if s == 200 and d['status'] in ('COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED'):
+                print('     사건:', ' → '.join(e['type'] for e in d['events']))
+                return d, poses
+        time.sleep(0.3)
+    check(False, f'{note} 종료', '(시간 초과)')
+
+
+def zone_scenarios(admin, user, rid, by):
+    """금지구역: 관리자가 지도에 그린 직사각형. 실제 장애물이 없어도 로봇이 그 안으로 가지 않아야 한다."""
+    def inside(poses, z=ZONE):
+        return [p for p in poses if z['x1'] < p[0] < z['x2'] and z['y1'] < p[1] < z['y2']]
+
+    def clear_zones():
+        for z in admin.get(f'/api/robots/{rid}/zones')[1]:
+            admin.call('DELETE', f"/api/robots/{rid}/zones/{z['zoneId']}")
+    print('Z-1. 금지구역: 권한')
+    obstacle('clear')
+    clear_zones()
+    sup_login = f'e2es{int(time.time()) % 100000}'
+    check(admin.post('/api/admin/users', {'loginId': sup_login, 'password': 'e2e-password-1', 'name': '시험 관리자', 'roleId': 1})[0] == 201,
+          f'사용자 생성 {sup_login} (1 관리자)')
+    sup = Client()
+    check(sup.post('/api/auth/login', {'loginId': sup_login, 'password': 'e2e-password-1'})[0] == 200, f'{sup_login} 로그인')
+    check(user.post(f'/api/robots/{rid}/zones', ZONE)[0] == 403, '2 매니저는 금지구역을 설정할 수 없음(403)')
+    check(user.get(f'/api/robots/{rid}/zones')[0] == 200, '조회는 누구나')
+    check(sup.post(f'/api/robots/{rid}/zones', {'x1': 1, 'y1': 1, 'x2': 1.05, 'y2': 1.05})[0] == 400, '너무 작은 구역 거부(400)')
+
+    print('Z-2. 금지구역: 미리 설정 (P3 → P1, 문 아래 골목이 금지구역 → 랙 위로 돌아감)')
+    run_task(user, rid, [by['P3']], 'P3 로 이동')
+    s, zs = sup.post(f'/api/robots/{rid}/zones', ZONE)
+    check(s == 200 and len(zs) == 1 and zs[0]['name'] == ZONE['name'], '1 관리자가 금지구역 설정')
+    time.sleep(4)                                    # 로봇의 계획 맵 · 제어 맵에 들어갈 시간
+    d, poses = drive_watch(user, rid, by['P1'], '금지구역을 두고 P1 로')
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', 'P1 도착·촬영')
+    check(not inside(poses), f'주행 내내 금지구역에 들어가지 않음(위치 {len(poses)}개)', str(inside(poses)[:3]))
+    check(max(y for _, y in poses) > 6.4, f"랙 위로 돌아감(가장 위 y={max(y for _, y in poses):.2f})")
+
+    print('Z-3. 금지구역: 로봇이 있는 자리에는 설정할 수 없음')
+    x, y = poses[-1]
+    s, e = sup.post(f'/api/robots/{rid}/zones', {'x1': x - 0.3, 'y1': y - 0.3, 'x2': x + 0.3, 'y2': y + 0.3})
+    check(s == 409, f"로봇 위 구역 거부(409: {e.get('message', '') if isinstance(e, dict) else ''})")
+
+    print('Z-4. 금지구역: 삭제하면 다시 지나감 (P1 → P3 직행)')
+    check(sup.call('DELETE', f"/api/robots/{rid}/zones/{zs[0]['zoneId']}")[0] == 200, '금지구역 삭제')
+    time.sleep(4)
+    d, poses = drive_watch(user, rid, by['P3'], '금지구역을 지우고 P3 로')
+    check(d['status'] == 'COMPLETED', 'P3 도착')
+    check(inside(poses) and max(y for _, y in poses) < 6.3, f"골목으로 직행(가장 위 y={max(y for _, y in poses):.2f})")
+
+    print('Z-5. 금지구역: 달리는 도중에 설정 (P3 → P1, 가던 골목이 금지구역이 됨 → 다시 계획해 돌아감)')
+    state = {}
+
+    def tick(v):
+        p = v.get('pose')
+        if not state and p and v.get('path') and p['x'] > 1.6 and p['y'] > 4.7:     # 전기실 가운데: 구역까지 1.5m 남짓
+            state['on_path'] = any(ZONE['x1'] < x < ZONE['x2'] and ZONE['y1'] < y < ZONE['y2'] for x, y in v['path'])
+            state['status'] = sup.post(f'/api/robots/{rid}/zones', ZONE)[0]
+    d, poses = drive_watch(user, rid, by['P1'], '달리는 도중 금지구역', tick)
+    check(state.get('on_path'), '설정하는 순간 계획 경로가 그 구역을 지나고 있었음')
+    check(state.get('status') == 200, '달리는 도중 금지구역 설정')
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 P1 도착·촬영')
+    check(not inside(poses), f'금지구역에 들어가지 않음(위치 {len(poses)}개)', str(inside(poses)[:3]))
+    check(max(y for _, y in poses) > 6.4, f"랙 위로 돌아감(가장 위 y={max(y for _, y in poses):.2f})")
+    clear_zones()
+    check(admin.get(f'/api/robots/{rid}/zones')[1] == [], '금지구역 정리')
+
+
 def main():
     print('1. 접속·로그인')
     anon = Client()
@@ -201,6 +284,11 @@ def main():
     check(True, f"제공 기능 {st['capabilities']}")
     s, img = user.get(f'/api/robots/{rid}/snapshot')
     check(s == 200 and isinstance(img, bytes) and img[:2] == b'\xff\xd8', f'카메라 스냅샷 JPEG {len(img)} bytes')
+    if '--only-zones' in sys.argv:
+        s, pts = user.get('/api/points')
+        zone_scenarios(admin, user, rid, {p['code']: p['point_id'] for p in pts})
+        print(f'\n모두 통과: {passed}개 확인')
+        return
     if '--only-obstacles' in sys.argv:
         s, pts = user.get('/api/points')
         obstacle_scenarios(user, rid, {p['code']: p['point_id'] for p in pts})
@@ -270,6 +358,7 @@ def main():
 
     if '--skip-obstacles' not in sys.argv:
         obstacle_scenarios(user, rid, by)
+        zone_scenarios(admin, user, rid, by)
 
     print('10. 제어권·비상 정지 (U1·A2)')
     s, lease = user.post(f'/api/robots/{rid}/control/acquire')

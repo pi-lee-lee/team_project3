@@ -9,8 +9,10 @@
 파일 크기는 dist/assets 의 현재 빌드 기준(해시와 크기는 빌드마다 달라진다).
 실행: python3 docs/architecture/build_spa_cycle.py  →  docs/architecture/spa_cycle.svg
 """
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
 OUT = Path(__file__).resolve().parent / 'spa_cycle.svg'

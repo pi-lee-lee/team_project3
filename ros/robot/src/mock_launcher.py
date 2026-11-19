@@ -1,4 +1,4 @@
-"""모의 투척 기구: 기구가 없는 로봇(시뮬레이션)에서 투척 계약에 답한다. (docs/plan/INTERFACES.md 2.2 절)
+"""모의 투척 기구: 기구가 없는 로봇(시뮬레이션)에서 투척 계약에 답한다. (docs/design/INTERFACES.md 2.2 절)
 
 서버와의 약속(모두 std_msgs/String, JSON):
   /inspection/actuator         ← {"commandId": "...", "kind": "LAUNCH", "count": 1, "params": {}}

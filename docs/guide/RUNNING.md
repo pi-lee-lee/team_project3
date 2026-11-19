@@ -12,7 +12,7 @@ docker compose up -d --build
 ```
 
 - 접속: http://localhost:8080 — 기본 계정 admin / `Admin1234!`, 시험 계정 sup1·mgr1·user1 / `User1234!` (`.env` 로 바꿀 수 있다).
-- 시나리오(브랜치 `feat/scenarios-sim`): 소방 관제(지점별 점검 규칙 → 정상·경고·비상 → 경고)와 소화액 투척(화재 감지 → 터틀봇 출동 → 재판독 → 승인/자동 투척)이 시뮬레이션에서 돈다. 설계는 [plan/SCENARIOS.md](../plan/SCENARIOS.md)·[plan/INTERFACES.md](../plan/INTERFACES.md), 해 보는 방법은 아래 "시나리오 해 보기".
+- 시나리오(브랜치 `feat/scenarios-sim`): 소방 관제(지점별 점검 규칙 → 정상·경고·비상 → 경고)와 소화액 투척(화재 감지 → 터틀봇 출동 → 재판독 → 승인/자동 투척)이 시뮬레이션에서 돈다. 설계는 [plan/SCENARIOS.md](../design/SCENARIOS.md)·[plan/INTERFACES.md](../design/INTERFACES.md), 해 보는 방법은 아래 "시나리오 해 보기".
 - 관제 대시보드: 전용 계정 dash1(역할 4 대시보드, 비밀번호는 시험 계정과 같음)로 로그인하면 바로 열린다(`/dashboard`). 조회만 할 수 있는 계정이고, 16:9 모니터 전체 화면용(1920×1080 고정, 반응형 아님)이다. 구성은 `web/nginx/frontend/src/pages/dashboard/` — `data.ts`(불러오기·경고) → `panels.tsx`(패널) + `layout.ts`(배치표) → `details.tsx`(누르면 뜨는 상세).
 - 첫 실행은 각 Spring 서비스가 시작할 때 Maven 빌드를 하고, 시뮬레이터가 Nav2 를 올리므로 3~5분 걸린다.
 - 종단 간 시험: `python3 scripts/e2e_test.py` (장애물 시나리오 제외: `--skip-obstacles`)
@@ -30,10 +30,13 @@ ros/                       로봇 쪽
   robot/                   로봇 측 노드(실제 로봇에도 같은 코드)
   maps/                    지도
 docs/                      문서 (목록: docs/README.md)
-  architecture/            시스템 아키텍처 구성도 · 시스템 사이클 SVG + 생성 스크립트
-  guide/                   실행 안내(이 파일)·Docker 구동 가이드
-  plan/                    향후 프로젝트 계획(ROADMAP.md)
+  guide/                   실행 안내(이 파일) · Docker 구동 가이드
+  architecture/            시스템 구조: 구성도 · 시스템 사이클 · SPA 사이클 SVG + 생성 스크립트
+  navigation/              주행: 지도 3겹 · 주행 제어기 설명서 SVG + 생성 스크립트
+  design/                  설계: 시나리오(SCENARIOS.md) · 인터페이스(INTERFACES.md)
+  plan/                    계획: 향후 계획(ROADMAP.md) · 주간 일정(SCHEDULE.md)
   storyboard/              화면 스토리보드 SVG + 생성 스크립트
+  _lib/                    SVG 생성 스크립트 공용 그리기 도구
 scripts/                   E2E 시험
 ```
 
@@ -136,6 +139,9 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
 
 #### 계획 방식과 좁은 틈
 
+그림으로 보는 설명서: [주행 제어기](../navigation/drive_controller.svg)(목표 → 경로 → 속도 명령, 막혔을 때의 순서, 장애물별 결과) · [주행 지도 3겹](../navigation/drive_layers.svg)(기존 맵 · 계획 맵 · 2배 촘촘한 제어 맵, 새 장애물이 생기는 층).
+계획기 · 제어기를 처음 본다면: [Theta\* 계획기](../navigation/theta_star.svg)(A\* 와 무엇이 다른가, 이 건물의 경로) · [MPPI 제어기](../navigation/mppi.svg)(한 주기에 하는 일, 평가 항목, 지금 설정값에서의 동작).
+
 "처음에 출렁임 없는 최단 경로를 한 번 세우고, 그 경로를 제어기가 따라간다."
 
 - **계획기**: Theta\*(any-angle A\*). 격자 칸을 따라가지 않고 서로 보이는 점끼리 직선으로 이어, 곧은 구간 + 모퉁이로만 된 경로를 낸다.
@@ -165,6 +171,19 @@ Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값�
 - 복도·문 폭: TurtleBot3 Waffle + 기본 여유값에서는 **1.0~1.1m 이상**이어야 저장 지도 운영에서 통행 가능으로 판정된다(0.9m 복도는 막힘으로 판정됐다).
 - 지도 잡음: 저장 지도의 점 하나가 로봇 반경만큼 팽창돼 좁은 복도를 막는다 → 저장 후 정리 필요.
 - 긴 복도의 위치 추정: AMCL 이 복도 방향으로 미끄러지면 라이다가 엉뚱한 곳에 벽을 찍어 문이 막힌 것처럼 보인다 → 빔 수·갱신 간격·odom 오차 계수 조정.
+
+### 금지구역
+
+실제 장애물이 없어도 로봇이 가지 않게 막아 두는 구역이다(예: 공사 중인 구역).
+
+- **설정**: ADMIN · 1 관리자(`sup1`)로 로그인 → 관제 → **지도** → **금지구역 설정** → 지도에서 누른 채 끌었다 놓으면 그 사각형이 금지구역이 된다
+  (이름은 선택). 붉은 테두리 + 빗금 상자로 표시되고, 다른 계정의 관제 지도 · 대시보드 지도에도 3초 안에 보인다.
+- **삭제**: 금지구역 설정 모드에서 상자를 눌러 고른 뒤 **삭제**.
+- **주행**: 구역은 계획 맵(전역 비용 지도)과 제어 맵(지역 비용 지도)에 막힌 칸으로 들어간다. 달리는 도중에 가던 길 위에 설정하면
+  1 ~ 2초 안에 다시 계획해 돌아간다. 길이 그 구역뿐이면 그 지점은 "진입 불가"로 끝난다.
+- **제한**: 한 변이 0.2m 이상이어야 하고, 로봇이 서 있는 자리(둘레 0.35m 포함)는 덮을 수 없다(덮으면 그 자리에서 계획이 거부돼 갇힌다).
+- **시험**: `python3 scripts/e2e_test.py --only-zones` — 권한(2 매니저는 403) · 미리 설정(P3 → P1 이 랙 위로 돌아감) · 로봇 위 설정 거부 ·
+  삭제 뒤 직행 · 달리는 도중 설정. 주행 내내 로봇 위치가 구역 안에 든 적이 없는지도 본다(34개 확인).
 
 ### 장애물 시험
 

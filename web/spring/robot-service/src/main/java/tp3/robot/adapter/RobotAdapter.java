@@ -116,6 +116,10 @@ public interface RobotAdapter extends AutoCloseable {
      * 시뮬레이션 전용: 시뮬레이션 도구(fire · target)를 실행하게 한다(sim 의 sim_control.py 가 받는다).
      * 결과는 onSimStatus 로 온다. 시뮬레이션이 아닌 로봇은 지원하지 않는다.
      */
+    /** 금지구역 목록(JSON: {"zones":[{"id","x1","y1","x2","y2"}]})을 로봇에 보낸다. 지원하지 않는 로봇은 무시한다. */
+    default void keepout(String json) {
+    }
+
     default void simCommand(String id, String tool, java.util.List<String> args) {
         throw new UnsupportedOperationException("시뮬레이션 로봇이 아닙니다");
     }

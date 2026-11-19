@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * 설정: 값이 정해지지 않은 항목(투척 사거리, 열화상 기준 등)을 코드가 아니라 여기서 받는다.
- * 표(app_setting)에 없는 키는 아래 기본값을 쓴다. 키 목록과 뜻은 docs/plan/INTERFACES.md 8장.
+ * 표(app_setting)에 없는 키는 아래 기본값을 쓴다. 키 목록과 뜻은 docs/design/INTERFACES.md 8장.
  */
 @Service
 public class SettingsService {

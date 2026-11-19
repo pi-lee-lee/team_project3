@@ -62,10 +62,10 @@ export default function Dashboard() {
         {top && <Detail r={top} d={d} open={open} close={close} back={stack.length > 1 ? back : undefined} />}
       </div>
       {/* 투척 승인 팝업(비상 팝업보다 위). 대시보드 계정도 승인할 수 있다 — 조회 전용의 유일한 예외 */}
-      <LaunchDialog canDismiss={!!me && ['SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)}
+      <LaunchDialog canDismiss={!!me && ['ADMIN', 'SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)}
         onOpen={(id) => open({ kind: 'incident', id })} />
       {/* 비상 등급 경고 팝업. 사용자 역할이면 확인을 서버에 남기고, 대시보드 전용 계정이면 이 화면에서만 닫는다 */}
-      <EmergencyDialog canAck={!!me && ['SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)} onOpen={(a) => open(
+      <EmergencyDialog canAck={!!me && ['ADMIN', 'SUPERVISOR', 'MANAGER', 'USER'].includes(me.role)} onOpen={(a) => open(
         a.ref_kind === 'incident' ? { kind: 'incident', id: a.ref_id }
           : a.ref_kind === 'observation' && a.task_id ? { kind: 'observation', id: a.ref_id, taskId: a.task_id }
             : a.task_id ? { kind: 'task', id: a.task_id } : { kind: 'system' })} />
@@ -133,6 +133,13 @@ function Header({ d, open }: { d: DashData; open: (r: Ref) => void }) {
       <div className="dz-who">
         <b>{me?.name}</b><span>{me?.loginId} · {me ? ROLE_LABEL[me.role] : ''}</span>
       </div>
+      {/* ADMIN 은 모든 화면에 들어갈 수 있다: 관리자 화면 · 사용자 화면으로 가는 단추 */}
+      {me?.role === 'ADMIN' && (
+        <>
+          <button className="dz-icon-btn" title="관리자 화면" aria-label="관리자 화면" onClick={() => navigate('/admin/users')}><Icon name="gearshape" size={22} /></button>
+          <button className="dz-icon-btn" title="사용자 화면" aria-label="사용자 화면" onClick={() => navigate('/app/monitor')}><Icon name="video" size={22} /></button>
+        </>
+      )}
       <button className="dz-icon-btn" title="전체 화면" aria-label="전체 화면"
         onClick={() => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}))}>
         <Icon name="arrow.up.left.and.arrow.down.right" size={22} />

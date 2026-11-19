@@ -152,6 +152,12 @@ class Bridge(Node):
         self.create_subscription(GoalStatusArray, '/navigate_to_pose/_action/status', self.on_nav_status, 10)
         self.block_pub = self.create_publisher(OccupancyGrid, '/inspection/virtual_map', latched)
         self.create_timer(1.0, self.publish_blocks)
+        # 금지구역: 서버가 보낸 직사각형 목록. 계획 맵(virtual_map 에 합침)과 제어 맵(keepout_map)에 막힌 칸으로 넣는다
+        self.zones = []                     # [(x1, y1, x2, y2)] (지도 좌표)
+        self.keepout_sent = None            # 마지막으로 보낸 (구역 목록, 지도 크기) — 바뀌었을 때만 다시 보낸다
+        self.create_subscription(String, '/inspection/keepout', self.on_keepout, 5)
+        self.keepout_pub = self.create_publisher(OccupancyGrid, '/inspection/keepout_map', latched)
+        self.create_timer(1.0, self.publish_keepout)
         self.get_logger().info(f'goal bridge ready (mode={MODE})')
 
     # ------------------------------------------------------------ 지나지 못하는 자리 피하기
@@ -278,6 +284,51 @@ class Bridge(Node):
             cmd.linear.x = -ESCAPE_SPEED if e['reverse'] else ESCAPE_SPEED
         self.cmd_pub.publish(cmd)
 
+    # ------------------------------------------------------------ 금지구역
+    def on_keepout(self, msg):
+        try:
+            zones = sorted((float(z['x1']), float(z['y1']), float(z['x2']), float(z['y2'])) for z in json.loads(msg.data)['zones'])
+        except (ValueError, KeyError, TypeError):
+            return
+        if zones != self.zones:
+            self.get_logger().info(f'keepout zones: {len(zones)}')
+            self.zones = zones
+            self.publish_keepout()
+            self.publish_blocks()           # 계획 맵에는 바로 넣는다(달리는 중이면 다음 경로 검사에서 다시 계획)
+
+    def zone_cells(self):
+        """금지구역이 덮는 지도 칸 {(cx, cy)}. 걸친 칸은 모두 넣는다."""
+        m = self.map_msg
+        if m is None:
+            return set()
+        res, w, h = m.info.resolution, m.info.width, m.info.height
+        ox, oy = m.info.origin.position.x, m.info.origin.position.y
+        cells = set()
+        for x1, y1, x2, y2 in self.zones:
+            for cx in range(max(0, int(math.floor((x1 - ox) / res))), min(w, int(math.ceil((x2 - ox) / res)))):
+                for cy in range(max(0, int(math.floor((y1 - oy) / res))), min(h, int(math.ceil((y2 - oy) / res)))):
+                    cells.add((cx, cy))
+        return cells
+
+    def publish_keepout(self):
+        """제어 맵(지역 비용 지도)의 keepout_layer 가 받는 격자. 구역이 없어도 빈 격자를 보낸다(층이 지도를 기다리지 않게)."""
+        m = self.map_msg
+        if m is None:
+            return
+        key = (tuple(self.zones), m.info.width, m.info.height, m.info.origin.position.x, m.info.origin.position.y)
+        if key == self.keepout_sent:
+            return
+        self.keepout_sent = key
+        grid = OccupancyGrid()
+        grid.header.frame_id = m.header.frame_id
+        grid.header.stamp = self.get_clock().now().to_msg()
+        grid.info = m.info
+        data = [0] * (m.info.width * m.info.height)
+        for cx, cy in self.zone_cells():
+            data[cy * m.info.width + cx] = 100
+        grid.data = data
+        self.keepout_pub.publish(grid)
+
     def publish_blocks(self):
         m = self.map_msg
         if m is None:
@@ -291,6 +342,7 @@ class Bridge(Node):
             gx, gy = self.plan[-1] if self.plan else (1e9, 1e9)
             cells |= {(cx, cy) for cx, cy in self.fill
                       if math.hypot(ox + (cx + 0.5) * res - gx, oy + (cy + 0.5) * res - gy) > SHADOW_GOAL_CLEAR}
+        cells |= self.zone_cells()          # 금지구역은 목표와 상관없이 늘 막혀 있다
         grid = OccupancyGrid()
         grid.header.frame_id = m.header.frame_id
         grid.header.stamp = self.get_clock().now().to_msg()

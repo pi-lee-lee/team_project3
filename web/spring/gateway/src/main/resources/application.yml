@@ -32,22 +32,26 @@ gateway:
       roles: [ADMIN, DASHBOARD]
     - pattern: /api/admin/**
       roles: [ADMIN]
-    # 시나리오: 설정 변경 · 수동 투척 · 사건/경고 해제는 1 관리자 · 2 매니저까지
+    # 시나리오: 설정 변경 · 수동 투척 · 사건/경고 해제는 1 관리자 · 2 매니저까지. ADMIN 은 모든 화면을 쓸 수 있으므로 함께 넣는다
     - pattern: /api/settings/**
       methods: [PUT]
       roles: [ADMIN, SUPERVISOR]
     - pattern: /api/incidents/*/approve
       methods: [POST]
-      roles: [SUPERVISOR, MANAGER, USER, DASHBOARD]
+      roles: [ADMIN, SUPERVISOR, MANAGER, USER, DASHBOARD]
     - pattern: /api/incidents/*/launch
       methods: [POST]
-      roles: [SUPERVISOR, MANAGER]
+      roles: [ADMIN, SUPERVISOR, MANAGER]
     - pattern: /api/incidents/*/resolve
       methods: [POST]
-      roles: [SUPERVISOR, MANAGER]
+      roles: [ADMIN, SUPERVISOR, MANAGER]
     - pattern: /api/alerts/*/resolve
       methods: [POST]
-      roles: [SUPERVISOR, MANAGER]
+      roles: [ADMIN, SUPERVISOR, MANAGER]
+    # 금지구역 설정 · 삭제는 ADMIN · 1 관리자만(조회는 아래 GET 규칙으로 모두)
+    - pattern: /api/robots/*/zones/**
+      methods: [POST, DELETE]
+      roles: [ADMIN, SUPERVISOR]
     - pattern: /api/**
       methods: [GET]
       roles: [ADMIN, SUPERVISOR, MANAGER, USER, DASHBOARD]

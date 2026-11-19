@@ -13,8 +13,8 @@
 
 | 계정 | 비밀번호 | 역할 | 로그인하면 열리는 화면 | 쓰는 곳 |
 | --- | --- | --- | --- | --- |
-| `admin` | `Admin1234!` | ADMIN (웹사이트 관리자) | 관리자 화면 | 사용자 · 로봇 · 점검 지점 · 규칙 · 설정 · **시연** |
-| `sup1` | `User1234!` | 1 관리자 | 사용자 화면 | 아래 사용자 기능 전부 + 투척 모드 변경 · 수동 투척 · 사건/경고 해제 |
+| `admin` | `Admin1234!` | ADMIN (웹사이트 관리자) | 관리자 화면 | 사용자 · 로봇 · 점검 지점 · 규칙 · 설정 · **시연**. 사이드바 "화면 이동"으로 사용자 화면 · 관제 대시보드에도 들어간다(모든 화면 접근) |
+| `sup1` | `User1234!` | 1 관리자 | 사용자 화면 | 아래 사용자 기능 전부 + 투척 모드 변경 · 수동 투척 · 사건/경고 해제 · **금지구역 설정**(관제 지도에서 끌어서 그림) |
 | `mgr1` | `User1234!` | 2 매니저 | 사용자 화면 | 사용자 기능 + 수동 투척 · 사건/경고 해제 |
 | `user1` | `User1234!` | 3 사용자 | 사용자 화면 | 관제 · 조종, 점검 요청, 판정, 경고 확인, 투척 승인 |
 | `dash1` | `User1234!` | 대시보드 (조회 전용) | 관제 대시보드 | 상황실 모니터용. 조회만 하고, **투척 승인만 예외로** 할 수 있음 |
@@ -162,10 +162,12 @@ python3 scripts/demo.py all
 | --- | --- |
 | [docs/guide/RUNNING.md](docs/guide/RUNNING.md) | 구성 · 시험 시설과 지도 · 주행 설정 · 화면 · 시나리오 해 보기 |
 | [docs/guide/DOCKER_GUIDE.md](docs/guide/DOCKER_GUIDE.md) | 설치부터 실행 · 초기화 · 문제 해결 |
-| [docs/plan/SCENARIOS.md](docs/plan/SCENARIOS.md) | 두 시나리오의 계획(무엇을 왜) |
-| [docs/plan/INTERFACES.md](docs/plan/INTERFACES.md) | 상세 설계: 토픽 계약 · API · DB 표 · 상태 흐름 · 설정 |
+| [docs/navigation/drive_layers.svg](docs/navigation/drive_layers.svg) | 주행 지도 3겹(기존 맵 · 계획 맵 · 제어 맵)과 새 장애물이 생기는 층 |
+| [docs/navigation/drive_controller.svg](docs/navigation/drive_controller.svg) | 주행 제어기: 목표 → 경로 → 속도 명령, 막혔을 때의 순서 |
+| [docs/design/SCENARIOS.md](docs/design/SCENARIOS.md) | 두 시나리오의 설계(무엇을 왜) |
+| [docs/design/INTERFACES.md](docs/design/INTERFACES.md) | 상세 설계: 토픽 계약 · API · DB 표 · 상태 흐름 · 설정 |
 | [docs/plan/ROADMAP.md](docs/plan/ROADMAP.md) | 향후 계획: 소화기 인식 모델, 주행 제어기 개선 |
-| [docs/README.md](docs/README.md) | 문서 전체 목록(아키텍처 도면 · 스토리보드 포함) |
+| [docs/README.md](docs/README.md) | 문서 전체 목록과 분류 기준(시스템 구조 도면 · 스토리보드 포함) |
 
 ## 8. 지금 구현 범위
 

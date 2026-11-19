@@ -157,6 +157,15 @@ export interface MapView {
   mission: { missionId: number; currentPointId: number | null } | null;
 }
 
+/** 금지구역: 관리자가 지도에 그린 직사각형(지도 좌표, m). 로봇은 이 안으로 가지 않는다 */
+export interface KeepoutZone {
+  zoneId: number;
+  name: string;
+  xMin: number; yMin: number; xMax: number; yMax: number;
+  createdBy: string;
+  createdAt: string;
+}
+
 export type ScheduleKind = 'MANUAL' | 'ONCE' | 'INTERVAL' | 'DAILY' | 'WEEKLY';
 export type ScheduleOutcome = 'CREATED' | 'SKIPPED_BUSY' | 'SKIPPED_OFFLINE' | 'MISSED' | 'FAILED' | 'CANCELLED';
 
@@ -260,7 +269,7 @@ export interface SystemStatus {
   robots: { code: string; enabled: boolean; connected: boolean; ageMs: Record<string, number | null>; outboxPending: number }[];
 }
 
-// ------------------------------------------------------------------ 시나리오: 규칙 · 경고 · 사건 · 설정 (docs/plan/INTERFACES.md)
+// ------------------------------------------------------------------ 시나리오: 규칙 · 경고 · 사건 · 설정 (docs/design/INTERFACES.md)
 export type Grade = 'NORMAL' | 'WARNING' | 'EMERGENCY' | 'UNKNOWN';
 export type LaunchMode = 'APPROVAL' | 'AUTO';
 
@@ -437,6 +446,10 @@ export interface Api {
   mapImageUrl(id: number, version: number): string;
   mapView(id: number): Promise<MapView>;
   goTo(id: number, x: number, y: number, yaw: number): Promise<ManualGoal>;
+  zones(id: number): Promise<KeepoutZone[]>;
+  /** 끌기 시작한 점(x1, y1)과 놓은 점(x2, y2). ADMIN · 1 관리자만 */
+  addZone(id: number, z: { name: string; x1: number; y1: number; x2: number; y2: number }): Promise<KeepoutZone[]>;
+  deleteZone(id: number, zoneId: number): Promise<KeepoutZone[]>;
   cancelGoTo(id: number): Promise<void>;
   // 지점
   points(): Promise<Point[]>;

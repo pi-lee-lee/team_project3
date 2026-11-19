@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RobotStatus } from '../../api/types';
 import { STATUS_LABEL, ago, fmtTime, useApi, usePoll } from '../../util';
 import { Icon } from '../../Icon';
-import { mapGeo } from '../../mapGeo';
+import { drawZone, mapGeo } from '../../mapGeo';
 import { drawRobot } from '../user/Monitor';
 import { EVENT_LABEL, eventText } from '../user/inspectionText';
 import { INCIDENT_STATE, LAUNCH_MODE, checkText } from '../user/scenarioText';
@@ -112,6 +112,8 @@ function MapPanel({ d, open }: PanelProps) {
   // 설정 "주행 경로 표시(제어기 방향)": 켜 두었을 때만 주황 실선을 그린다(기본은 숨김)
   const settings = usePoll(() => api.settings().catch(() => null), 10000);
   const showControl = settings.data?.['display.control_direction'] === true;
+  // 금지구역(관리자가 관제 화면에서 그린 것): 붉은 빗금 상자로 보여 준다
+  const zones = usePoll(() => (d.robotId ? api.zones(d.robotId).catch(() => []) : Promise.resolve([])), 3000, [d.robotId]);
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -137,6 +139,7 @@ function MapPanel({ d, open }: PanelProps) {
     const g = c.getContext('2d')!;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.drawImage(img, 0, 0, geo.cw, geo.ch);
+    zones.data?.forEach((z) => drawZone(g, geo.toPx, geo.toPy, z, { label: z.name || '금지구역' }));
     const v = d.view;
     if (v?.path?.length) {
       g.strokeStyle = '#0a84ff'; g.lineWidth = 3; g.lineJoin = 'round'; g.lineCap = 'round';
@@ -164,7 +167,7 @@ function MapPanel({ d, open }: PanelProps) {
       }
     }
     if (v?.pose) drawRobot(g, geo.toPx(v.pose.x), geo.toPy(v.pose.y), v.pose.yaw, geo.scale / m.resolution);
-  }, [m, img, d.view, geo?.scale, showControl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [m, img, d.view, geo?.scale, showControl, zones.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="dz-map" ref={box}>
@@ -198,6 +201,7 @@ function MapPanel({ d, open }: PanelProps) {
       <div className="dz-legend">
         {(['ok', 'wait', 'warn', 'bad', 'none'] as const).map((s) => <span key={s}><Dot tone={`pt-${s}`} />{POINT_STATE_TEXT[s]}</span>)}
         <span style={{ color: '#0a84ff' }}>┄ 계획 경로(A*)</span>
+        {!!zones.data?.length && <span style={{ color: '#ff3b30' }}>▨ 금지구역</span>}
         {showControl && <span style={{ color: '#ff9500' }}>━▶ 제어기 방향</span>}
       </div>
     </div>

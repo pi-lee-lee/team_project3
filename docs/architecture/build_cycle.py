@@ -6,8 +6,10 @@
   bridge map 5초 · map_pose 5Hz · 지도 화면 0.2초 · cdn 보관 기간(web/nginx/web/default.conf 의 Cache-Control, cdn/default.conf).
 실행: python3 docs/architecture/build_cycle.py  →  docs/architecture/system_cycle.svg
 """
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
 OUT = Path(__file__).resolve().parent / 'system_cycle.svg'

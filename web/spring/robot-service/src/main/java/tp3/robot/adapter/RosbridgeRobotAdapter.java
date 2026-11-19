@@ -116,6 +116,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         defaults.put("actuator", "/inspection/actuator");             // 투척 명령(INTERFACES.md 2.2)
         defaults.put("actuatorStatus", "/inspection/actuator_status");
         defaults.put("actuatorState", "/inspection/actuator_state");
+        defaults.put("keepout", "/inspection/keepout");               // 금지구역 목록(목표 브리지가 비용 지도에 넣는다)
         defaults.put("simCommand", "/sim/command");                   // 시뮬레이션 전용: 시연 화면이 시뮬레이션 도구를 실행
         defaults.put("simStatus", "/sim/command_status");
         defaults.put("detection", "/patrol/detection");               // 로봇이 스스로 감지해 보내는 것(2.3)
@@ -181,6 +182,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             subscribe("detection", "std_msgs/msg/String", 0);
             subscribe("simStatus", "std_msgs/msg/String", 0);
             advertise("simCommand", "std_msgs/msg/String");
+            advertise("keepout", "std_msgs/msg/String");
             advertise("actuator", "std_msgs/msg/String");
             advertise("teleop", "geometry_msgs/msg/Twist");
             advertise("goal", "std_msgs/msg/String");
@@ -479,6 +481,11 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     @Override
     public ActuatorState actuatorState() {
         return System.currentTimeMillis() - actuatorStateAt < 3000 ? actuatorState : null;
+    }
+
+    @Override
+    public void keepout(String json) {
+        publishString("keepout", json);
     }
 
     @Override

@@ -46,6 +46,7 @@ const SYMBOLS: Record<string, string> = {
   'xmark': 'close',
   'arrow.triangle.2.circlepath': 'refresh',
   'chevron.right': 'chevron_right',
+  'arrow.up.right.square': 'open_in_new',
   'chevron.left': 'chevron_left',
   'chevron.up.chevron.down': 'unfold_more',
   'checkmark': 'check',

@@ -1,4 +1,4 @@
-"""투척 기구 브리지(실로봇용): 서버의 투척 계약 ↔ 기구의 시리얼. (docs/plan/INTERFACES.md 2.2 절)
+"""투척 기구 브리지(실로봇용): 서버의 투척 계약 ↔ 기구의 시리얼. (docs/design/INTERFACES.md 2.2 절)
 
 서버와의 약속(모두 std_msgs/String, JSON) — 시뮬레이션의 mock_launcher.py 와 같다:
   /inspection/actuator         ← {"commandId": "...", "kind": "LAUNCH", "count": 1, "params": {}}

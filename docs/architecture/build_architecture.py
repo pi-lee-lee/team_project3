@@ -10,8 +10,10 @@
 - 컨테이너 이름 옆 색 표시는 Docker 네트워크(front · edge · backend · robot)다.
 실행: python3 docs/architecture/build_architecture.py  →  docs/architecture/system_architecture.svg
 """
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, NET, Svg, text_width
 
 OUT = Path(__file__).resolve().parent / 'system_architecture.svg'

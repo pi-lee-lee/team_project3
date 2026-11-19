@@ -56,6 +56,10 @@
 #     장애물이 0.4m 안에 있으면, 브리지가 라이다로 본 가까운 장애물에서 멀어지는 쪽으로(전진 · 후진 중 덜 도는 쪽)
 #     최대 0.45m 움직인 뒤 다시 계획하게 한다. 실패한 목표는 3번까지 다시 보낸다. (지나온 길을 되짚는 후진은 뒤가
 #     막혀 있으면 움직이지 못해 버렸다.)
+# 11) 금지구역(관리자가 지도에 그린 직사각형 — 공사 중인 구역 등): 실제 장애물이 없어 라이다로는 보이지 않으므로 목표
+#     브리지가 서버에서 받은 구역을 격자로 만들어 두 비용 지도에 넣는다. 계획 맵(전역)에는 가상 장애물 층
+#     (/inspection/virtual_map)에 합치고, 제어 맵(지역)에는 따로 keepout_layer(/inspection/keepout_map)를 둔다 —
+#     계획만 막으면 제어기가 장애물을 비켜 가다 구역 모서리를 넘을 수 있다. 몸통 채우기 표시는 제어 맵에 넣지 않는다(8).
 #  (slam_toolbox 는 기본값을 쓴다. 0.2m·0.2rad 마다 반영하도록 바꿔 보았으나 에뮬레이션 환경에서 계산이 밀려
 #   위치 추정이 틀어지고 지도가 번져 로봇이 장애물에 끼었다. 기본값(0.5m·0.5rad)으로 깨끗한 지도를 얻었다.)
 # use_sim_time 과 지도 파일 경로는 실행할 때(sim.launch.py) 바꿔 넣는다. 실제 로봇은 이 파일을 그대로 쓰고 use_sim_time 만 False.
@@ -283,7 +287,13 @@ local_costmap:
       height: 3
       resolution: 0.025    # 전역(0.05)보다 촘촘하게: 좁은 틈에서 칸 어긋남으로 잃는 폭을 줄인다(머리 목록 9)
       robot_radius: 0.22
-      plugins: ["obstacle_layer", "inflation_layer"]
+      # 금지구역(머리 목록 11): 목표 브리지가 보내는 격자. 반드시 라이다 층보다 앞에 둔다 — 이 층은 자기 값으로 덮어쓰므로
+      # 뒤에 두면 빈 칸(0)이 라이다 표시를 지운다. 라이다 층은 큰 값으로 합치므로 앞의 금지구역을 지우지 않는다.
+      plugins: ["keepout_layer", "obstacle_layer", "inflation_layer"]
+      keepout_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_topic: /inspection/keepout_map
+        map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         inflation_radius: 0.6

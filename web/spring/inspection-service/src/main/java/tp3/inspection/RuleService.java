@@ -25,7 +25,7 @@ import java.util.Map;
  * 점검 규칙과 판독 결과.
  * 규칙 = 판독기 종류(kind) + 설정(params) + 로봇 종류별 영역(regions) + 등급 기준(grading).
  * 판독은 analysis-service 가 한다. 여기서는 규칙을 보관해 넘겨 주고, 돌아온 결과를 저장하고, 등급에 따라 경고를 열거나 푼다.
- * 모양은 docs/plan/INTERFACES.md 3.3 · 3.4, 흐름은 7장 F2.
+ * 모양은 docs/design/INTERFACES.md 3.3 · 3.4, 흐름은 7장 F2.
  */
 @Service
 public class RuleService {
