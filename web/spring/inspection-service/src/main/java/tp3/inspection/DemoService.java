@@ -38,7 +38,12 @@ public class DemoService {
     /** key → [이름, 설명, 묶음] */
     private static final Map<String, String[]> SCENARIOS = new LinkedHashMap<>();
 
+    /** 통합 시연이 차례로 돌리는 시나리오(사람 손이 필요 없는 것만). scripts/demo.py 의 all 과 같다. */
+    private static final List<String> ALL = List.of("reset", "rules-abnormal", "rules-restore", "fire-false", "fire-auto");
+
     static {
+        SCENARIOS.put("all", new String[]{"통합 시연",
+                "초기화 → 소방 관제(이상 발생 → 복구) → 화재(오탐 → 자동 투척)를 사람 손 없이 이어서 실행한다. 10분 안팎.", "통합"});
         SCENARIOS.put("fire-approval", new String[]{"화재 · 사람 승인",
                 "투척 모드를 사람 승인으로 두고 화재를 낸다. 터틀봇이 출동해 도착하면 투척 승인 팝업이 뜬다 — 승인은 화면에서 직접 한다.", "소화액 투척"});
         SCENARIOS.put("fire-auto", new String[]{"화재 · 자동 투척",
@@ -197,7 +202,20 @@ public class DemoService {
     // ------------------------------------------------------------- 시나리오
     private void run(Run r, CurrentUser u) throws InterruptedException {
         long robotId = simRobot(r);
-        switch (r.key) {
+        if ("all".equals(r.key)) {
+            int n = 0;
+            for (String key : ALL) {
+                check(r);
+                say(r, "step", "[" + (++n) + "/" + ALL.size() + "] " + SCENARIOS.get(key)[0]);
+                scenario(r, u, robotId, key);
+            }
+            return;
+        }
+        scenario(r, u, robotId, r.key);
+    }
+
+    private void scenario(Run r, CurrentUser u, long robotId, String key) throws InterruptedException {
+        switch (key) {
             case "fire-approval" -> {
                 mode(r, "APPROVAL", u);
                 String spot = spot(r, robotId, 0);

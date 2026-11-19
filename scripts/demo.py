@@ -27,7 +27,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from e2e_test import ENV, Client   # noqa: E402
 
 MARK = {'step': '▶', 'wait': '…', 'info': ' ', 'ok': '✓', 'warn': '!', 'error': '✗'}
-ALL = ['reset', 'rules-abnormal', 'rules-restore', 'fire-false', 'fire-auto']
 
 
 def run(c, key):
@@ -63,11 +62,6 @@ def main():
     if arg == 'stop':
         c.post('/api/admin/demo/stop')
         print('중지를 요청했습니다')
-        return
-    if arg == 'all':
-        for k in ALL:
-            if not run(c, k):
-                sys.exit(1)
         return
     if arg not in keys:
         print(__doc__)

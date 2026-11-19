@@ -2,7 +2,7 @@
 // 어디에 얼마나 크게 놓을지는 layout.ts 가 정한다 — 패널을 더하거나 옮길 때 이 두 곳만 고친다.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RobotStatus } from '../../api/types';
-import { STATUS_LABEL, ago, fmtTime, useApi } from '../../util';
+import { STATUS_LABEL, ago, fmtTime, useApi, usePoll } from '../../util';
 import { Icon } from '../../Icon';
 import { mapGeo } from '../../mapGeo';
 import { drawRobot } from '../user/Monitor';
@@ -109,6 +109,9 @@ function RobotTabs({ d }: { d: DashData }) {
 
 function MapPanel({ d, open }: PanelProps) {
   const api = useApi();
+  // 설정 "주행 경로 표시(제어기 방향)": 켜 두었을 때만 주황 실선을 그린다(기본은 숨김)
+  const settings = usePoll(() => api.settings().catch(() => null), 10000);
+  const showControl = settings.data?.['display.control_direction'] === true;
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -144,7 +147,7 @@ function MapPanel({ d, open }: PanelProps) {
       g.setLineDash([]);
     }
     // 제어기 방향: 지금 속도 명령을 3초 유지했을 때 갈 호(주황 실선) + 화살촉. 점선(A* 경로)과 어긋난 만큼이 제어기의 판단이다
-    const ct = v?.control?.traj;
+    const ct = showControl ? v?.control?.traj : null;
     if (ct && ct.length > 1) {
       g.strokeStyle = '#ff9500'; g.fillStyle = '#ff9500'; g.lineWidth = 4; g.lineJoin = 'round'; g.lineCap = 'round';
       g.beginPath();
@@ -161,7 +164,7 @@ function MapPanel({ d, open }: PanelProps) {
       }
     }
     if (v?.pose) drawRobot(g, geo.toPx(v.pose.x), geo.toPy(v.pose.y), v.pose.yaw, geo.scale / m.resolution);
-  }, [m, img, d.view, geo?.scale]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [m, img, d.view, geo?.scale, showControl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="dz-map" ref={box}>
@@ -195,7 +198,7 @@ function MapPanel({ d, open }: PanelProps) {
       <div className="dz-legend">
         {(['ok', 'wait', 'warn', 'bad', 'none'] as const).map((s) => <span key={s}><Dot tone={`pt-${s}`} />{POINT_STATE_TEXT[s]}</span>)}
         <span style={{ color: '#0a84ff' }}>┄ 계획 경로(A*)</span>
-        <span style={{ color: '#ff9500' }}>━▶ 제어기 방향</span>
+        {showControl && <span style={{ color: '#ff9500' }}>━▶ 제어기 방향</span>}
       </div>
     </div>
   );

@@ -691,6 +691,7 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 가까운 감지를 한 사건으로 묶는 거리 | 설정 `incident.merge_radius_m` | 1.0 |
 | 투척 뒤 현장 감시 간격 · 종료 기준 | 설정 `incident.monitor_interval_sec`, `incident.monitor_clear_count` | 10, 2 |
 | 닫은 뒤에도 감지가 계속될 때 다시 여는 유예 | 설정 `incident.reopen_grace_sec` | 60 |
+| 지도에 제어기 방향(주황 실선) 표시 | 설정 `display.control_direction`(관제 지도 · 대시보드 지도) | `false`(숨김) |
 | 열화상 인쇄물의 색상표 · 열원 기준 | 감지 설정 `detect.thermal`(= `THERMAL` 규칙의 `params` · `grading`) | `iron`, 3.3 의 예 |
 | 감지 보고에 필요한 연속 프레임 수 | 설정 `detect.report_frames` | 5 |
 | 계기판 · 표시등의 실제 대상, 눈금 · 색 | 규칙의 `params` | — (규칙을 만들 때 입력) |
