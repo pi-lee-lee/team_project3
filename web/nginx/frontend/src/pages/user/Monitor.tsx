@@ -322,7 +322,7 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.imageSmoothingEnabled = true;            // 지도 그림은 4배 해상도로 다듬어 오므로 부드럽게 축소
     g.drawImage(img, 0, 0, cw, ch);
-    // 금지구역: 붉은 빗금 상자. 고른 것은 굵게, 끄는 중인 것은 점선
+    // 금지구역: 붉은 빗금 상자. 고른 것은 자홍 + 굵게, 끄는 중인 것은 점선
     zones.data?.forEach((z) => drawZone(g, toPx, toPy, z, { selected: z.zoneId === picked, label: z.name || '금지구역' }));
     if (draft) drawZone(g, toPx, toPy, draft, { draft: true });
     const v = view.data;
