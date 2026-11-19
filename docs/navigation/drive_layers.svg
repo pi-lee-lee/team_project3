@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="2198" viewBox="0 0 1640 2198" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
-<defs></defs>
-<rect width="1640" height="2198" fill="#f2f2f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="2814" viewBox="0 0 1640 2814" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a007aff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#007aff"/></marker><marker id="a1c1c1e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c1c1e"/></marker><marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker></defs>
+<rect width="1640" height="2814" fill="#f2f2f7"/>
 <text x="24.0" y="46.0" font-size="26" font-weight="700" fill="#1c1c1e" text-anchor="start">주행 지도 구조 — 3겹</text>
 <text x="24.0" y="72.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">로봇은 지도 한 장으로 달리지 않는다. 변하지 않는 기존 맵 위에 계획 맵과, 2배 촘촘한 제어 맵을 겹쳐 쓴다. 값은 nav2_params.yaml · site.yaml 기준이다.</text>
 <rect x="16.0" y="92.0" width="1608.0" height="950.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
@@ -8,6 +8,7 @@
 <text x="40.0" y="124.0" font-size="18" font-weight="700" fill="#007aff" text-anchor="start">1  주행에 쓰는 지도는 3겹이다</text>
 <text x="40.0" y="146.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">아래에서 위로: 변하지 않는 기존 맵 → 건물 전체를 보는 계획 맵 → 로봇 둘레만 2배 촘촘하게 보는 제어 맵. 같은 순간(전기실 문 앞, 골목에 상자가 놓인 직후)의 세 겹이다.</text>
 <pattern id="lh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#d6e8ff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#007aff" stroke-width="2"/></pattern>
+<pattern id="zh" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#ffe1df"/><line x1="0" y1="0" x2="0" y2="7" stroke="#ff3b30" stroke-width="2"/></pattern>
 <g transform="matrix(1 0 -0.5 0.5 302.0 740)">
 <clipPath id="pl"><rect x="-10" y="-10" width="553.6" height="484.0" rx="6"/></clipPath>
 <rect x="-10.0" y="-10.0" width="553.6" height="484.0" rx="6" fill="#ffffff" stroke="none" stroke-width="0"/>
@@ -68,6 +69,7 @@
 <rect x="461.1" y="-20.3" width="81.2" height="63.8" rx="26.1" fill="#cfe4ff" stroke="none" stroke-width="0"/>
 <rect x="-23.2" y="107.3" width="69.6" height="87.0" rx="26.1" fill="#cfe4ff" stroke="none" stroke-width="0"/>
 <rect x="208.8" y="87.0" width="72.5" height="69.6" rx="26.1" fill="#cfe4ff" stroke="none" stroke-width="0"/>
+<rect x="110.2" y="-5.8" width="116.0" height="87.0" rx="26.1" fill="#cfe4ff" stroke="none" stroke-width="0"/>
 <rect x="0.0" y="461.1" width="533.6" height="5.8" rx="0.0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
 <rect x="0.0" y="-2.9" width="533.6" height="5.8" rx="0.0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
 <rect x="-2.9" y="0.0" width="5.8" height="464.0" rx="0.0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
@@ -92,6 +94,7 @@
 <rect x="234.9" y="176.9" width="17.4" height="29.0" rx="0.0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
 <rect x="487.2" y="5.8" width="29.0" height="11.6" rx="0.0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
 <rect x="2.9" y="133.4" width="17.4" height="34.8" rx="0.0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="136.3" y="20.3" width="63.8" height="34.8" rx="0" fill="url(#zh)" stroke="#ff3b30" stroke-width="2.4"/>
 <rect x="234.9" y="113.1" width="20.3" height="17.4" rx="0.0" fill="url(#lh)" stroke="#007aff" stroke-width="1.4"/>
 <path d="M234.9 113.1 L255.2 113.1" fill="none" stroke="#e5352b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
 <path d="M74.2 150.8 L96.3 143.3 L118.3 135.7 L140.4 128.8 L164.1 126.4 L187.3 125.3 L207.6 116.0 L227.9 95.7 L251.1 92.8 L263.3 116.0 L265.1 139.2 L268.5 162.4 L281.3 183.9 L306.2 191.4" fill="none" stroke="#007aff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 7"/>
@@ -159,6 +162,8 @@
 <rect x="452.4" y="-29.0" width="98.6" height="81.2" rx="34.8" fill="#ffe0b8" stroke="none" stroke-width="0"/>
 <rect x="-31.9" y="98.6" width="87.0" height="104.4" rx="34.8" fill="#ffe0b8" stroke="none" stroke-width="0"/>
 <rect x="200.1" y="78.3" width="89.9" height="87.0" rx="34.8" fill="#ffe0b8" stroke="none" stroke-width="0"/>
+<rect x="101.5" y="-14.5" width="133.4" height="104.4" rx="34.8" fill="#ffe0b8" stroke="none" stroke-width="0"/>
+<rect x="136.3" y="20.3" width="63.8" height="34.8" rx="0" fill="url(#zh)" stroke="#ff3b30" stroke-width="2.4"/>
 <rect x="0.0" y="461.1" width="533.6" height="5.8" rx="0" fill="#fbe3e0" stroke="#e5352b" stroke-width="2.6"/>
 <rect x="0.0" y="-2.9" width="533.6" height="5.8" rx="0" fill="#fbe3e0" stroke="#e5352b" stroke-width="2.6"/>
 <rect x="-2.9" y="0.0" width="5.8" height="464.0" rx="0" fill="#fbe3e0" stroke="#e5352b" stroke-width="2.6"/>
@@ -267,7 +272,7 @@
 <text x="904.0" y="897.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">월드가 바뀌면 SLAM 으로 다시 만든다. 시험 장애물 · 사람 · 적재물은 여기에 들어가지 않는다.</text>
 <text x="852.0" y="446.0" font-size="11.5" font-weight="500" fill="#636366" text-anchor="end">색이 든 네모 = 제어 맵 전체(3×3m). 바깥의 흐린 윤곽은 이 겹에 없는 정보다</text>
 <text x="852.0" y="722.0" font-size="11.5" font-weight="500" fill="#636366" text-anchor="end">점선 네모 = 지금 제어 맵이 보고 있는 자리</text>
-<text x="852.0" y="998.0" font-size="11.5" font-weight="500" fill="#636366" text-anchor="end">이 겹이 계획 맵의 바탕 층으로 그대로 올라간다</text>
+<text x="852.0" y="998.0" font-size="11.5" font-weight="500" fill="#636366" text-anchor="end">이 겹이 계획 맵의 바탕 층으로 그대로 올라간다. 금지구역은 이 겹에 없다</text>
 <rect x="44.0" y="1006.0" width="16.0" height="14.0" rx="2" fill="#3a3a3c" stroke="#8e8e93" stroke-width="0.8"/>
 <text x="66.0" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">벽 · 설비(기존 맵)</text>
 <rect x="218.4" y="1006.0" width="16.0" height="14.0" rx="2" fill="#cfe4ff" stroke="#8e8e93" stroke-width="0.8"/>
@@ -278,10 +283,12 @@
 <text x="622.8" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다가 본 면</text>
 <rect x="730.4" y="1006.0" width="16.0" height="14.0" rx="2" fill="#ffe0b8" stroke="#8e8e93" stroke-width="0.8"/>
 <text x="752.4" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">제어 맵 팽창 0.6m</text>
-<path d="M904.8 1013.0 L938.8 1013.0" fill="none" stroke="#007aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 7"/>
-<text x="946.8" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">계획 경로</text>
-<path d="M1014.8 1013.0 L1048.8 1013.0" fill="none" stroke="#ff9500" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
-<text x="1056.8" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">제어기 후보 궤적</text>
+<rect x="904.8" y="1006.0" width="16.0" height="14.0" rx="2" fill="url(#zh)" stroke="#ff3b30" stroke-width="0.8"/>
+<text x="926.8" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">금지구역(예시)</text>
+<path d="M1034.4 1013.0 L1068.4 1013.0" fill="none" stroke="#007aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 7"/>
+<text x="1076.4" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">계획 경로</text>
+<path d="M1144.4 1013.0 L1178.4 1013.0" fill="none" stroke="#ff9500" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
+<text x="1186.4" y="1018.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">제어기 후보 궤적</text>
 <rect x="16.0" y="1056.0" width="1608.0" height="704.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
 <rect x="16.0" y="1056.0" width="8.0" height="704.0" rx="4" fill="#c93400" stroke="#c93400" stroke-width="1.0"/>
 <text x="40.0" y="1088.0" font-size="18" font-weight="700" fill="#c93400" text-anchor="start">2  새 장애물은 어느 층에 생기나</text>
@@ -372,70 +379,160 @@
 <text x="44.0" y="1682.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 라이다 층은 "보이면 찍고(marking), 빔이 지나가면 지운다(clearing)". 찍는 거리는 7.5m, 지우는 거리는 8m 다.</text>
 <text x="44.0" y="1703.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 가상 장애물 층에는 한 가지가 더 들어간다: 물러났다가 같은 자리에서 또 막히면 그 자리(반지름 0.25m)를 막는다(마지막 안전망).</text>
 <text x="44.0" y="1724.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 채워서 길이 아예 없어지면(계획 실패) 그 목표 동안은 몸통 채우기를 끈다. 목표 둘레 0.45m 도 채우지 않는다.</text>
-<rect x="16.0" y="1774.0" width="1608.0" height="400.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
-<rect x="16.0" y="1774.0" width="8.0" height="400.0" rx="4" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
-<text x="40.0" y="1806.0" font-size="18" font-weight="700" fill="#b25000" text-anchor="start">3  세 겹 비교</text>
-<text x="40.0" y="1828.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">같은 건물을 서로 다른 눈으로 본다. 계획은 멀리 · 성기게 · 가끔, 제어는 가까이 · 촘촘하게 · 자주.</text>
-<rect x="36.0" y="1839.0" width="1568.0" height="28.0" rx="6" fill="#f2f2f7" stroke="none" stroke-width="0"/>
-<text x="44.0" y="1858.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start"></text>
-<text x="214.0" y="1858.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="start">1겹 기존 맵</text>
-<text x="604.0" y="1858.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵</text>
-<text x="1054.0" y="1858.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start">3겹 제어 맵</text>
-<text x="44.0" y="1888.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">정체</text>
-<text x="214.0" y="1888.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">저장 지도 site.pgm</text>
-<text x="604.0" y="1888.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">전역 비용 지도</text>
-<text x="1054.0" y="1888.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">지역 비용 지도</text>
-<line x1="36" y1="1897" x2="1604" y2="1897" stroke="#e5e5ea"/>
-<text x="44.0" y="1915.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">칸 크기</text>
-<text x="214.0" y="1915.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.05m</text>
-<text x="604.0" y="1915.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.05m</text>
-<text x="1054.0" y="1915.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.025m (2배 촘촘 · 칸 넓이 1/4)</text>
-<line x1="36" y1="1924" x2="1604" y2="1924" stroke="#e5e5ea"/>
-<text x="44.0" y="1942.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">범위 · 칸 수</text>
-<text x="214.0" y="1942.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">건물 전체 · 183×160</text>
-<text x="604.0" y="1942.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">건물 전체 · 183×160</text>
-<text x="1054.0" y="1942.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">로봇 둘레 3×3m · 120×120 (0.05m 였다면 60×60)</text>
-<line x1="36" y1="1951" x2="1604" y2="1951" stroke="#e5e5ea"/>
-<text x="44.0" y="1969.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">움직임</text>
-<text x="214.0" y="1969.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">고정</text>
-<text x="604.0" y="1969.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">고정</text>
-<text x="1054.0" y="1969.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">로봇을 따라 움직인다</text>
-<line x1="36" y1="1978" x2="1604" y2="1978" stroke="#e5e5ea"/>
-<text x="44.0" y="1996.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">안의 층</text>
-<text x="214.0" y="1996.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">— (그림 한 장)</text>
-<text x="604.0" y="1996.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">기존 맵 + 라이다 + 가상 장애물 → 팽창 0.45m</text>
-<text x="1054.0" y="1996.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">금지구역 + 라이다 → 팽창 0.6m</text>
-<line x1="36" y1="2005" x2="1604" y2="2005" stroke="#e5e5ea"/>
-<text x="44.0" y="2023.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">새 장애물</text>
-<text x="214.0" y="2023.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">생기지 않는다</text>
-<text x="604.0" y="2023.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다 층(선) + 가상 장애물 층(몸통)</text>
-<text x="1054.0" y="2023.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다 층(선)</text>
-<line x1="36" y1="2032" x2="1604" y2="2032" stroke="#e5e5ea"/>
-<text x="44.0" y="2050.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">금지구역</text>
-<text x="214.0" y="2050.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">들어가지 않는다</text>
-<text x="604.0" y="2050.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">가상 장애물 층에 합친다</text>
-<text x="1054.0" y="2050.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">금지구역 층 (keepout_layer)</text>
-<line x1="36" y1="2059" x2="1604" y2="2059" stroke="#e5e5ea"/>
-<text x="44.0" y="2077.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">갱신</text>
-<text x="214.0" y="2077.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">없음</text>
-<text x="604.0" y="2077.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">1초에 1번</text>
-<text x="1054.0" y="2077.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">1초에 5번</text>
-<line x1="36" y1="2086" x2="1604" y2="2086" stroke="#e5e5ea"/>
-<text x="44.0" y="2104.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">쓰는 곳</text>
-<text x="214.0" y="2104.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">위치 추정 AMCL · 웹 지도 원본</text>
-<text x="604.0" y="2104.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">전역 계획 Theta* (목표마다 한 번)</text>
-<text x="1054.0" y="2104.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">제어기 MPPI (1초에 10번)</text>
-<line x1="36" y1="2113" x2="1604" y2="2113" stroke="#e5e5ea"/>
-<text x="44.0" y="2131.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">바꾸는 곳</text>
-<text x="214.0" y="2131.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">SLAM 으로 다시 만든다 (save_map.sh)</text>
-<text x="604.0" y="2131.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">nav2_params.yaml global_costmap</text>
-<text x="1054.0" y="2131.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">nav2_params.yaml local_costmap</text>
-<line x1="36" y1="2140" x2="1604" y2="2140" stroke="#e5e5ea"/>
-<text x="44.0" y="2170.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">웹 화면의 지도(MapRenderer)는 1겹을 보기 좋게 다시 그린 그림이다. 주행에 쓰는 세 겹에는 영향이 없다. 제어기 동작 · 막혔을 때의 순서는 drive_controller.svg 를 본다.</text>
+<rect x="16.0" y="1774.0" width="1608.0" height="602.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="1774.0" width="8.0" height="602.0" rx="4" fill="#c93400" stroke="#c93400" stroke-width="1.0"/>
+<text x="40.0" y="1806.0" font-size="18" font-weight="700" fill="#c93400" text-anchor="start">3  금지구역은 어디에서 동작하나</text>
+<text x="40.0" y="1828.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">관리자가 지도에 그린 직사각형(공사 중인 구역 등). 실제 장애물이 없어 라이다로는 안 보이므로, 서버가 목록을 로봇에 보내고 브리지가 두 겹에 직접 넣는다.</text>
+<rect x="44.0" y="1870.0" width="204.0" height="92.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.5"/>
+<text x="146.0" y="1892.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle">화면 · 관제 지도</text>
+<text x="146.0" y="1909.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Monitor.tsx · drawZone</text>
+<text x="146.0" y="1926.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">끌어서 그림 · 눌러 고름 · 삭제</text>
+<text x="146.0" y="1942.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">붉은 빗금 상자로 표시</text>
+<rect x="288.0" y="1870.0" width="204.0" height="92.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.5"/>
+<text x="390.0" y="1892.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle">gateway</text>
+<text x="390.0" y="1909.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">application.yml</text>
+<text x="390.0" y="1926.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">설정 · 삭제: ADMIN · 1 관리자</text>
+<text x="390.0" y="1942.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">조회: 모든 역할</text>
+<rect x="532.0" y="1870.0" width="204.0" height="92.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.5"/>
+<text x="634.0" y="1892.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle">robot-service</text>
+<text x="634.0" y="1909.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">KeepoutService · keepout_zone</text>
+<text x="634.0" y="1926.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">저장 · 검사 후 목록 전체를 보냄</text>
+<text x="634.0" y="1942.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">바뀔 때 + 5초마다</text>
+<rect x="776.0" y="1870.0" width="204.0" height="92.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="878.0" y="1892.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">목표 브리지</text>
+<text x="878.0" y="1909.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_goal_bridge.py</text>
+<text x="878.0" y="1926.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">구역 → 지도와 같은 크기의</text>
+<text x="878.0" y="1942.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">격자 두 장으로 바꿈</text>
+<rect x="1194.0" y="1844.0" width="406.0" height="66.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.6"/>
+<text x="1208.0" y="1866.0" font-size="13" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵 — 가상 장애물 층 (virtual_layer)</text>
+<text x="1208.0" y="1884.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">몸통 채우기 표시와 한 격자에 합쳐진다 → 팽창 0.45m</text>
+<text x="1208.0" y="1900.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">→ Theta* 가 구역을 피해 계획(달리는 중이면 다시 계획)</text>
+<rect x="1194.0" y="1922.0" width="406.0" height="66.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="1.6"/>
+<text x="1208.0" y="1944.0" font-size="13" font-weight="700" fill="#b25000" text-anchor="start">3겹 제어 맵 — 금지구역 층 (keepout_layer)</text>
+<text x="1208.0" y="1962.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다 층보다 앞에 놓인 전용 층 → 팽창 0.6m</text>
+<text x="1208.0" y="1978.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">→ MPPI 가 비켜 가다 구역 모서리를 넘지 않는다</text>
+<rect x="1194.0" y="2000.0" width="406.0" height="34.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="1208.0" y="2022.0" font-size="12" font-weight="600" fill="#3a3a3c" text-anchor="start">1겹 기존 맵 — 들어가지 않는다 (위치 추정은 그대로)</text>
+<rect x="36.0" y="2047.0" width="1568.0" height="28.0" rx="6" fill="#f2f2f7" stroke="none" stroke-width="0"/>
+<text x="44.0" y="2066.0" font-size="13" font-weight="700" fill="#636366" text-anchor="start">곳</text>
+<text x="274.0" y="2066.0" font-size="13" font-weight="700" fill="#636366" text-anchor="start">금지구역에 대해 하는 일</text>
+<text x="1104.0" y="2066.0" font-size="13" font-weight="700" fill="#636366" text-anchor="start">값 · 근거</text>
+<circle cx="50" cy="2092" r="5" fill="#3a3a3c"/>
+<text x="64.0" y="2096.0" font-size="12.5" font-weight="700" fill="#3a3a3c" text-anchor="start">1겹 기존 맵 (저장 지도)</text>
+<text x="274.0" y="2096.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">동작하지 않는다. 구역을 그려도 저장 지도 · 위치 추정(AMCL) · 웹 지도 그림은 바뀌지 않는다</text>
+<text x="1104.0" y="2096.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">—</text>
+<line x1="36" y1="2105" x2="1604" y2="2105" stroke="#e5e5ea"/>
+<circle cx="50" cy="2119" r="5" fill="#007aff"/>
+<text x="64.0" y="2123.0" font-size="12.5" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵 · 가상 장애물 층</text>
+<text x="274.0" y="2123.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">구역이 덮는 칸을 막힌 칸(100)으로 넣는다. 걸친 칸은 모두 넣는다. 목표와 상관없이 지울 때까지 남는다</text>
+<text x="1104.0" y="2123.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">0.05m 칸 · 1초마다 다시 보냄</text>
+<line x1="36" y1="2132" x2="1604" y2="2132" stroke="#e5e5ea"/>
+<circle cx="50" cy="2146" r="5" fill="#007aff"/>
+<text x="64.0" y="2150.0" font-size="12.5" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵 · 팽창 층</text>
+<text x="274.0" y="2150.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">구역 둘레에 여유 띠를 두른다 → 경로가 구역에 붙지 않는다</text>
+<text x="1104.0" y="2150.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">팽창 0.45m</text>
+<line x1="36" y1="2159" x2="1604" y2="2159" stroke="#e5e5ea"/>
+<circle cx="50" cy="2173" r="5" fill="#007aff"/>
+<text x="64.0" y="2177.0" font-size="12.5" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵 · 라이다 층 / 기존 맵 층</text>
+<text x="274.0" y="2177.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">동작하지 않는다(구역은 실제 장애물이 아니라 라이다에 안 보인다)</text>
+<text x="1104.0" y="2177.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">—</text>
+<line x1="36" y1="2186" x2="1604" y2="2186" stroke="#e5e5ea"/>
+<circle cx="50" cy="2200" r="5" fill="#b25000"/>
+<text x="64.0" y="2204.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">3겹 제어 맵 · 금지구역 층</text>
+<text x="274.0" y="2204.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">같은 구역을 제어 맵에도 막힌 칸으로 넣는다. 로봇 둘레 3×3m 창에 들어온 부분만 쓰인다</text>
+<text x="1104.0" y="2204.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">keepout_layer · 라이다 층보다 앞</text>
+<line x1="36" y1="2213" x2="1604" y2="2213" stroke="#e5e5ea"/>
+<circle cx="50" cy="2227" r="5" fill="#b25000"/>
+<text x="64.0" y="2231.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">3겹 제어 맵 · 팽창 층</text>
+<text x="274.0" y="2231.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">구역 둘레에 여유 띠를 두른다 → 제어기 후보 궤적이 구역으로 들어가지 않는다</text>
+<text x="1104.0" y="2231.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">팽창 0.6m</text>
+<line x1="36" y1="2240" x2="1604" y2="2240" stroke="#e5e5ea"/>
+<circle cx="50" cy="2254" r="5" fill="#8944ab"/>
+<text x="64.0" y="2258.0" font-size="12.5" font-weight="700" fill="#8944ab" text-anchor="start">목표 브리지</text>
+<text x="274.0" y="2258.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">서버 목록을 두 격자로 바꿔 보낸다. 구역이 없어도 빈 격자를 보낸다(층이 기다리지 않게)</text>
+<text x="1104.0" y="2258.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">바뀔 때만 keepout_map 재전송</text>
+<line x1="36" y1="2267" x2="1604" y2="2267" stroke="#e5e5ea"/>
+<circle cx="50" cy="2281" r="5" fill="#248a3d"/>
+<text x="64.0" y="2285.0" font-size="12.5" font-weight="700" fill="#248a3d" text-anchor="start">robot-service</text>
+<text x="274.0" y="2285.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">한 변 0.2m 미만 거부(400) · 로봇이 구역 안이거나 둘레 0.35m 안이면 거부(409) · DB 에 보관</text>
+<text x="1104.0" y="2285.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">KeepoutService</text>
+<line x1="36" y1="2294" x2="1604" y2="2294" stroke="#e5e5ea"/>
+<text x="44.0" y="2326.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 달리는 도중 가던 길 위에 설정: 계획 맵에 1 ~ 2초 안에 들어가고, 경로 검사가 "막힘"을 보고 다시 계획해 돌아간다(E2E Z-5).</text>
+<text x="44.0" y="2347.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 구역이 목적지를 덮거나 길이 그 구역뿐이면 그 지점은 BLOCKED_NO_PATH(진입 불가)로 끝난다. 구역을 지우면 1 ~ 2초 안에 다시 지나간다(E2E Z-4).</text>
+<rect x="16.0" y="2390.0" width="1608.0" height="400.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="2390.0" width="8.0" height="400.0" rx="4" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="40.0" y="2422.0" font-size="18" font-weight="700" fill="#b25000" text-anchor="start">4  세 겹 비교</text>
+<text x="40.0" y="2444.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">같은 건물을 서로 다른 눈으로 본다. 계획은 멀리 · 성기게 · 가끔, 제어는 가까이 · 촘촘하게 · 자주.</text>
+<rect x="36.0" y="2455.0" width="1568.0" height="28.0" rx="6" fill="#f2f2f7" stroke="none" stroke-width="0"/>
+<text x="44.0" y="2474.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start"></text>
+<text x="214.0" y="2474.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="start">1겹 기존 맵</text>
+<text x="604.0" y="2474.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="start">2겹 계획 맵</text>
+<text x="1054.0" y="2474.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start">3겹 제어 맵</text>
+<text x="44.0" y="2504.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">정체</text>
+<text x="214.0" y="2504.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">저장 지도 site.pgm</text>
+<text x="604.0" y="2504.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">전역 비용 지도</text>
+<text x="1054.0" y="2504.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">지역 비용 지도</text>
+<line x1="36" y1="2513" x2="1604" y2="2513" stroke="#e5e5ea"/>
+<text x="44.0" y="2531.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">칸 크기</text>
+<text x="214.0" y="2531.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.05m</text>
+<text x="604.0" y="2531.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.05m</text>
+<text x="1054.0" y="2531.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.025m (2배 촘촘 · 칸 넓이 1/4)</text>
+<line x1="36" y1="2540" x2="1604" y2="2540" stroke="#e5e5ea"/>
+<text x="44.0" y="2558.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">범위 · 칸 수</text>
+<text x="214.0" y="2558.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">건물 전체 · 183×160</text>
+<text x="604.0" y="2558.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">건물 전체 · 183×160</text>
+<text x="1054.0" y="2558.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">로봇 둘레 3×3m · 120×120 (0.05m 였다면 60×60)</text>
+<line x1="36" y1="2567" x2="1604" y2="2567" stroke="#e5e5ea"/>
+<text x="44.0" y="2585.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">움직임</text>
+<text x="214.0" y="2585.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">고정</text>
+<text x="604.0" y="2585.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">고정</text>
+<text x="1054.0" y="2585.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">로봇을 따라 움직인다</text>
+<line x1="36" y1="2594" x2="1604" y2="2594" stroke="#e5e5ea"/>
+<text x="44.0" y="2612.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">안의 층</text>
+<text x="214.0" y="2612.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">— (그림 한 장)</text>
+<text x="604.0" y="2612.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">기존 맵 + 라이다 + 가상 장애물 → 팽창 0.45m</text>
+<text x="1054.0" y="2612.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">금지구역 + 라이다 → 팽창 0.6m</text>
+<line x1="36" y1="2621" x2="1604" y2="2621" stroke="#e5e5ea"/>
+<text x="44.0" y="2639.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">새 장애물</text>
+<text x="214.0" y="2639.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">생기지 않는다</text>
+<text x="604.0" y="2639.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다 층(선) + 가상 장애물 층(몸통)</text>
+<text x="1054.0" y="2639.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">라이다 층(선)</text>
+<line x1="36" y1="2648" x2="1604" y2="2648" stroke="#e5e5ea"/>
+<text x="44.0" y="2666.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">금지구역</text>
+<text x="214.0" y="2666.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">들어가지 않는다</text>
+<text x="604.0" y="2666.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">가상 장애물 층에 합친다</text>
+<text x="1054.0" y="2666.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">금지구역 층 (keepout_layer)</text>
+<line x1="36" y1="2675" x2="1604" y2="2675" stroke="#e5e5ea"/>
+<text x="44.0" y="2693.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">갱신</text>
+<text x="214.0" y="2693.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">없음</text>
+<text x="604.0" y="2693.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">1초에 1번</text>
+<text x="1054.0" y="2693.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">1초에 5번</text>
+<line x1="36" y1="2702" x2="1604" y2="2702" stroke="#e5e5ea"/>
+<text x="44.0" y="2720.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">쓰는 곳</text>
+<text x="214.0" y="2720.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">위치 추정 AMCL · 웹 지도 원본</text>
+<text x="604.0" y="2720.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">전역 계획 Theta* (목표마다 한 번)</text>
+<text x="1054.0" y="2720.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">제어기 MPPI (1초에 10번)</text>
+<line x1="36" y1="2729" x2="1604" y2="2729" stroke="#e5e5ea"/>
+<text x="44.0" y="2747.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">바꾸는 곳</text>
+<text x="214.0" y="2747.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">SLAM 으로 다시 만든다 (save_map.sh)</text>
+<text x="604.0" y="2747.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">nav2_params.yaml global_costmap</text>
+<text x="1054.0" y="2747.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">nav2_params.yaml local_costmap</text>
+<line x1="36" y1="2756" x2="1604" y2="2756" stroke="#e5e5ea"/>
+<text x="44.0" y="2786.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">웹 화면의 지도(MapRenderer)는 1겹을 보기 좋게 다시 그린 그림이다. 주행에 쓰는 세 겹에는 영향이 없다. 제어기 동작 · 막혔을 때의 순서는 drive_controller.svg 를 본다.</text>
 <line x1="423.2" y1="197.3" x2="423.2" y2="749.3" stroke="#b25000" stroke-width="1.3" stroke-dasharray="4 5" opacity=".8"/>
 <line x1="597.2" y1="197.3" x2="597.2" y2="749.3" stroke="#b25000" stroke-width="1.3" stroke-dasharray="4 5" opacity=".8"/>
 <line x1="336.2" y1="284.3" x2="336.2" y2="836.3" stroke="#b25000" stroke-width="1.3" stroke-dasharray="4 5" opacity=".8"/>
 <line x1="510.2" y1="284.3" x2="510.2" y2="836.3" stroke="#b25000" stroke-width="1.3" stroke-dasharray="4 5" opacity=".8"/>
 <path d="M423.2 473.3 L597.2 473.3 L510.2 560.3 L336.2 560.3 z" fill="none" stroke="#b25000" stroke-width="1.6" stroke-dasharray="6 4"/>
 <path d="M423.2 749.3 L597.2 749.3 L510.2 836.3 L336.2 836.3 z" fill="none" stroke="#b25000" stroke-width="1.6" stroke-dasharray="6 4"/>
+<path d="M251.0 1916.0 L284.0 1916.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="268.0" y="1862.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">POST · DELETE</text>
+<path d="M495.0 1916.0 L528.0 1916.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="512.0" y="1862.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/api/robots/{id}/zones</text>
+<path d="M739.0 1916.0 L772.0 1916.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="756.0" y="1862.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/keepout</text>
+<path d="M983.0 1904.0 L1040.0 1904.0 L1040.0 1876.0 L1190.0 1876.0" fill="none" stroke="#007aff" stroke-width="1.8" marker-end="url(#a007aff)"/>
+<path d="M983.0 1928.0 L1040.0 1928.0 L1040.0 1956.0 L1190.0 1956.0" fill="none" stroke="#b25000" stroke-width="1.8" marker-end="url(#ab25000)"/>
+<text x="1048.0" y="1868.0" font-size="10" font-weight="600" fill="#007aff" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/virtual_map</text>
+<text x="1048.0" y="1972.0" font-size="10" font-weight="600" fill="#b25000" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/keepout_map</text>
 </svg>

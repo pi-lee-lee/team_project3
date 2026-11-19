@@ -33,7 +33,7 @@
 
 | 파일 | 내용 |
 | --- | --- |
-| [drive_layers.svg](navigation/drive_layers.svg) | 주행 지도 3겹: 기존 맵(저장 지도) · 계획 맵(전역 비용 지도 0.05m) · 제어 맵(지역 비용 지도 0.025m, 2배 촘촘). 새 장애물이 생기고 사라지는 층 |
+| [drive_layers.svg](navigation/drive_layers.svg) | 주행 지도 3겹: 기존 맵(저장 지도) · 계획 맵(전역 비용 지도 0.05m) · 제어 맵(지역 비용 지도 0.025m, 2배 촘촘). 새 장애물이 생기고 사라지는 층, **금지구역이 동작하는 층**(계획 맵 가상 장애물 층 + 제어 맵 금지구역 층, 기존 맵에는 없음) |
 | [drive_controller.svg](navigation/drive_controller.svg) | 주행 제어기: 목표 → 경로(Theta*) → 속도 명령(MPPI), 장애물별 맞는 결과와 측정 시간, 목표 브리지가 돕는 세 가지, 막혔을 때의 순서, 주요 설정값 |
 | [theta_star.svg](navigation/theta_star.svg) | Theta* 계획기(처음 보는 사람용): A* 가 길을 찾는 법 → Theta* 가 바꾼 한 가지(보이는 점에 바로 잇기) → 같은 지도에서 비교 → 이 건물의 경로 → 벽 비용(w_traversal_cost) → 설정값 · 한계 |
 | [mppi.svg](navigation/mppi.svg) | MPPI 제어기(처음 보는 사람용): 한 주기의 네 걸음(후보 1000개 → 굴리기 → 점수 → 가중 평균) → 속도 열 → 평가 항목 8가지 → temperature → 상황별 동작(직선 · 상자 · 좁은 틈) → 도착 구간 → 설정값 · 실측 |
