@@ -44,14 +44,15 @@
 <rect x="1140.0" y="302.0" width="216.0" height="86.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="1.5"/>
 <text x="1248.0" y="324.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="middle">지역 비용 지도</text>
 <text x="1248.0" y="341.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.025m 칸 · 로봇 둘레 3×3m</text>
-<text x="1248.0" y="358.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">라이다만 (지금 보이는 것)</text>
+<text x="1248.0" y="358.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">금지구역 + 라이다(지금 보이는 것)</text>
 <text x="1248.0" y="374.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">팽창 0.6m</text>
 <rect x="1424.0" y="310.0" width="166.0" height="70.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.5"/>
 <text x="1507.0" y="332.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="middle">라이다 /scan</text>
 <text x="1507.0" y="352.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">최대 8m · 360°</text>
-<text x="44.0" y="362.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">점선 = 결과가 되돌아오는 길</text>
-<text x="44.0" y="378.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">사유 코드: BLOCKED_NO_PATH · NAV_FAILED</text>
-<text x="44.0" y="394.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">· NO_PROGRESS · NAV_UNAVAILABLE</text>
+<text x="44.0" y="346.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">점선 = 결과가 되돌아오는 길</text>
+<text x="44.0" y="362.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">사유 코드: BLOCKED_NO_PATH · NAV_FAILED</text>
+<text x="44.0" y="378.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">· NO_PROGRESS · NAV_UNAVAILABLE</text>
+<text x="44.0" y="394.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">금지구역이 들어가는 층은 drive_layers.svg 3절</text>
 <rect x="16.0" y="424.0" width="1608.0" height="716.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
 <rect x="16.0" y="424.0" width="8.0" height="716.0" rx="4" fill="#007aff" stroke="#007aff" stroke-width="1.0"/>
 <text x="40.0" y="456.0" font-size="18" font-weight="700" fill="#007aff" text-anchor="start">2  지도 위에서 보기 — 길이 좁아지거나 막혔을 때</text>
@@ -494,17 +495,21 @@
 <text x="1152.0" y="2370.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">최대 3번</text>
 <text x="1610.0" y="2370.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">MAX_RETRIES</text>
 <line x1="1040" y1="2378" x2="1610" y2="2378" stroke="#e5e5ea"/>
-<text x="1040.0" y="2395.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">전진 없음 제한</text>
-<text x="1152.0" y="2395.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">90초</text>
-<text x="1610.0" y="2395.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">NO_PROGRESS_SEC</text>
+<text x="1040.0" y="2395.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">금지구역</text>
+<text x="1152.0" y="2395.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">계획 맵 + 제어 맵 · 한 변 0.2m 이상 · 로봇 둘레 0.35m 제외</text>
+<text x="1610.0" y="2395.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">KeepoutService</text>
 <line x1="1040" y1="2403" x2="1610" y2="2403" stroke="#e5e5ea"/>
-<text x="1040.0" y="2436.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">대문자 이름은 ros/robot/src/nav2_goal_bridge.py 의 상수다.</text>
-<text x="1040.0" y="2470.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">확인하는 법</text>
-<rect x="1040.0" y="2482.0" width="570.0" height="76.0" rx="8" fill="#1c1c1e" stroke="none" stroke-width="0"/>
-<text x="1052.0" y="2504.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/nav_soak.py --rounds 3     # 장애물 × 시점 반복 시험</text>
-<text x="1052.0" y="2524.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/plan_probe.py              # 계획 경로 길이 · 꺾임 · 벽 여유</text>
-<text x="1052.0" y="2544.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 scripts/e2e_test.py --only-obstacles  # 장애물 시나리오 9-1 ~ 9-6</text>
-<text x="1040.0" y="2576.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">위 두 줄은 sim 컨테이너 안에서(docker compose exec sim …), 셋째는 저장소 루트에서.</text>
+<text x="1040.0" y="2420.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">전진 없음 제한</text>
+<text x="1152.0" y="2420.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">90초</text>
+<text x="1610.0" y="2420.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">NO_PROGRESS_SEC</text>
+<line x1="1040" y1="2428" x2="1610" y2="2428" stroke="#e5e5ea"/>
+<text x="1040.0" y="2461.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">대문자 이름은 ros/robot/src/nav2_goal_bridge.py 의 상수다.</text>
+<text x="1040.0" y="2495.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">확인하는 법</text>
+<rect x="1040.0" y="2507.0" width="570.0" height="76.0" rx="8" fill="#1c1c1e" stroke="none" stroke-width="0"/>
+<text x="1052.0" y="2529.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/nav_soak.py --rounds 3     # 장애물 × 시점 반복 시험</text>
+<text x="1052.0" y="2549.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/plan_probe.py              # 계획 경로 길이 · 꺾임 · 벽 여유</text>
+<text x="1052.0" y="2569.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 scripts/e2e_test.py --only-obstacles  # 장애물 시나리오 9-1 ~ 9-6</text>
+<text x="1040.0" y="2601.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">위 두 줄은 sim 컨테이너 안에서(docker compose exec sim …), 셋째는 저장소 루트에서.</text>
 <path d="M243.0 204.0 L310.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
 <text x="277.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/goal</text>
 <path d="M513.0 204.0 L580.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
@@ -522,7 +527,7 @@
 <path d="M1421.0 345.0 L1359.0 345.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
 <path d="M1454.0 383.0 L1454.0 406.0 L914.0 406.0 L914.0 391.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
 <path d="M412.0 265.0 L412.0 345.0 L790.0 345.0" fill="none" stroke="#8944ab" stroke-width="1.8" marker-end="url(#a8944ab)"/>
-<text x="631.0" y="337.0" font-size="10.5" font-weight="600" fill="#8944ab" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리)</text>
+<text x="631.0" y="337.0" font-size="10.5" font-weight="600" fill="#8944ab" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리 · 금지구역)</text>
 <path d="M1492.0 307.0 L1492.0 265.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-start="url(#a8e8e93)"/>
 <path d="M381.1 627.6 L394.0 574.4 L403.1 537.9 L454.8 536.4 L504.2 540.2 L515.6 582.0 L515.6 703.6 L496.6 741.6 L453.3 756.8" fill="none" stroke="#8944ab" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
 <path d="M453.3 756.8 L500.4 810.0 L530.8 855.6 L530.8 939.2 L489.0 1007.6 L523.2 1060.8 L682.8 1060.8 L709.4 1015.2 L709.4 589.6" fill="none" stroke="#8944ab" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
