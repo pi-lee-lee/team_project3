@@ -116,6 +116,9 @@ export const httpApi: Api = {
   mapImageUrl: (id, version) => `/api/robots/${id}/map.png?v=${version}`,
   mapView: (id) => get(`/api/robots/${id}/mapview`),
   goTo: (id, x, y, yaw) => post(`/api/robots/${id}/goto`, { x, y, yaw }),
+  zones: (id) => get(`/api/robots/${id}/zones`),
+  addZone: (id, z) => post(`/api/robots/${id}/zones`, z),
+  deleteZone: (id, zoneId) => call('DELETE', `/api/robots/${id}/zones/${zoneId}`),
   cancelGoTo: (id) => post(`/api/robots/${id}/goto/cancel`),
 
   points: () => get('/api/points'),

@@ -105,6 +105,7 @@
 .dz-pin.bad { animation: dz-pulse 1.2s ease-in-out infinite; }
 .dz-pin.current { box-shadow: 0 0 0 4px rgba(59, 155, 255, .55), 0 0 0 9px rgba(59, 155, 255, .22); }
 .dz-pin:hover { transform: scale(1.15); }
+.dz-pin.over { opacity: .35; }   /* 로봇과 겹침: 로봇이 비쳐 보이게. 색(상태)은 그대로 */
 .dz-legend { position: absolute; left: 4px; right: 4px; bottom: -30px; display: flex; gap: 16px; font-size: 13px; color: var(--dim); }
 .dz-legend span { display: flex; align-items: center; gap: 6px; }
 .dz-camera { width: 100%; height: 100%; object-fit: contain; background: #000; }

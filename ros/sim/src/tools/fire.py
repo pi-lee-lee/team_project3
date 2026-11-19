@@ -7,7 +7,7 @@
   /sim/tools/fire.sh clear [자리]                                 인쇄물 치우기(자리가 없으면 전부)
 
 자리·판 모양의 원본은 worlds/world_spec.py (FIRE_SPOTS, thermal_model). 판은 충돌체가 없어 주행과 지도에 영향이 없다.
-감지 보고: /patrol/detection (std_msgs/String JSON) 에 같은 detId 로 1초 간격 3번 — docs/plan/INTERFACES.md 2.3 절.
+감지 보고: /patrol/detection (std_msgs/String JSON) 에 같은 detId 로 1초 간격 3번 — docs/design/INTERFACES.md 2.3 절.
 """
 import json
 import math

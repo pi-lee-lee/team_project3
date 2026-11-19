@@ -6,8 +6,10 @@
   bridge map 5초 · map_pose 5Hz · 지도 화면 0.2초 · cdn 보관 기간(web/nginx/web/default.conf 의 Cache-Control, cdn/default.conf).
 실행: python3 docs/architecture/build_cycle.py  →  docs/architecture/system_cycle.svg
 """
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
 OUT = Path(__file__).resolve().parent / 'system_cycle.svg'
@@ -48,7 +50,7 @@ SECTIONS = [
         ('i', 'r', '미션 전달 POST /internal/missions — missionId = 작업 번호(같은 번호는 다시 실행하지 않음)'),
         ('r', 'r', '미션이 제어권을 가짐 → ACCEPTED → 출발 전 검사(연결 · odom 2초 · 카메라 5초 · Nav2 준비 · 위치 추정)'),
         ('r', 's', '지점마다 목표 /inspection/goal (rosbridge) — 사건 MOVING'),
-        ('s', 's', 'nav2_goal_bridge → Nav2 NavigateToPose: Smac A* 경로 + RPP 추종 · 실패하면 코스트맵 비우고 경로 확인 후 1회 재시도'),
+        ('s', 's', 'nav2_goal_bridge → Nav2 NavigateToPose: Theta* 직선 경로(한 번 계획) + MPPI 추종 · 실패하면 코스트맵 비우고 경로 확인 후 1회 재시도'),
         ('s', 'r', '결과 /inspection/goal_status: SUCCEEDED(우회 여부) · BLOCKED_NO_PATH · NAV_FAILED · NO_PROGRESS · NAV_UNAVAILABLE'),
         ('r', 's', '도착 1.5초 뒤 스냅샷 HTTP(최대 3회) → ARRIVED · 진입 불가·실패면 촬영 불가로 남기고 다음 지점'),
         ('r', 'r', '사건 · 관측(사진)을 report_outbox 에 먼저 저장 — 모든 지점이 끝나면 COMPLETED, 제어권 반납'),

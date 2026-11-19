@@ -6,9 +6,9 @@ import './admin.css';
 
 /**
  * 설정 키의 이름과 설명. 값이 정해지지 않은 항목(사거리 · 열원 기준 등)을 코드가 아니라 여기서 받는다
- * (docs/plan/INTERFACES.md 8장). 서버의 기본값 목록(SettingsService)에 있는 키만 저장된다.
+ * (docs/design/INTERFACES.md 8장). 서버의 기본값 목록(SettingsService)에 있는 키만 저장된다.
  */
-type Kind = 'mode' | 'number' | 'json' | 'robot';
+type Kind = 'mode' | 'number' | 'json' | 'robot' | 'bool';
 const GROUPS: { header: string; footer?: string; items: [key: string, label: string, kind: Kind, hint: string][] }[] = [
   {
     header: '투척',
@@ -41,7 +41,15 @@ const GROUPS: { header: string; footer?: string; items: [key: string, label: str
       ['camera.hfov_deg', '카메라 수평 화각 (°)', 'number', '사진 속 위치를 조준 각도로 바꿀 때 쓴다'],
     ],
   },
+  {
+    header: '화면',
+    footer: '관제 화면(지도 모드)과 대시보드 지도에 함께 적용됩니다. 열려 있는 화면에는 10초 안에 반영됩니다.',
+    items: [
+      ['display.control_direction', '주행 경로 표시 (제어기 방향)', 'bool', '지도에 제어기가 지금 가려는 방향을 주황 실선과 화살촉으로 그린다. 점선(계획 경로)은 항상 보인다'],
+    ],
+  },
 ];
+const ONOFF: ['on' | 'off', string][] = [['on', '표시'], ['off', '숨김']];
 const MODES: [LaunchMode, string][] = [['APPROVAL', '사람 승인'], ['AUTO', '자동 투척']];
 
 /** A7 설정: 키마다 따로 저장한다. */
@@ -85,6 +93,9 @@ export default function Settings() {
               {kind === 'mode' ? (
                 <Segmented value={(settings.data![key] as LaunchMode) ?? 'APPROVAL'} options={MODES}
                   onChange={(v) => { if (v !== settings.data![key]) save(key, v, label); }} />
+              ) : kind === 'bool' ? (
+                <Segmented value={settings.data![key] === true ? 'on' : 'off'} options={ONOFF}
+                  onChange={(v) => { if ((v === 'on') !== (settings.data![key] === true)) save(key, v === 'on', label); }} />
               ) : kind === 'robot' ? (
                 <Picker variant="field" label={label} value={settings.data![key] == null ? 0 : Number(settings.data![key])}
                   onChange={(v) => save(key, v === 0 ? null : v, label)}

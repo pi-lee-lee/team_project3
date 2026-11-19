@@ -86,6 +86,8 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     private volatile java.util.List<double[]> scanMap = java.util.List.of();
     private volatile long scanMapAt;
     private volatile long planAt;
+    private volatile DrivePlan drivePlan;
+    private volatile long drivePlanAt;
     private volatile MapInfo mapInfo;
     private volatile byte[] mapPng;
     private long mapVersion;
@@ -114,9 +116,11 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         defaults.put("actuator", "/inspection/actuator");             // 투척 명령(INTERFACES.md 2.2)
         defaults.put("actuatorStatus", "/inspection/actuator_status");
         defaults.put("actuatorState", "/inspection/actuator_state");
+        defaults.put("keepout", "/inspection/keepout");               // 금지구역 목록(목표 브리지가 비용 지도에 넣는다)
         defaults.put("simCommand", "/sim/command");                   // 시뮬레이션 전용: 시연 화면이 시뮬레이션 도구를 실행
         defaults.put("simStatus", "/sim/command_status");
         defaults.put("detection", "/patrol/detection");               // 로봇이 스스로 감지해 보내는 것(2.3)
+        defaults.put("drivePlan", "/inspection/drive_plan");   // 제어기의 속도 명령과 예상 호(관제 지도의 "제어기 방향")
         defaults.put("scanMap", "/inspection/scan_map");   // 로봇 측에서 스캔 시각의 TF 로 지도 좌표로 바꾼 라이다 점
         topics.putAll(defaults);
         config.path("topics").fields().forEachRemaining(e -> topics.put(e.getKey(), e.getValue().asText()));
@@ -171,12 +175,14 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             subscribe("mapPose", "geometry_msgs/msg/PoseStamped", 200);
             subscribe("plan", "nav_msgs/msg/Path", 1000);
             subscribe("scanMap", "std_msgs/msg/String", 0);
+            subscribe("drivePlan", "std_msgs/msg/String", 0);
             subscribe("map", "nav_msgs/msg/OccupancyGrid", 0);
             subscribe("actuatorStatus", "std_msgs/msg/String", 0);
             subscribe("actuatorState", "std_msgs/msg/String", 0);
             subscribe("detection", "std_msgs/msg/String", 0);
             subscribe("simStatus", "std_msgs/msg/String", 0);
             advertise("simCommand", "std_msgs/msg/String");
+            advertise("keepout", "std_msgs/msg/String");
             advertise("actuator", "std_msgs/msg/String");
             advertise("teleop", "geometry_msgs/msg/Twist");
             advertise("goal", "std_msgs/msg/String");
@@ -334,6 +340,18 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
             }
             return;
         }
+        if (topic.equals(topics.get("drivePlan"))) {
+            try {
+                JsonNode d = om.readTree(msg.path("data").asText());
+                java.util.List<double[]> list = new java.util.ArrayList<>();
+                d.path("traj").forEach(p -> list.add(new double[]{p.get(0).asDouble(), p.get(1).asDouble()}));
+                drivePlan = new DrivePlan(d.path("v").asDouble(), d.path("w").asDouble(), list);
+                drivePlanAt = System.currentTimeMillis();
+            } catch (Exception e) {
+                log.debug("[{}] bad drive_plan", code);
+            }
+            return;
+        }
         if (topic.equals(topics.get("plan"))) {
             java.util.List<double[]> pts = new java.util.ArrayList<>();
             JsonNode poses = msg.path("poses");
@@ -466,6 +484,11 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
     }
 
     @Override
+    public void keepout(String json) {
+        publishString("keepout", json);
+    }
+
+    @Override
     public void simCommand(String id, String tool, java.util.List<String> args) {
         ObjectNode data = om.createObjectNode().put("id", id).put("tool", tool);
         var arr = data.putArray("args");
@@ -518,7 +541,22 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
                         Math.round((p.y() + r * Math.sin(a)) * 100) / 100.0});
             }
         }
-        return new MapView(p, scanPts, now - planAt < 3000 ? plan : java.util.List.of());
+        // 경로는 처음 한 번만 계획되어 /plan 도 한 번만 온다. 제어기가 명령을 내는 동안(주행 중)에는 계속 보여 주고,
+        // 계획도 명령도 3초 넘게 없으면(도착·취소) 지운다. 이미 지나온 부분은 잘라 로봇 앞쪽만 남긴다.
+        java.util.List<double[]> path = now - Math.max(planAt, drivePlanAt) < 3000 ? plan : java.util.List.of();
+        if (p != null && path.size() > 2) {
+            int best = 0;
+            double bd = Double.MAX_VALUE;
+            for (int i = 0; i < path.size(); i++) {
+                double d = Math.hypot(path.get(i)[0] - p.x(), path.get(i)[1] - p.y());
+                if (d < bd) {
+                    bd = d;
+                    best = i;
+                }
+            }
+            path = path.subList(Math.min(best, path.size() - 2), path.size());
+        }
+        return new MapView(p, scanPts, path, now - drivePlanAt < 600 ? drivePlan : null);
     }
 
     private static Double frontMin(JsonNode scan) {

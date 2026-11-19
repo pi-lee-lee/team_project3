@@ -10,8 +10,10 @@
 - 컨테이너 이름 옆 색 표시는 Docker 네트워크(front · edge · backend · robot)다.
 실행: python3 docs/architecture/build_architecture.py  →  docs/architecture/system_architecture.svg
 """
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, NET, Svg, text_width
 
 OUT = Path(__file__).resolve().parent / 'system_architecture.svg'
@@ -280,7 +282,7 @@ def build():
     node(rx_, rb_y, rw, 84, 'nav2_goal_bridge', ['목표 계약 ↔ Nav2 액션', '실패 사유 판정 · 재시도 1회', '지도·위치·스캔 좌표 변환'], 'bridge')
     node(lx, vid_y, lw, 52, 'web_video_server :8080', ['카메라 토픽 → 압축 영상·스냅샷'], 'ros')
     nav_y = rb_y + 84 + 44
-    node(rx_, nav_y, rw, 96, 'Nav2', ['경로: Smac 2D A* + 평활', '추종: Regulated Pure Pursuit', '위치: AMCL / slam_toolbox'], 'ros')
+    node(rx_, nav_y, rw, 96, 'Nav2', ['경로: Theta* 직선(한 번 계획)', '추종: MPPI(실시간 회피)', '위치: AMCL / slam_toolbox'], 'ros')
     gz_y = nav_y + 96 + 44
     node(lx, gz_y, sx1 - sx0 - 34, 78, 'Gazebo — TurtleBot3 Waffle Pi',
          ['라이다 360° 0.16~8m (5Hz · 360점) · Pi 카메라 640×480', '바퀴 구동(diff drive) · 시험용 공장 월드'], 'dev')

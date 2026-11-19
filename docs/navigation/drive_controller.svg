@@ -1,0 +1,563 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="2640" viewBox="0 0 1640 2640" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a007aff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#007aff"/></marker><marker id="a1c1c1e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c1c1e"/></marker><marker id="a248a3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#248a3d"/></marker><marker id="a8944ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8944ab"/></marker><marker id="a8e8e93" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8e8e93"/></marker><marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker><marker id="aff9500" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ff9500"/></marker></defs>
+<rect width="1640" height="2640" fill="#f2f2f7"/>
+<text x="24.0" y="46.0" font-size="26" font-weight="700" fill="#1c1c1e" text-anchor="start">주행 제어기 설명서</text>
+<text x="24.0" y="72.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">목표 하나가 경로가 되고 속도 명령이 되는 과정, 길이 좁아지거나 막혔을 때의 동작. 시뮬레이션(Nav2 Humble, TurtleBot3 Waffle Pi) 기준이고 값은 코드 · 설정 · 반복 시험에서 가져왔다.</text>
+<rect x="16.0" y="92.0" width="1608.0" height="318.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="92.0" width="8.0" height="318.0" rx="4" fill="#0071a4" stroke="#0071a4" stroke-width="1.0"/>
+<text x="40.0" y="124.0" font-size="18" font-weight="700" fill="#0071a4" text-anchor="start">1  목표 하나가 속도 명령이 되기까지</text>
+<text x="40.0" y="146.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">웹은 "어디로 가라"만 보낸다. 길을 정하는 일(계획)과 그 길을 따라 모는 일(제어)은 로봇 쪽에서 나뉘어 돈다.</text>
+<rect x="44.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.5"/>
+<text x="142.0" y="192.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle">웹 · robot-service</text>
+<text x="142.0" y="212.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">점검 지점 · 지도 클릭 · 출동</text>
+<text x="142.0" y="228.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">목표 단위로만 말한다</text>
+<rect x="314.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="412.0" y="192.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">목표 브리지</text>
+<text x="412.0" y="209.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_goal_bridge.py</text>
+<text x="412.0" y="226.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">목표를 Nav2 로 옮기고</text>
+<text x="412.0" y="242.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">실패했을 때 판단한다</text>
+<rect x="584.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.5"/>
+<text x="682.0" y="192.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle">행동 트리</text>
+<text x="682.0" y="209.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">navigate_fixed_plan.xml</text>
+<text x="682.0" y="226.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">처음 계획을 유지</text>
+<text x="682.0" y="242.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">막히면 복구 뒤 다시 계획</text>
+<rect x="854.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.5"/>
+<text x="952.0" y="192.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle">전역 계획</text>
+<text x="952.0" y="209.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Theta* (목표마다 한 번)</text>
+<text x="952.0" y="226.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">건물 전체에서</text>
+<text x="952.0" y="242.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">직선 위주 최단 경로</text>
+<rect x="1124.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="1.5"/>
+<text x="1222.0" y="192.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="middle">제어기</text>
+<text x="1222.0" y="209.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">MPPI (1초에 10번)</text>
+<text x="1222.0" y="226.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">후보 1000개 × 3초 앞</text>
+<text x="1222.0" y="242.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">가장 좋은 속도를 고른다</text>
+<rect x="1394.0" y="170.0" width="196.0" height="92.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.5"/>
+<text x="1492.0" y="192.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="middle">로봇</text>
+<text x="1492.0" y="209.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">TurtleBot3 Waffle Pi</text>
+<text x="1492.0" y="226.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">바퀴 최대 0.22 m/s</text>
+<text x="1492.0" y="242.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">반지름 0.22m 원으로 본다</text>
+<rect x="794.0" y="302.0" width="256.0" height="86.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.5"/>
+<text x="922.0" y="324.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle">전역 비용 지도</text>
+<text x="922.0" y="341.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.05m 칸 · 건물 전체</text>
+<text x="922.0" y="358.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">저장 지도 + 라이다 + 가상 장애물</text>
+<text x="922.0" y="374.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">팽창 0.45m (벽 여유 띠)</text>
+<rect x="1140.0" y="302.0" width="216.0" height="86.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="1.5"/>
+<text x="1248.0" y="324.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="middle">지역 비용 지도</text>
+<text x="1248.0" y="341.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.025m 칸 · 로봇 둘레 3×3m</text>
+<text x="1248.0" y="358.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">라이다만 (지금 보이는 것)</text>
+<text x="1248.0" y="374.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">팽창 0.6m</text>
+<rect x="1424.0" y="310.0" width="166.0" height="70.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.5"/>
+<text x="1507.0" y="332.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="middle">라이다 /scan</text>
+<text x="1507.0" y="352.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">최대 8m · 360°</text>
+<text x="44.0" y="362.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">점선 = 결과가 되돌아오는 길</text>
+<text x="44.0" y="378.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">사유 코드: BLOCKED_NO_PATH · NAV_FAILED</text>
+<text x="44.0" y="394.0" font-size="11" font-weight="400" fill="#636366" text-anchor="start">· NO_PROGRESS · NAV_UNAVAILABLE</text>
+<rect x="16.0" y="424.0" width="1608.0" height="716.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="424.0" width="8.0" height="716.0" rx="4" fill="#007aff" stroke="#007aff" stroke-width="1.0"/>
+<text x="40.0" y="456.0" font-size="18" font-weight="700" fill="#007aff" text-anchor="start">2  지도 위에서 보기 — 길이 좁아지거나 막혔을 때</text>
+<text x="40.0" y="478.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">평면도는 시뮬레이션 월드 그대로다. 파란 점선은 실제 계획 경로(장애물 없음), 보라 점선은 돌아가는 길의 개략이다.</text>
+<rect x="52.0" y="506.0" width="699.2" height="608.0" rx="0" fill="#ffffff" stroke="none" stroke-width="0"/>
+<rect x="52.0" y="1110.2" width="699.2" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="52.0" y="502.2" width="699.2" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="48.2" y="506.0" width="7.6" height="608.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="747.4" y="506.0" width="7.6" height="608.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="352.2" y="1098.8" width="7.6" height="15.2" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="352.2" y="810.0" width="7.6" height="212.8" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="52.0" y="806.2" width="110.2" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="238.2" y="806.2" width="117.8" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="352.2" y="658.0" width="7.6" height="152.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="352.2" y="506.0" width="7.6" height="83.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="356.0" y="1003.8" width="91.2" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="523.2" y="1003.8" width="144.4" height="7.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="663.8" y="779.6" width="7.6" height="228.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="663.8" y="506.0" width="7.6" height="197.6" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="143.2" y="901.2" width="121.6" height="60.8" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="55.8" y="817.6" width="38.0" height="76.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="226.8" y="593.4" width="91.2" height="38.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="409.2" y="870.8" width="91.2" height="60.8" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="568.8" y="855.6" width="60.8" height="76.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="432.0" y="566.8" width="45.6" height="152.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="553.6" y="566.8" width="45.6" height="121.6" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="359.8" y="737.8" width="22.8" height="38.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="690.4" y="513.6" width="38.0" height="15.2" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="55.8" y="680.8" width="22.8" height="45.6" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="52.0" y="506.0" width="699.2" height="608.0" rx="0" fill="none" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="204.0" y="1019.0" font-size="12" font-weight="600" fill="#aeaeb2" text-anchor="middle">사무실</text>
+<text x="204.0" y="540.2" font-size="12" font-weight="600" fill="#aeaeb2" text-anchor="middle">전기실</text>
+<text x="599.2" y="813.8" font-size="12" font-weight="600" fill="#aeaeb2" text-anchor="middle">생산동</text>
+<text x="576.4" y="1038.0" font-size="12" font-weight="600" fill="#aeaeb2" text-anchor="middle">C1 복도</text>
+<text x="730.7" y="954.4" font-size="12" font-weight="600" fill="#aeaeb2" text-anchor="middle">C2</text>
+<rect x="359.8" y="658.0" width="72.2" height="15.2" rx="2" fill="none" stroke="#e5352b" stroke-width="1.8" stroke-dasharray="5 3"/>
+<rect x="660.0" y="703.6" width="15.2" height="76.0" rx="2" fill="#fbd3cf" stroke="#e5352b" stroke-width="1.8"/>
+<rect x="667.6" y="642.8" width="83.6" height="30.4" rx="2" fill="#fbd3cf" stroke="#e5352b" stroke-width="1.8"/>
+<rect x="359.8" y="654.2" width="26.6" height="22.8" rx="2" fill="#ffd9a3" stroke="#ff9500" stroke-width="1.8"/>
+<rect x="584.0" y="726.4" width="30.4" height="30.4" rx="2" fill="#ffd9a3" stroke="#ff9500" stroke-width="1.8"/>
+<text x="795.2" y="520.0" font-size="14" font-weight="700" fill="#1c1c1e" text-anchor="start">선과 표시</text>
+<path d="M795.2 542.0 L841.2 542.0" fill="none" stroke="#007aff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 8"/>
+<text x="853.2" y="546.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">계획 경로 — 목표를 받을 때 한 번 계산한 직선 위주 최단 경로</text>
+<path d="M795.2 564.0 L841.2 564.0" fill="none" stroke="#8944ab" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
+<text x="853.2" y="568.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">돌아가는 길 — 가던 길이 막힌 것을 보고 다시 계획한 경로(개략)</text>
+<rect x="803.2" y="578.0" width="30.0" height="14.0" rx="2" fill="#ffd9a3" stroke="#ff9500" stroke-width="1.6"/>
+<text x="853.2" y="590.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">지날 수 있게 남는 장애물 — 비켜서 그대로 간다</text>
+<rect x="803.2" y="600.0" width="30.0" height="14.0" rx="2" fill="#fbd3cf" stroke="#e5352b" stroke-width="1.6"/>
+<text x="853.2" y="612.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">길을 막는 장애물 — 다른 길로 가거나, 길이 없으면 끝낸다</text>
+<text x="795.2" y="654.0" font-size="14" font-weight="700" fill="#1c1c1e" text-anchor="start">장애물별 맞는 결과와 측정 시간</text>
+<text x="795.2" y="673.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">반복 시험 nav_soak.py · 놓는 시점 3가지(출발 전 · 1.2m 앞 · 0.6m 앞) · 연속 3회 126번 주행에서 틀린 결과 0</text>
+<rect x="787.2" y="683.0" width="760.0" height="26.0" rx="6" fill="#f2f2f7" stroke="none" stroke-width="0"/>
+<text x="795.2" y="700.0" font-size="12" font-weight="700" fill="#636366" text-anchor="start"></text>
+<text x="831.2" y="700.0" font-size="12" font-weight="700" fill="#636366" text-anchor="start">장애물 (구간)</text>
+<text x="1045.2" y="700.0" font-size="12" font-weight="700" fill="#636366" text-anchor="start">남는 폭</text>
+<text x="1191.2" y="700.0" font-size="12" font-weight="700" fill="#636366" text-anchor="start">맞는 결과</text>
+<text x="1355.2" y="700.0" font-size="12" font-weight="700" fill="#636366" text-anchor="start">걸린 시간</text>
+<text x="831.2" y="730.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">없음 (P3 ↔ P1)</text>
+<text x="1045.2" y="730.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.95m</text>
+<text x="1191.2" y="730.0" font-size="12.5" font-weight="600" fill="#248a3d" text-anchor="start">직행</text>
+<text x="1355.2" y="730.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">25 ~ 32초</text>
+<line x1="787.1999999999999" y1="740" x2="1547.1999999999998" y2="740" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="756" r="10" fill="#ff9500"/>
+<text x="805.2" y="760.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<text x="831.2" y="760.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">골목 반쯤 막힘 aisle70 · aisle60</text>
+<text x="1045.2" y="760.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.7 · 0.6m</text>
+<text x="1191.2" y="760.0" font-size="12.5" font-weight="600" fill="#248a3d" text-anchor="start">틈으로 직행</text>
+<text x="1355.2" y="760.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">25 ~ 32초 (같음)</text>
+<line x1="787.1999999999999" y1="770" x2="1547.1999999999998" y2="770" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="786" r="10" fill="#e5352b"/>
+<text x="805.2" y="790.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="831.2" y="790.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">골목 더 막힘 aisle50</text>
+<text x="1045.2" y="790.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0.5m</text>
+<text x="1191.2" y="790.0" font-size="12.5" font-weight="600" fill="#8944ab" text-anchor="start">랙 위로 돌아감</text>
+<text x="1355.2" y="790.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">41 ~ 62초</text>
+<line x1="787.1999999999999" y1="800" x2="1547.1999999999998" y2="800" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="816" r="10" fill="#e5352b"/>
+<text x="805.2" y="820.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="831.2" y="820.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">골목 완전 막힘 aisle</text>
+<text x="1045.2" y="820.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0</text>
+<text x="1191.2" y="820.0" font-size="12.5" font-weight="600" fill="#8944ab" text-anchor="start">랙 위로 돌아감</text>
+<text x="1355.2" y="820.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">41 ~ 62초</text>
+<line x1="787.1999999999999" y1="830" x2="1547.1999999999998" y2="830" stroke="#e5e5ea"/>
+<text x="831.2" y="850.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">없음 (P1 → P2)</text>
+<text x="1045.2" y="850.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">—</text>
+<text x="1191.2" y="850.0" font-size="12.5" font-weight="600" fill="#248a3d" text-anchor="start">직행</text>
+<text x="1355.2" y="850.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">26초</text>
+<line x1="787.1999999999999" y1="860" x2="1547.1999999999998" y2="860" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="876" r="10" fill="#ff9500"/>
+<text x="805.2" y="880.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<text x="831.2" y="880.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">경로 위 팔레트 pallet</text>
+<text x="1045.2" y="880.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">양옆 열림</text>
+<text x="1191.2" y="880.0" font-size="12.5" font-weight="600" fill="#248a3d" text-anchor="start">비켜서 직행</text>
+<text x="1355.2" y="880.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">27 ~ 29초</text>
+<line x1="787.1999999999999" y1="890" x2="1547.1999999999998" y2="890" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="906" r="10" fill="#e5352b"/>
+<text x="805.2" y="910.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<text x="831.2" y="910.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">생산동 → C2 문 막힘 door</text>
+<text x="1045.2" y="910.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0</text>
+<text x="1191.2" y="910.0" font-size="12.5" font-weight="600" fill="#8944ab" text-anchor="start">C1 · C2 로 돌아감</text>
+<text x="1355.2" y="910.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">58 ~ 74초</text>
+<line x1="787.1999999999999" y1="920" x2="1547.1999999999998" y2="920" stroke="#e5e5ea"/>
+<circle cx="805.1999999999999" cy="936" r="10" fill="#e5352b"/>
+<text x="805.2" y="940.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<text x="831.2" y="940.0" font-size="12.5" font-weight="500" fill="#1c1c1e" text-anchor="start">C2 위쪽 막힘 block</text>
+<text x="1045.2" y="940.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">0 (길 없음)</text>
+<text x="1191.2" y="940.0" font-size="12.5" font-weight="600" fill="#e5352b" text-anchor="start">BLOCKED_NO_PATH 로 끝냄</text>
+<text x="1355.2" y="940.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">42 ~ 54초</text>
+<line x1="787.1999999999999" y1="950" x2="1547.1999999999998" y2="950" stroke="#e5e5ea"/>
+<text x="795.2" y="988.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">읽는 법</text>
+<text x="795.2" y="1009.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 로봇은 반지름 0.22m 원이다. 틈이 0.6m 면 양쪽에 0.08m 씩 남아 지나간다(돌아가지 않는다).</text>
+<text x="795.2" y="1030.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 틈이 0.5m 이하면 계획이 막힌 것으로 보고 돌아간다. 0.44m(지름) 아래로는 물리적으로 못 지난다.</text>
+<text x="795.2" y="1051.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 길이 아예 없으면 끼인 채 멈추지 않고 "진입 불가"로 끝낸 뒤 다음 지점으로 간다.</text>
+<text x="795.2" y="1072.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 달리는 도중 코앞(0.6m)에 생겨도 결과는 같다. 문 막힘은 가던 거리만큼 2 ~ 3m 더 달린다.</text>
+<text x="795.2" y="988.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">읽는 법</text>
+<rect x="16.0" y="1154.0" width="1608.0" height="452.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="1154.0" width="8.0" height="452.0" rx="4" fill="#8944ab" stroke="#8944ab" stroke-width="1.0"/>
+<text x="40.0" y="1186.0" font-size="18" font-weight="700" fill="#8944ab" text-anchor="start">3  목표 브리지가 계획을 돕는 세 가지</text>
+<text x="40.0" y="1208.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">Nav2 기본 동작만으로는 새 장애물 앞에서 헛도는 경우가 있었다. 브리지가 라이다를 보고 세 가지를 보탠다.</text>
+<rect x="40.0" y="1230.0" width="510.0" height="356.0" rx="12" fill="#faf7fc" stroke="#e3d3ee" stroke-width="1.0"/>
+<circle cx="64" cy="1256" r="13" fill="#8944ab"/>
+<text x="64.0" y="1260.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">가</text>
+<text x="86.0" y="1261.0" font-size="15" font-weight="700" fill="#8944ab" text-anchor="start">장애물의 몸통 채우기</text>
+<text x="60.0" y="1284.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">라이다는 앞면만 선으로 본다 → 뒤 0.3m 를 막힌 것으로</text>
+<rect x="564.0" y="1230.0" width="510.0" height="356.0" rx="12" fill="#faf7fc" stroke="#e3d3ee" stroke-width="1.0"/>
+<circle cx="588" cy="1256" r="13" fill="#8944ab"/>
+<text x="588.0" y="1260.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">나</text>
+<text x="610.0" y="1261.0" font-size="15" font-weight="700" fill="#8944ab" text-anchor="start">물러나 자세 잡기</text>
+<text x="584.0" y="1284.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">장애물에 붙어 계획이 안 되면 → 멀어지는 쪽으로 빠져나옴</text>
+<rect x="1088.0" y="1230.0" width="510.0" height="356.0" rx="12" fill="#faf7fc" stroke="#e3d3ee" stroke-width="1.0"/>
+<circle cx="1112" cy="1256" r="13" fill="#8944ab"/>
+<text x="1112.0" y="1260.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">다</text>
+<text x="1134.0" y="1261.0" font-size="15" font-weight="700" fill="#8944ab" text-anchor="start">두 번 막힌 자리 막기</text>
+<text x="1108.0" y="1284.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">물러났다 다시 와서 또 막히면 → 그 자리를 막고 다른 길</text>
+<rect x="80.0" y="1308.0" width="16.0" height="176.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="286.0" y="1308.0" width="44.0" height="176.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<rect x="96.0" y="1348.0" width="70.0" height="60.0" rx="0" fill="#d6e8ff" stroke="#007aff" stroke-width="1.6" stroke-dasharray="4 3"/>
+<pattern id="hb" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#007aff" stroke-width="2" opacity=".55"/></pattern>
+<rect x="96.0" y="1348.0" width="70.0" height="60.0" rx="0" fill="url(#hb)" stroke="none" stroke-width="0"/>
+<path d="M96.0 1408.0 L166.0 1408.0" fill="none" stroke="#f5c400" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
+<line x1="220.0" y1="1458" x2="102" y2="1411.0" stroke="#e5352b" stroke-width="1" opacity=".6"/>
+<line x1="220.0" y1="1458" x2="131.0" y2="1411.0" stroke="#e5352b" stroke-width="1" opacity=".6"/>
+<line x1="220.0" y1="1458" x2="162.0" y2="1411.0" stroke="#e5352b" stroke-width="1" opacity=".6"/>
+<circle cx="220.0" cy="1458.0" r="22.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="220.0" y1="1458.0" x2="220.0" y2="1436.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<text x="370.0" y="1322.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">노란 선 = 라이다가 본 면</text>
+<text x="370.0" y="1341.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">파란 빗금 = 브리지가 채운 몸통</text>
+<text x="370.0" y="1360.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">(면에 수직으로 0.3m, 같은 폭)</text>
+<text x="370.0" y="1394.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">채우지 않으면 계획기가 선 바로</text>
+<text x="370.0" y="1413.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">뒤를 빈 곳으로 보고 장애물을</text>
+<text x="370.0" y="1432.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">스치는 길을 낸다 → 제어기 실패</text>
+<text x="60.0" y="1514.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 저장 지도의 벽에서 0.15m 안의 점은 벽으로 보고 채우지 않는다.</text>
+<text x="60.0" y="1533.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 목표 둘레 0.45m 는 채우지 않는다. 채워서 길이 없어지면 그 목표 동안 끈다.</text>
+<text x="60.0" y="1552.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 빔 방향으로 끝까지 막거나 0.9m 깊이는 버렸다(틈 · 문까지 막아 먼 길로 돌았다).</text>
+<rect x="604.0" y="1314.0" width="150.0" height="60.0" rx="2" fill="#ffd9a3" stroke="#ff9500" stroke-width="1.6"/>
+<rect x="604.0" y="1314.0" width="16.0" height="180.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<circle cx="700" cy="1414" r="80" fill="none" stroke="#8e8e93" stroke-width="1" stroke-dasharray="3 4"/>
+<circle cx="622" cy="1384" r="3" fill="#e5352b"/>
+<circle cx="622" cy="1414" r="3" fill="#e5352b"/>
+<circle cx="622" cy="1444" r="3" fill="#e5352b"/>
+<circle cx="650" cy="1372" r="3" fill="#e5352b"/>
+<circle cx="680" cy="1372" r="3" fill="#e5352b"/>
+<circle cx="710" cy="1372" r="3" fill="#e5352b"/>
+<circle cx="740" cy="1372" r="3" fill="#e5352b"/>
+<circle cx="700.0" cy="1414.0" r="30.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="700.0" y1="1414.0" x2="670.0" y2="1414.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="782" cy="1476" r="24" fill="none" stroke="#248a3d" stroke-width="1.6" stroke-dasharray="5 4"/>
+<text x="854.0" y="1322.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">빨간 점 = 0.7m 안의 라이다 점</text>
+<text x="854.0" y="1341.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">초록 화살표 = 점들에서 멀어지는</text>
+<text x="854.0" y="1360.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">방향(가까울수록 세게 민다)</text>
+<text x="854.0" y="1394.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">전진 · 후진 중 덜 도는 쪽으로</text>
+<text x="854.0" y="1413.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">0.10 m/s, 최대 0.45m</text>
+<text x="854.0" y="1432.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">사방 0.40m 가 트이면 멈춤</text>
+<text x="854.0" y="1451.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">가는 쪽이 0.22m 안이면 멈춤</text>
+<text x="584.0" y="1514.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 언제: 같은 자리(0.4m)에서 제어기가 3번 실패 / 목표 실패 뒤 장애물이 0.4m 안.</text>
+<text x="584.0" y="1533.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 왜: 로봇 중심이 충돌 구역에 들면 Nav2 의 후진 · 회전은 "Collision Ahead" 로 시작도 못 한다.</text>
+<text x="584.0" y="1552.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 지나온 길을 되짚는 후진은 버렸다(뒤가 막혀 있으면 한 뼘도 못 움직였다).</text>
+<rect x="1128.0" y="1314.0" width="16.0" height="180.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="1318.0" y="1348.0" width="34.0" height="146.0" rx="0" fill="#b9b9c0" stroke="none" stroke-width="0"/>
+<pattern id="hr" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#e5352b" stroke-width="2" opacity=".6"/></pattern>
+<circle cx="1232" cy="1418" r="34" fill="url(#hr)" stroke="#e5352b" stroke-width="1.8"/>
+<path d="M1232.0 1320.0 L1232.0 1384.0" fill="none" stroke="#007aff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 8"/>
+<text x="1232.0" y="1423.0" font-size="18" font-weight="700" fill="#e5352b" text-anchor="middle">✕</text>
+<path d="M1232.0 1320.0 L1278.0 1330.0 L1378.0 1332.0 L1390.0 1388.0 L1390.0 1488.0" fill="none" stroke="#8944ab" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
+<circle cx="1232.0" cy="1322.0" r="13.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="1232.0" y1="1322.0" x2="1232.0" y2="1335.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<text x="1418.0" y="1322.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">빨간 원 = 가상 장애물</text>
+<text x="1418.0" y="1341.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">(반지름 0.25m)</text>
+<text x="1418.0" y="1374.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">물러났다가 0.5m 안에서</text>
+<text x="1418.0" y="1393.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">또 막히면 그 자리를 막아</text>
+<text x="1418.0" y="1412.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">계획이 다른 길을 내게 한다</text>
+<text x="1418.0" y="1431.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">목표가 끝나면 지운다</text>
+<text x="1108.0" y="1514.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· 마지막 안전망이다. 반복 시험 126번에서는 한 번도 필요하지 않았다.</text>
+<text x="1108.0" y="1533.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">· "3번 실패하면 경로 앞자리를 막기"는 버렸다</text>
+<text x="1108.0" y="1552.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">  (돌아갈 길 · 물러날 길을 막아 로봇을 가두는 일이 거듭됐다).</text>
+<rect x="16.0" y="1620.0" width="1608.0" height="372.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="1620.0" width="8.0" height="372.0" rx="4" fill="#c93400" stroke="#c93400" stroke-width="1.0"/>
+<text x="40.0" y="1652.0" font-size="18" font-weight="700" fill="#c93400" text-anchor="start">4  막혔을 때의 순서 — 끼인 채 멈추지 않게</text>
+<text x="40.0" y="1674.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">위 줄은 달리는 도중, 아래 줄은 Nav2 가 목표를 포기한 뒤다. 어느 쪽이든 끝은 "도착" 아니면 "사유 코드"다.</text>
+<text x="44.0" y="1706.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">달리는 도중</text>
+<rect x="44.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="1.5"/>
+<text x="162.0" y="1738.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="middle">제어기가 길을 못 찾음</text>
+<text x="162.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">후보 1000개가 모두 충돌</text>
+<text x="162.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">(FollowPath 실패)</text>
+<rect x="312.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.5"/>
+<text x="430.0" y="1738.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle">Nav2 복구</text>
+<text x="430.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">지역 비용 지도 비우고 다시 계획</text>
+<text x="430.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">→ 회전 · 대기 · 후진 차례로</text>
+<rect x="580.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="698.0" y="1738.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">같은 자리에서 3번</text>
+<text x="698.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">0.4m 안에서 되풀이되면</text>
+<text x="698.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">브리지가 넘겨받는다</text>
+<rect x="848.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="966.0" y="1738.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">빠져나와 다시 계획</text>
+<text x="966.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">장애물에서 멀어진 자리에서</text>
+<text x="966.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">새 경로 (3-나)</text>
+<rect x="1116.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="1234.0" y="1738.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">또 같은 자리면 막기</text>
+<text x="1234.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">0.5m 안에서 두 번째면</text>
+<text x="1234.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">그 자리를 막고 다른 길 (3-다)</text>
+<rect x="1384.0" y="1716.0" width="236.0" height="84.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.5"/>
+<text x="1502.0" y="1738.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle">도착</text>
+<text x="1502.0" y="1758.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">막힌 원인이 풀리면</text>
+<text x="1502.0" y="1774.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">원래 목표로 이어 간다</text>
+<text x="44.0" y="1842.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">Nav2 가 목표를 포기한 뒤 (복구 6회를 다 씀 · 계획 실패)</text>
+<rect x="44.0" y="1852.0" width="236.0" height="84.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="162.0" y="1874.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">붙어 있으면 빠져나옴</text>
+<text x="162.0" y="1894.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">라이다 최소 거리 0.4m 아래면</text>
+<text x="162.0" y="1910.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">먼저 멀어진다</text>
+<rect x="312.0" y="1852.0" width="236.0" height="84.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.5"/>
+<text x="430.0" y="1874.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">비용 지도 비우고 3초</text>
+<text x="430.0" y="1894.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">옛 장애물 표시를 지우고</text>
+<text x="430.0" y="1910.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">라이다로 다시 채운다</text>
+<rect x="580.0" y="1852.0" width="236.0" height="84.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.5"/>
+<text x="698.0" y="1874.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle">경로가 있는지 확인</text>
+<text x="698.0" y="1894.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">로봇을 움직이지 않고</text>
+<text x="698.0" y="1910.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">계획만 해 본다</text>
+<rect x="848.0" y="1852.0" width="236.0" height="84.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.5"/>
+<text x="966.0" y="1874.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle">있으면 다시 보냄</text>
+<text x="966.0" y="1894.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">같은 목표를 최대 3번</text>
+<text x="966.0" y="1910.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">(자세가 달라져 풀린다)</text>
+<rect x="1116.0" y="1852.0" width="236.0" height="84.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="1.5"/>
+<text x="1234.0" y="1874.0" font-size="13.5" font-weight="700" fill="#c93400" text-anchor="middle">없으면 진입 불가</text>
+<text x="1234.0" y="1894.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">BLOCKED_NO_PATH</text>
+<text x="1234.0" y="1910.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="middle">다음 지점으로 넘어감</text>
+<text x="1376.0" y="1870.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">그 밖의 끝</text>
+<text x="1376.0" y="1888.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">3번 다 실패 → NAV_FAILED</text>
+<text x="1376.0" y="1906.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">90초 동안 전진 없음 → NO_PROGRESS</text>
+<text x="1376.0" y="1924.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">Nav2 가 준비 안 됨 → NAV_UNAVAILABLE</text>
+<text x="1376.0" y="1870.0" font-size="11.5" font-weight="700" fill="#1c1c1e" text-anchor="start">그 밖의 끝</text>
+<text x="44.0" y="1968.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">경로가 없는데 장애물에 붙어 있으면(0.4m 안) "길 없음"으로 단정하지 않고, 한 번 더 빠져나와 다시 본다 — 붙은 자리에서는 출발점이 충돌 구역이라 계획 자체가 거부되기 때문이다.</text>
+<rect x="16.0" y="2006.0" width="1608.0" height="610.0" rx="14" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="16.0" y="2006.0" width="8.0" height="610.0" rx="4" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="40.0" y="2038.0" font-size="18" font-weight="700" fill="#b25000" text-anchor="start">5  좁은 틈, 화면에서 읽는 법, 주요 값</text>
+<text x="40.0" y="2060.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">0.6m 틈을 멈칫거리지 않고 지나게 한 것은 제어기가 보는 지도의 칸 크기다.</text>
+<text x="44.0" y="2090.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">틈 0.6m 를 두 가지 칸 크기로 본 모습</text>
+<text x="44.0" y="2114.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">지역 비용 지도 0.05m (전)</text>
+<rect x="44.0" y="2118.0" width="320.0" height="160.0" rx="0" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="44.0" y="2118.0" width="64.0" height="160.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="300.0" y="2118.0" width="64.0" height="160.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="108.0" y="2118.0" width="70.4" height="160.0" rx="0" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<rect x="229.6" y="2118.0" width="70.4" height="160.0" rx="0" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<rect x="178.4" y="2118.0" width="51.2" height="160.0" rx="0" fill="#d9f2e1" stroke="none" stroke-width="0"/>
+<line x1="44.0" y1="2118" x2="44.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="60.0" y1="2118" x2="60.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="76.0" y1="2118" x2="76.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="92.0" y1="2118" x2="92.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="108.0" y1="2118" x2="108.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="124.0" y1="2118" x2="124.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="140.0" y1="2118" x2="140.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="156.0" y1="2118" x2="156.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="172.0" y1="2118" x2="172.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="188.0" y1="2118" x2="188.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="204.0" y1="2118" x2="204.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="220.0" y1="2118" x2="220.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="236.0" y1="2118" x2="236.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="252.0" y1="2118" x2="252.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="268.0" y1="2118" x2="268.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="284.0" y1="2118" x2="284.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="300.0" y1="2118" x2="300.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="316.0" y1="2118" x2="316.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="332.0" y1="2118" x2="332.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="348.0" y1="2118" x2="348.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="364.0" y1="2118" x2="364.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2118.0" x2="364.0" y2="2118.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2134.0" x2="364.0" y2="2134.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2150.0" x2="364.0" y2="2150.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2166.0" x2="364.0" y2="2166.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2182.0" x2="364.0" y2="2182.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2198.0" x2="364.0" y2="2198.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2214.0" x2="364.0" y2="2214.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2230.0" x2="364.0" y2="2230.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2246.0" x2="364.0" y2="2246.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2262.0" x2="364.0" y2="2262.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2278.0" x2="364.0" y2="2278.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<circle cx="204.0" cy="2198.0" r="9.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="204.0" y1="2198.0" x2="204.0" y2="2189.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="204.0" cy="2198.0" r="70.4" fill="none" stroke="#1c1c1e" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="44.0" y="2296.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">한 칸 어긋나면 띠가 3칸 → 1칸: 15 ~ 31초 멈칫하거나 실패</text>
+<text x="44.0" y="2340.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">지역 비용 지도 0.025m (지금)</text>
+<rect x="44.0" y="2344.0" width="320.0" height="160.0" rx="0" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="44.0" y="2344.0" width="64.0" height="160.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="300.0" y="2344.0" width="64.0" height="160.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="108.0" y="2344.0" width="70.4" height="160.0" rx="0" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<rect x="229.6" y="2344.0" width="70.4" height="160.0" rx="0" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<rect x="178.4" y="2344.0" width="51.2" height="160.0" rx="0" fill="#d9f2e1" stroke="none" stroke-width="0"/>
+<line x1="44.0" y1="2344" x2="44.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="52.0" y1="2344" x2="52.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="60.0" y1="2344" x2="60.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="68.0" y1="2344" x2="68.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="76.0" y1="2344" x2="76.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="84.0" y1="2344" x2="84.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="92.0" y1="2344" x2="92.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="100.0" y1="2344" x2="100.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="108.0" y1="2344" x2="108.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="116.0" y1="2344" x2="116.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="124.0" y1="2344" x2="124.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="132.0" y1="2344" x2="132.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="140.0" y1="2344" x2="140.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="148.0" y1="2344" x2="148.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="156.0" y1="2344" x2="156.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="164.0" y1="2344" x2="164.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="172.0" y1="2344" x2="172.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="180.0" y1="2344" x2="180.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="188.0" y1="2344" x2="188.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="196.0" y1="2344" x2="196.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="204.0" y1="2344" x2="204.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="212.0" y1="2344" x2="212.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="220.0" y1="2344" x2="220.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="228.0" y1="2344" x2="228.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="236.0" y1="2344" x2="236.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="244.0" y1="2344" x2="244.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="252.0" y1="2344" x2="252.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="260.0" y1="2344" x2="260.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="268.0" y1="2344" x2="268.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="276.0" y1="2344" x2="276.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="284.0" y1="2344" x2="284.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="292.0" y1="2344" x2="292.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="300.0" y1="2344" x2="300.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="308.0" y1="2344" x2="308.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="316.0" y1="2344" x2="316.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="324.0" y1="2344" x2="324.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="332.0" y1="2344" x2="332.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="340.0" y1="2344" x2="340.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="348.0" y1="2344" x2="348.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="356.0" y1="2344" x2="356.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="364.0" y1="2344" x2="364.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2344.0" x2="364.0" y2="2344.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2352.0" x2="364.0" y2="2352.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2360.0" x2="364.0" y2="2360.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2368.0" x2="364.0" y2="2368.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2376.0" x2="364.0" y2="2376.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2384.0" x2="364.0" y2="2384.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2392.0" x2="364.0" y2="2392.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2400.0" x2="364.0" y2="2400.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2408.0" x2="364.0" y2="2408.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2416.0" x2="364.0" y2="2416.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2424.0" x2="364.0" y2="2424.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2432.0" x2="364.0" y2="2432.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2440.0" x2="364.0" y2="2440.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2448.0" x2="364.0" y2="2448.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2456.0" x2="364.0" y2="2456.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2464.0" x2="364.0" y2="2464.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2472.0" x2="364.0" y2="2472.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2480.0" x2="364.0" y2="2480.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2488.0" x2="364.0" y2="2488.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2496.0" x2="364.0" y2="2496.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<line x1="44" y1="2504.0" x2="364.0" y2="2504.0" stroke="#8e8e93" stroke-width=".6" opacity=".7"/>
+<circle cx="204.0" cy="2424.0" r="9.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="204.0" y1="2424.0" x2="204.0" y2="2415.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="204.0" cy="2424.0" r="70.4" fill="none" stroke="#1c1c1e" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="44.0" y="2522.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">어긋나도 4 ~ 6칸 남는다: 막지 않았을 때와 같은 시간</text>
+<rect x="44.0" y="2562.0" width="14.0" height="14.0" rx="2" fill="#3a3a3c" stroke="#8e8e93" stroke-width="0.6"/>
+<text x="64.0" y="2574.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">장애물</text>
+<rect x="114.0" y="2562.0" width="14.0" height="14.0" rx="2" fill="#c7c7cc" stroke="#8e8e93" stroke-width="0.6"/>
+<text x="134.0" y="2574.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">충돌 구역 (0.22m)</text>
+<rect x="240.0" y="2562.0" width="14.0" height="14.0" rx="2" fill="#d9f2e1" stroke="#8e8e93" stroke-width="0.6"/>
+<text x="260.0" y="2574.0" font-size="11.5" font-weight="400" fill="#1c1c1e" text-anchor="start">로봇 중심이 지날 수 있는 띠 0.16m</text>
+<text x="500.0" y="2090.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">화면에서 읽는 법 (관제 지도 · 대시보드)</text>
+<rect x="500.0" y="2104.0" width="500.0" height="190.0" rx="10" fill="#f7f7fa" stroke="#d1d1d6" stroke-width="1.0"/>
+<rect x="520.0" y="2124.0" width="12.0" height="150.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<rect x="750.0" y="2124.0" width="120.0" height="40.0" rx="0" fill="#3a3a3c" stroke="none" stroke-width="0"/>
+<path d="M590.0 2260.0 L650.0 2210.0 L800.0 2200.0 L960.0 2190.0" fill="none" stroke="#007aff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 8"/>
+<path d="M590.0 2260.0 L618.0 2236.0 L650.0 2220.0 L684.0 2214.0" fill="none" stroke="#ff9500" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
+<path d="M696 2212 L682 2207 L684 2221 z" fill="#ff9500"/>
+<path d="M750.0 2166.0 L870.0 2166.0" fill="none" stroke="#e5352b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
+<path d="M534.0 2130.0 L534.0 2270.0" fill="none" stroke="#e5352b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="1.0"/>
+<circle cx="590.0" cy="2260.0" r="14.0" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="590.0" y1="2260.0" x2="600.7" y2="2251.0" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="960" cy="2190" r="8" fill="#ffffff" stroke="#30b0c7" stroke-width="3"/>
+<text x="500.0" y="2318.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 파란 점선 = 계획 경로. 목표 동안 유지되고, 지나온 부분은 지워진다.</text>
+<text x="500.0" y="2338.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 주황 실선 + 화살촉 = 제어기 방향. 지금 속도를 3초 유지하면 갈 호다.</text>
+<text x="500.0" y="2358.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  점선과 어긋난 만큼이 제어기의 판단(장애물 비켜 가기)이다.</text>
+<text x="500.0" y="2378.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 빨간 선 = 라이다가 지금 보는 것.</text>
+<text x="500.0" y="2398.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 주황 실선은 기본으로 숨김이다. admin → 설정 → 화면 →</text>
+<text x="500.0" y="2418.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  "주행 경로 표시 (제어기 방향)" 에서 켠다.</text>
+<text x="500.0" y="2438.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 로봇과 겹친 점검 지점 단추는 반투명해져 로봇이 비쳐 보인다.</text>
+<text x="1040.0" y="2090.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">주요 값 (어디서 바꾸나)</text>
+<text x="1040.0" y="2120.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">계획기</text>
+<text x="1152.0" y="2120.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">Theta* · w_traversal_cost 2.0</text>
+<text x="1610.0" y="2120.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2128" x2="1610" y2="2128" stroke="#e5e5ea"/>
+<text x="1040.0" y="2145.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">전역 비용 지도</text>
+<text x="1152.0" y="2145.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">0.05m · 팽창 0.45 · 가상 장애물 층</text>
+<text x="1610.0" y="2145.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2153" x2="1610" y2="2153" stroke="#e5e5ea"/>
+<text x="1040.0" y="2170.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">지역 비용 지도</text>
+<text x="1152.0" y="2170.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">0.025m · 3×3m · 팽창 0.6</text>
+<text x="1610.0" y="2170.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2178" x2="1610" y2="2178" stroke="#e5e5ea"/>
+<text x="1040.0" y="2195.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">제어기</text>
+<text x="1152.0" y="2195.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">MPPI 10Hz · 후보 1000 · 30단계 × 0.1초</text>
+<text x="1610.0" y="2195.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2203" x2="1610" y2="2203" stroke="#e5e5ea"/>
+<text x="1040.0" y="2220.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">속도</text>
+<text x="1152.0" y="2220.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">직진 0.22 m/s · 회전 1.2 rad/s · 후진 없음</text>
+<text x="1610.0" y="2220.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2228" x2="1610" y2="2228" stroke="#e5e5ea"/>
+<text x="1040.0" y="2245.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">도착 판정</text>
+<text x="1152.0" y="2245.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">위치 0.12m · 방향 0.15rad</text>
+<text x="1610.0" y="2245.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2253" x2="1610" y2="2253" stroke="#e5e5ea"/>
+<text x="1040.0" y="2270.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">로봇 크기</text>
+<text x="1152.0" y="2270.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">반지름 0.22m 원</text>
+<text x="1610.0" y="2270.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_params.yaml</text>
+<line x1="1040" y1="2278" x2="1610" y2="2278" stroke="#e5e5ea"/>
+<text x="1040.0" y="2295.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">몸통 채우기</text>
+<text x="1152.0" y="2295.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">깊이 0.3m · 벽 허용 0.15m</text>
+<text x="1610.0" y="2295.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">SHADOW_*</text>
+<line x1="1040" y1="2303" x2="1610" y2="2303" stroke="#e5e5ea"/>
+<text x="1040.0" y="2320.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">같은 자리 판정</text>
+<text x="1152.0" y="2320.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">3번 · 0.4m 안</text>
+<text x="1610.0" y="2320.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">STUCK_*</text>
+<line x1="1040" y1="2328" x2="1610" y2="2328" stroke="#e5e5ea"/>
+<text x="1040.0" y="2345.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">빠져나오기</text>
+<text x="1152.0" y="2345.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">0.45m · 0.10 m/s · 10초 제한</text>
+<text x="1610.0" y="2345.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">ESCAPE_*</text>
+<line x1="1040" y1="2353" x2="1610" y2="2353" stroke="#e5e5ea"/>
+<text x="1040.0" y="2370.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">다시 보내기</text>
+<text x="1152.0" y="2370.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">최대 3번</text>
+<text x="1610.0" y="2370.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">MAX_RETRIES</text>
+<line x1="1040" y1="2378" x2="1610" y2="2378" stroke="#e5e5ea"/>
+<text x="1040.0" y="2395.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">전진 없음 제한</text>
+<text x="1152.0" y="2395.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">90초</text>
+<text x="1610.0" y="2395.0" font-size="10.5" font-weight="500" fill="#636366" text-anchor="end" font-family="'SF Mono', Menlo, Consolas, monospace">NO_PROGRESS_SEC</text>
+<line x1="1040" y1="2403" x2="1610" y2="2403" stroke="#e5e5ea"/>
+<text x="1040.0" y="2436.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">대문자 이름은 ros/robot/src/nav2_goal_bridge.py 의 상수다.</text>
+<text x="1040.0" y="2470.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">확인하는 법</text>
+<rect x="1040.0" y="2482.0" width="570.0" height="76.0" rx="8" fill="#1c1c1e" stroke="none" stroke-width="0"/>
+<text x="1052.0" y="2504.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/nav_soak.py --rounds 3     # 장애물 × 시점 반복 시험</text>
+<text x="1052.0" y="2524.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 /sim/tools/plan_probe.py              # 계획 경로 길이 · 꺾임 · 벽 여유</text>
+<text x="1052.0" y="2544.0" font-size="10.5" font-weight="400" fill="#e5e5ea" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">python3 scripts/e2e_test.py --only-obstacles  # 장애물 시나리오 9-1 ~ 9-6</text>
+<text x="1040.0" y="2576.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">위 두 줄은 sim 컨테이너 안에서(docker compose exec sim …), 셋째는 저장소 루트에서.</text>
+<path d="M243.0 204.0 L310.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="277.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/goal</text>
+<path d="M513.0 204.0 L580.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="547.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">NavigateToPose</text>
+<path d="M783.0 204.0 L850.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="817.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">경로 요청</text>
+<path d="M1053.0 204.0 L1120.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="1087.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">경로 (/plan)</text>
+<path d="M1323.0 204.0 L1390.0 204.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<text x="1357.0" y="196.0" font-size="10" font-weight="500" fill="#1c1c1e" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/cmd_vel</text>
+<path d="M310.0 236.0 L243.0 236.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)" stroke-dasharray="5 4"/>
+<text x="277.0" y="254.0" font-size="10" font-weight="500" fill="#636366" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">goal_status</text>
+<path d="M922.0 299.0 L922.0 265.0" fill="none" stroke="#007aff" stroke-width="1.8" marker-end="url(#a007aff)"/>
+<path d="M1238.0 299.0 L1238.0 265.0" fill="none" stroke="#b25000" stroke-width="1.8" marker-end="url(#ab25000)"/>
+<path d="M1421.0 345.0 L1359.0 345.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M1454.0 383.0 L1454.0 406.0 L914.0 406.0 L914.0 391.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M412.0 265.0 L412.0 345.0 L790.0 345.0" fill="none" stroke="#8944ab" stroke-width="1.8" marker-end="url(#a8944ab)"/>
+<text x="631.0" y="337.0" font-size="10.5" font-weight="600" fill="#8944ab" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리)</text>
+<path d="M1492.0 307.0 L1492.0 265.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-start="url(#a8e8e93)"/>
+<path d="M381.1 627.6 L394.0 574.4 L403.1 537.9 L454.8 536.4 L504.2 540.2 L515.6 582.0 L515.6 703.6 L496.6 741.6 L453.3 756.8" fill="none" stroke="#8944ab" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
+<path d="M453.3 756.8 L500.4 810.0 L530.8 855.6 L530.8 939.2 L489.0 1007.6 L523.2 1060.8 L682.8 1060.8 L709.4 1015.2 L709.4 589.6" fill="none" stroke="#8944ab" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="7 5"/>
+<path d="M149.3 703.6 L178.2 693.7 L207.0 683.8 L235.9 674.7 L267.1 671.7 L297.5 670.2 L324.1 658.0 L350.7 631.4 L381.1 627.6 L397.0 658.0 L399.3 688.4 L403.9 718.8 L420.6 746.9 L453.3 756.8" fill="none" stroke="#007aff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 8"/>
+<path d="M453.3 756.8 L482.9 754.5 L514.1 748.4 L574.9 746.2 L635.7 743.1 L666.1 741.6 L695.7 734.8 L707.9 703.6 L707.9 642.8 L707.9 589.6" fill="none" stroke="#007aff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity="1.0" stroke-dasharray="0.1 8"/>
+<circle cx="454.8" cy="756.8" r="8" fill="#ffffff" stroke="#30b0c7" stroke-width="3"/>
+<text x="454.8" y="742.8" font-size="13" font-weight="700" fill="#0e8aa0" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">P1</text>
+<circle cx="709.4" cy="589.6" r="8" fill="#ffffff" stroke="#30b0c7" stroke-width="3"/>
+<text x="709.4" y="575.6" font-size="13" font-weight="700" fill="#0e8aa0" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">P2</text>
+<circle cx="150.8" cy="703.6" r="8" fill="#ffffff" stroke="#30b0c7" stroke-width="3"/>
+<text x="150.8" y="689.6" font-size="13" font-weight="700" fill="#0e8aa0" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">P3</text>
+<circle cx="128.0" cy="1053.2" r="16.7" fill="#1c1c1e" stroke="#ffffff" stroke-width="1.5"/>
+<line x1="128.0" y1="1053.2" x2="144.7" y2="1053.2" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<text x="128.0" y="1087.2" font-size="11" font-weight="600" fill="#636366" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">충전 위치</text>
+<circle cx="403.1" cy="665.6" r="11" fill="#ff9500" stroke="#ffffff" stroke-width="2"/>
+<text x="403.1" y="669.6" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<circle cx="454.8" cy="520.4" r="11" fill="#e5352b" stroke="#ffffff" stroke-width="2"/>
+<text x="454.8" y="524.4" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<circle cx="599.2" cy="713.6" r="11" fill="#ff9500" stroke="#ffffff" stroke-width="2"/>
+<text x="599.2" y="717.6" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<circle cx="647.6" cy="692.2" r="11" fill="#e5352b" stroke="#ffffff" stroke-width="2"/>
+<text x="647.6" y="696.2" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<circle cx="709.4" cy="682.0" r="11" fill="#e5352b" stroke="#ffffff" stroke-width="2"/>
+<text x="709.4" y="686.0" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<path d="M170.0 1330.0 L282.0 1330.0" fill="none" stroke="#ff9500" stroke-width="1.6" marker-end="url(#aff9500)" marker-start="url(#aff9500)"/>
+<text x="226.0" y="1322.0" font-size="11" font-weight="600" fill="#ff9500" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">틈 0.6m — 그대로 열림</text>
+<path d="M722.0 1434.0 L766.0 1464.0" fill="none" stroke="#248a3d" stroke-width="3.4" marker-end="url(#a248a3d)"/>
+<text x="812.0" y="1486.0" font-size="11" font-weight="600" fill="#248a3d" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">여기서 다시 계획</text>
+<path d="M283.0 1758.0 L308.0 1758.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M551.0 1758.0 L576.0 1758.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M819.0 1758.0 L844.0 1758.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M1087.0 1758.0 L1112.0 1758.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M1355.0 1758.0 L1380.0 1758.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M283.0 1894.0 L308.0 1894.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M551.0 1894.0 L576.0 1894.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M819.0 1894.0 L844.0 1894.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+<path d="M1087.0 1894.0 L1112.0 1894.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
+</svg>

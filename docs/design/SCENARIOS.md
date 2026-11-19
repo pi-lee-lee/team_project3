@@ -2,7 +2,7 @@
 
 준비 중인 두 시나리오를 지금 구조에 올리려면 무엇을 더하고 고쳐야 하는지 정리한다.
 주고받는 모양(토픽 · API · DB 표 · 상태 흐름)은 [INTERFACES.md](INTERFACES.md) 에서 정한다 — **계획 단계는 그 상세 설계까지가 완료다.**
-현재 구조는 [guide/RUNNING.md](../guide/RUNNING.md), 소화기 인식 모델의 학습 방식은 [ROADMAP.md](ROADMAP.md) 를 본다.
+현재 구조는 [guide/RUNNING.md](../guide/RUNNING.md), 소화기 인식 모델의 학습 방식은 [ROADMAP.md](../plan/ROADMAP.md) 를 본다.
 
 | | 시나리오 1: 소화액 투척 | 시나리오 2: 소방 관제 |
 | --- | --- | --- |

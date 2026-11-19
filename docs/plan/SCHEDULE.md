@@ -1,7 +1,7 @@
 # 주간 계획서 (2026-11-23 ~ 2027-01-22)
 
 젯봇 · 투척기 · 터틀봇 · 웹을 **처음부터 만든다고 가정**한 9주 계획이다. 5명이 맡고, 마지막 1주는 통합 테스트 기간이다.
-무엇을 만드는지는 [SCENARIOS.md](SCENARIOS.md), 서로 주고받는 모양은 [INTERFACES.md](INTERFACES.md) 를 기준으로 한다.
+무엇을 만드는지는 [SCENARIOS.md](../design/SCENARIOS.md), 서로 주고받는 모양은 [INTERFACES.md](../design/INTERFACES.md) 를 기준으로 한다.
 
 ## 1. 전제
 

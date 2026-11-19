@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * 설정: 값이 정해지지 않은 항목(투척 사거리, 열화상 기준 등)을 코드가 아니라 여기서 받는다.
- * 표(app_setting)에 없는 키는 아래 기본값을 쓴다. 키 목록과 뜻은 docs/plan/INTERFACES.md 8장.
+ * 표(app_setting)에 없는 키는 아래 기본값을 쓴다. 키 목록과 뜻은 docs/design/INTERFACES.md 8장.
  */
 @Service
 public class SettingsService {
@@ -40,6 +40,7 @@ public class SettingsService {
                  "grading": {"type": "ranges", "ranges": [{"max": 0.01, "grade": "NORMAL"},
                              {"min": 0.01, "max": 0.08, "grade": "WARNING"}], "default": "EMERGENCY"}}""");
         DEFAULTS.put("camera.hfov_deg", "62.2");                // 로봇 카메라 수평 화각(조준 각 계산)
+        DEFAULTS.put("display.control_direction", "false");     // 지도(관제 · 대시보드)에 제어기 방향(주황 실선)을 그릴지. 기본은 숨김
     }
 
     private final JdbcClient jdbc;
@@ -90,6 +91,9 @@ public class SettingsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "launch.mode 는 APPROVAL 또는 AUTO");
         }
         JsonNode def = parse(DEFAULTS.get(key));
+        if (def.isBoolean() && !value.isBoolean()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, key + " 는 true 또는 false 여야 합니다");
+        }
         if (def.isNumber() && !value.isNumber()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, key + " 는 숫자여야 합니다");
         }

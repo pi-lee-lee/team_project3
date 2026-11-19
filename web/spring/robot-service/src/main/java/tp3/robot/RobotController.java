@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +31,12 @@ public class RobotController {
     private final RobotRegistry registry;
     private final ControlService control;
     private final MissionService missions;
+    private final KeepoutService keepout;
     private final ObjectMapper om = new ObjectMapper();
 
-    public RobotController(RobotRepository repo, RobotRegistry registry, ControlService control, MissionService missions) {
+    public RobotController(RobotRepository repo, RobotRegistry registry, ControlService control, MissionService missions,
+                           KeepoutService keepout) {
+        this.keepout = keepout;
         this.repo = repo;
         this.registry = registry;
         this.control = control;
@@ -107,7 +111,7 @@ public class RobotController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).header("Cache-Control", "no-cache").body(png);
     }
 
-    /** 지도 위 실시간 표시: 로봇 위치(지도 좌표), 라이다 점, 계획 경로, 지도 이동 목적지 상태. */
+    /** 지도 위 실시간 표시: 로봇 위치(지도 좌표), 라이다 점, 계획 경로, 제어기 방향(control), 지도 이동 목적지 상태. */
     @GetMapping("/api/robots/{id}/mapview")
     public Map<String, Object> mapView(@PathVariable long id) {
         RobotAdapter.MapView v = registry.adapter(id).mapView();
@@ -115,6 +119,7 @@ public class RobotController {
         m.put("pose", v.pose());
         m.put("scan", v.scan());
         m.put("path", v.path());
+        m.put("control", v.control());
         m.put("manualGoal", missions.manualGoal(id));
         m.put("mission", missions.active(id));
         return m;
@@ -125,6 +130,29 @@ public class RobotController {
     public Map<String, Object> goTo(@PathVariable long id, @RequestBody JsonNode b, HttpServletRequest req) {
         return missions.goTo(id, CurrentUser.from(req).id(), b.path("x").asDouble(), b.path("y").asDouble(),
                 b.path("yaw").asDouble(0));
+    }
+
+    // ------------------------------------------------------------- 금지구역 (조회는 모두, 설정 · 삭제는 ADMIN · 1 관리자 — 게이트웨이 규칙)
+    @GetMapping("/api/robots/{id}/zones")
+    public List<Map<String, Object>> zones(@PathVariable long id) {
+        return keepout.list(id);
+    }
+
+    /** body: {"name":"공사 중","x1":1.0,"y1":2.0,"x2":2.0,"y2":3.0} (지도 좌표: 끌기 시작한 점과 놓은 점) */
+    @PostMapping("/api/robots/{id}/zones")
+    public List<Map<String, Object>> addZone(@PathVariable long id, @RequestBody JsonNode b, HttpServletRequest req) {
+        for (String k : List.of("x1", "y1", "x2", "y2")) {
+            if (!b.path(k).isNumber()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, k + " 가 필요합니다");
+            }
+        }
+        return keepout.create(id, b.path("name").asText(""), b.path("x1").asDouble(), b.path("y1").asDouble(),
+                b.path("x2").asDouble(), b.path("y2").asDouble(), CurrentUser.from(req).login());
+    }
+
+    @DeleteMapping("/api/robots/{id}/zones/{zoneId}")
+    public List<Map<String, Object>> deleteZone(@PathVariable long id, @PathVariable long zoneId) {
+        return keepout.delete(id, zoneId);
     }
 
     @PostMapping("/api/robots/{id}/goto/cancel")

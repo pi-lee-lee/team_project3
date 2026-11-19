@@ -19,7 +19,8 @@ docker compose logs -f sim                   # 시뮬레이션 로그 (Nav2 준�
 ```bash
 python3 scripts/e2e_test.py                    # 전체
 python3 scripts/e2e_test.py --skip-obstacles   # 장애물 시나리오 제외
-python3 scripts/e2e_test.py --only-obstacles   # 장애물 시나리오(우회·다른 길·진입 불가)만
+python3 scripts/e2e_test.py --only-obstacles   # 장애물 시나리오(달리는 도중 경로 위에 놓는 팔레트·문 막힘·골목 막힘, 진입 불가)만
+python3 scripts/e2e_test.py --only-zones       # 금지구역 시나리오(권한 · 미리 설정 · 달리는 도중 설정 · 삭제)만
 ```
 시나리오(소방 관제 · 소화액 투척) 전 구간 시험은 따로 있다(20~40분):
 
@@ -40,8 +41,11 @@ docker compose exec sim /sim/tools/explore.sh             # 고정 경유점 순
 docker compose exec sim /sim/tools/save_map.sh            # ros/maps/site.* 저장 + 잡음 정리
 docker compose up -d --force-recreate sim                 # nav 모드(저장 지도 + AMCL)로 복귀
 python3 ros/sim/src/tools/explore.py --check              # 순회 계획 여유 거리 검사(호스트에서, ROS 불필요)
-docker compose exec sim /sim/tools/obstacle.sh place detour|reroute|block   # 시험용 장애물, clear 로 치움
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'  # 주행 품질 측정
+docker compose exec sim /sim/tools/obstacle.sh place pallet|door|aisle|aisle60|block|detour|reroute   # 시험용 장애물, clear 로 치움
+docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'  # 주행 품질 측정(최대속도 유지율 등. --gap 폭, --drop 이름 거리)
+docker compose exec sim /sim/tools/obstacle.sh place gap 0.6                # 좁은 통로 시험: C1 복도에 폭 0.6m 틈만 남김(reroute 와 함께)
+docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/plan_probe.py'   # 계획 경로 품질 측정(로봇을 움직이지 않고 길이·꺾임·벽 여유)
+docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py --rounds 3'   # 반복 시험(장애물 종류 × 놓는 시점별로 맞는 경로 · 정지 시간. 한 회 한 시간 남짓, --sets · --only)
 python3 ros/sim/src/worlds/world_spec.py                  # 월드·설계도 지도 재생성(inspection.world 는 직접 고치지 않는다)
 docker compose exec sim /sim/tools/target.sh gauge 0.6|lamp red|extinguisher remove|reset|status   # 점검 대상(계기판·표시등·소화기) 바꾸기
 docker compose exec sim /sim/tools/fire.sh place <자리> [normal|warning|emergency] [--detect]       # 열화상 인쇄물 세우기(+젯봇 대신 감지 보고), list·detect·clear
@@ -53,13 +57,14 @@ docker compose exec sim /sim/tools/fire.sh place <자리> [normal|warning|emerge
 
 - **요청 경로**: 브라우저 → `cdn`(nginx 캐시 프록시: CDN 엣지 역할, 외부 포트 8080, `/assets/*` 만 보관하고 `index.html`·`/api`·`/ws` 는 통과. 설정 `web/nginx/cdn/default.conf`, 응답 헤더 `X-Cache-Status` 로 확인, 비우기는 `--force-recreate cdn`) → `web`(nginx 원본 서버: 정적 화면 + `Cache-Control` 지시, `/api`·`/ws` 프록시) → `gateway`(Spring Cloud Gateway: HttpOnly 쿠키 JWT 검증·세션 확인·경로별 역할 정책·감사 기록, 규칙은 `application.yml`) → 각 서비스.
 - **서비스**: `user-service`(로그인·사용자·역할 0 ADMIN/1 관리자/2 매니저/3 사용자/4 대시보드(조회 전용, 게이트웨이가 GET 만 허용 — 예외로 투척 승인 `/api/incidents/*/approve` 는 허용)·감사 로그), `inspection-service`(점검 지점·작업·사건 기록·관측·판정·이력·예약 점검: `ScheduleService` 가 때가 된 회차를 로봇별 메모리 실행 버퍼에 담아 로봇이 비면 이어서 실행(건너뛰지 않음, 지연은 화면 상단 안내). 재기동하면 버퍼가 비고 꺼진 동안 지난 회차는 MISSED 로만 기록. 시각은 `SCHEDULE_ZONE` 기준), `robot-service`(로봇 연결 계층), `analysis-service`(Python FastAPI: 관측 사진 품질 분석, PostgreSQL LISTEN/NOTIFY + SKIP LOCKED 작업 큐). DB 는 PostgreSQL 17 하나에 서비스별 DB, 스키마는 Flyway 마이그레이션.
-- **로봇 추상화**: `robot-service` 의 `RobotAdapter` 인터페이스(구현: `RosbridgeRobotAdapter`, `MockRobotAdapter`)가 시뮬레이션/실로봇 교체 지점이다. 웹은 Nav2 를 직접 모르고 **목표 단위 토픽 계약**만 쓴다: `/inspection/goal` → `/inspection/goal_status`(사유 코드 `BLOCKED_NO_PATH`·`NAV_FAILED`·`NO_PROGRESS`·`NAV_UNAVAILABLE`), `bridge_status`, `map_pose`, `map`, `scan_map`. 이 계약을 Nav2 로 옮기는 쪽이 `ros/robot/src/nav2_goal_bridge.py`(실로봇에도 같은 코드)이고, rosbridge(9090)로 연결된다.
-- **시나리오(브랜치 `feat/scenarios-sim`, 설계 `docs/plan/SCENARIOS.md`·`INTERFACES.md`)**: 터틀봇 한 대로 시뮬레이션에서 돈다. 젯봇(위치 추정·순찰·두 로봇 조정)은 아직 없고 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다. 시뮬레이션에 투척 기구가 없어 `ros/robot/src/mock_launcher.py` 가 투척 계약(`/inspection/actuator` → `actuator_status`·`actuator_state`)에 답한다(실로봇용 시리얼 브리지 `launcher_bridge.py` 는 만들어만 둠).
+- **로봇 추상화**: `robot-service` 의 `RobotAdapter` 인터페이스(구현: `RosbridgeRobotAdapter`, `MockRobotAdapter`)가 시뮬레이션/실로봇 교체 지점이다. 웹은 Nav2 를 직접 모르고 **목표 단위 토픽 계약**만 쓴다: `/inspection/goal` → `/inspection/goal_status`(사유 코드 `BLOCKED_NO_PATH`·`NAV_FAILED`·`NO_PROGRESS`·`NAV_UNAVAILABLE`), `bridge_status`, `map_pose`, `map`, `scan_map`. 이 계약을 Nav2 로 옮기는 쪽이 `ros/robot/src/nav2_goal_bridge.py`(실로봇에도 같은 코드. 계획을 돕는 일도 한다: 새 장애물의 몸통 채우기, 막힌 자리에서 물러나 자세 잡기, 두 번 막힌 자리 막기 → 전역 비용 지도 `/inspection/virtual_map`)이고, rosbridge(9090)로 연결된다.
+- **시나리오(브랜치 `feat/scenarios-sim`, 설계 `docs/design/SCENARIOS.md`·`INTERFACES.md`)**: 터틀봇 한 대로 시뮬레이션에서 돈다. 젯봇(위치 추정·순찰·두 로봇 조정)은 아직 없고 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다. 시뮬레이션에 투척 기구가 없어 `ros/robot/src/mock_launcher.py` 가 투척 계약(`/inspection/actuator` → `actuator_status`·`actuator_state`)에 답한다(실로봇용 시리얼 브리지 `launcher_bridge.py` 는 만들어만 둠).
   - **소방 관제**: 지점마다 규칙(`inspection_rule`: 판독기 종류 + 설정 + 영역 + 등급 기준) → analysis-service 판독기(`src/checkers/`: OBJECT·GAUGE·LAMP·THERMAL, numpy+Pillow, `GET /checkers`·`POST /check`) → `rule_result` → `RuleService.saveResults` 가 경고(`alert`)를 열고, 다음 점검이 정상이면 스스로 푼다. 등급은 NORMAL/WARNING/EMERGENCY/UNKNOWN. OBJECT 는 학습 모델이 없어 색으로 찾는다(`detector: color`).
   - **소화액 투척**: `IncidentService` 가 2초마다 열린 사건을 상태대로 끌고 간다(DETECTED→DISPATCHED→ARRIVED→재판독→AWAITING_APPROVAL→LAUNCHING→LAUNCHED→RESOLVED/DISMISSED/FAILED). 판단은 서버가 한다. robot-service 는 출동 미션(`RESPONSE`: 투척 위치 후보를 차례로 시도해 도착하면 HOLDING), 투척 명령(`ActuatorService`, commandId 로 한 번만), 투척 위치 후보(`Standoff`: 점유 격자에서 사거리·시야 확인), 감지 전달(`DetectionForwarder`)을 맡는다. 투척 모드(`launch.mode`: APPROVAL/AUTO)와 사거리 등 미정 값은 설정(`SettingsService`, `/api/settings`)이다.
 - **신뢰성**: 미션은 멱등, 결과는 outbox 에 보관 후 재전송, 조종은 제어권 임대 + `cmd_vel_watchdog.py`(0.5초 무명령 시 정지) + 비상 정지.
+- **금지구역**: ADMIN · 1 관리자가 관제 지도에서 끌어 그리는 직사각형(공사 중인 구역 등). robot-service `KeepoutService`(`/api/robots/{id}/zones`, 표 `keepout_zone`)가 목록 전체를 `/inspection/keepout` 으로 보내고(바뀔 때 + 5초마다), 목표 브리지가 계획 맵(`virtual_map` 에 합침)과 제어 맵(`/inspection/keepout_map` → 지역 비용 지도 `keepout_layer`)에 막힌 칸으로 넣는다. `keepout_layer` 는 반드시 라이다 층보다 앞에 둔다(뒤에 두면 빈 칸이 라이다 표시를 지운다). 화면 그리기는 `mapGeo.ts` 의 `drawZone`.
 - **시뮬레이션**(`ros/sim`): Apple Silicon 에서 amd64 에뮬레이션으로 Gazebo Classic 헤드리스(Xvfb) 실행 → 실제보다 느리다. `sim.launch.py` 가 Gazebo·Nav2 bringup(nav: AMCL, slam: slam_toolbox)·rosbridge·web_video_server·브리지를 띄우고, 로봇 모델은 패키지 SDF 에서 라이다 거리만 `LIDAR_MAX_RANGE`(기본 8m) 로 바꾼 사본을 스폰한다.
-- **Nav2 설정**: `ros/sim/src/config/nav2_params.yaml`. 기본값에서 바꾼 점과 이유가 파일 머리에 번호로 적혀 있다(Smac 2D A* + smoother, Regulated Pure Pursuit, 팽창 0.6/3.0, voxel 층 제거, AMCL 조정 등). 설정을 바꿀 때 그 목록도 함께 고친다. slam_toolbox 는 기본값 유지(조정했을 때 지도가 깨졌다).
+- **Nav2 설정**: `ros/sim/src/config/nav2_params.yaml`. 기본값에서 바꾼 점과 이유가 파일 머리에 번호로 적혀 있다(Theta* 직선 경로 + 처음 계획을 유지하는 행동 트리 `navigate_fixed_plan.xml`, MPPI 제어기, 팽창 지역 0.6·전역 0.45, 지역 비용 지도 0.025m, 가상 장애물 층 `virtual_layer`, voxel 층 제거, AMCL 조정 등). 설정을 바꿀 때 그 목록도 함께 고친다. slam_toolbox 는 기본값 유지(조정했을 때 지도가 깨졌다).
 - **월드·지도**: `ros/sim/src/worlds/world_spec.py` 하나가 월드(SDF), 설계도 지도(`ros/maps/reference.*`), 점검 지점 P1~P3, 장애물 정의의 원본이다. 운영 지도는 SLAM 으로 만든 `ros/maps/site.*`(없으면 reference). 월드를 바꾸면 SLAM 재스캔이 필요하다. 순회 계획(`explore.py`)은 직선 구간마다 로봇 중심이 벽·설비에서 0.27m 이상 떨어져야 출발한다.
 - **웹 지도는 실제 지도와 별개**: `MapRenderer`(robot-service)가 `/inspection/map` 을 받아 표시용 PNG 를 새로 그린다(잡음 제거, 로봇이 못 지나는 틈 닫기, 섬은 직사각형, 직선 벽). 주행에 쓰는 지도에는 영향이 없다.
 - **관제 대시보드**(`pages/dashboard`, 계정 dash1): 16:9 모니터용 1920×1080 고정 화면(반응형 아님, 창에 맞춰 통째로 확대·축소). `data.ts`(폴링·경고 합치기) → `panels.tsx`(패널 등록표 `PANELS`) + `layout.ts`(24×12 격자 배치표) → `details.tsx`(항목을 누르면 뜨는 상세 등록표 `DETAILS`). 요약 API 는 inspection-service `DashboardController`(`/api/dashboard/overview`).
@@ -69,7 +74,7 @@ docker compose exec sim /sim/tools/fire.sh place <자리> [normal|warning|emerge
 
 - 커밋·푸시는 사용자가 요청할 때만. 작업 브랜치는 `feat/msa-sim-stack`이고, main 에는 아직 올리지 않는다(PR·병합 금지).
 - `개선초안/` 은 사용자의 커밋하지 않은 폴더다. 커밋하거나 고치지 않는다.
-- 루트에는 `README.md`(맨 위부터 접속 · 계정 → 실행 → 시연 안내 순서를 지킨다. 그 아래 개요 · 구성 · 구현 범위, 맨 끝에 보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더(`architecture/`, `guide/`, `plan/`, `storyboard/`)에 둔다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
+- 루트에는 `README.md`(맨 위부터 접속 · 계정 → 실행 → 시연 안내 순서를 지킨다. 그 아래 개요 · 구성 · 구현 범위, 맨 끝에 보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더에 둔다(목록 · 기준은 `docs/README.md`): `guide/`(실행 안내), `architecture/`(시스템 구조 도면), `navigation/`(주행: 지도 3겹 · 제어기 · Theta* · MPPI 설명서), `design/`(시나리오 · 인터페이스 설계), `plan/`(향후 계획 · 일정), `storyboard/`(화면). `docs/_lib/svg.py` 는 SVG 생성 스크립트 공용 도구다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
 - 시간대: 모든 컨테이너는 `APP_TZ`(기본 Asia/Seoul) — compose 에서 `TZ` 와 PostgreSQL `-c timezone` 으로 맞춘다. 저장 시각은 timestamptz(절대 시각).
 - nginx 설정(`web/nginx/web/`·`web/nginx/cdn/` 의 `default.conf`)은 폴더째 마운트한다(파일 하나만 마운트하면 편집기가 파일을 새로 쓸 때 컨테이너가 옛 파일을 본다). 고친 뒤 `docker compose exec web nginx -s reload`(cdn 도 같음)로 반영한다.
 - 화면을 다시 빌드한 뒤 결과가 안 바뀐 것처럼 보이면 먼저 브라우저 새로고침 여부를 확인한다.

@@ -68,6 +68,10 @@
 | `/inspection/map_pose` | 로봇 → 서버, 5Hz | `geometry_msgs/PoseStamped` (frame `map`) |
 | `/inspection/map` | 터틀봇 → 서버, 5초 | `nav_msgs/OccupancyGrid` — 공용 지도는 터틀봇만 낸다 |
 | `/inspection/scan_map` | 터틀봇 → 서버 | `{"pts": [[x, y], ...]}` |
+| `/inspection/drive_plan` | 터틀봇 → 서버 | `{"v": 0.22, "w": 0.1, "traj": [[x, y], ...]}` — 제어기가 지금 내는 속도 명령과 그 명령으로 3초간 갈 호(지도 좌표). 주행 명령이 있을 때만 5Hz. 관제 지도의 "제어기 방향"(브랜치 `feat/drive-controller` 에서만) |
+| `/inspection/virtual_map` | 로봇 안(브리지 → Nav2 전역 비용 지도) | `nav_msgs/OccupancyGrid`, 지도와 같은 크기. 계획에만 쓰는 가상 장애물: 새 장애물의 몸통, 두 번 막힌 자리. 서버는 쓰지 않는다 |
+| `/inspection/keepout` | 서버 → 로봇, 바뀔 때 + 5초 | `{"zones": [{"id", "x1", "y1", "x2", "y2"}]}` — 금지구역 목록 전체(지도 좌표, m). 브리지가 계획 맵(`virtual_map` 에 합침)과 제어 맵에 막힌 칸으로 넣는다 |
+| `/inspection/keepout_map` | 로봇 안(브리지 → Nav2 지역 비용 지도 `keepout_layer`) | `nav_msgs/OccupancyGrid`, 지도와 같은 크기. 금지구역 칸만 100 |
 | 영상 | 로봇 → 서버 | web_video_server(MJPEG) · 스냅샷 — 지금과 같음 |
 | `cmd_vel` | 서버 → 로봇 | `geometry_msgs/Twist`, 워치독 경유 — 지금과 같음 |
 
@@ -388,6 +392,21 @@ inspection-service 는 결과를 저장하고(D2), 등급에 따라 경고를 �
 | `POST /api/incidents/{id}/dismiss` | S·M·U | 오탐으로 닫기 `{"comment"}` |
 | `POST /api/incidents/{id}/resolve` | S·M | 조치 완료로 닫기 |
 
+### A3-1 금지구역 (robot-service)
+
+관리자가 지도에 그려 두는 직사각형이다(공사 중인 구역 등). 실제 장애물이 없어도 로봇은 그 안으로 계획하지도, 들어가지도 않는다.
+달리는 도중에 설정해도 1 ~ 2초 안에 경로 검사가 막힘을 보고 다시 계획한다.
+
+| 메서드 · 경로 | 역할 | 내용 |
+| --- | --- | --- |
+| `GET /api/robots/{id}/zones` | 모두 | `[{"zoneId", "name", "xMin", "yMin", "xMax", "yMax", "createdBy", "createdAt"}]` |
+| `POST /api/robots/{id}/zones` | A·S | `{"name"?, "x1", "y1", "x2", "y2"}` — 끌기 시작한 점과 놓은 점(지도 좌표). 한 변 0.2m 미만이면 400, 로봇이 그 안(둘레 0.35m 포함)에 있으면 409 |
+| `DELETE /api/robots/{id}/zones/{zoneId}` | A·S | 삭제. 남은 목록을 돌려준다 |
+
+저장은 robot-service DB 의 `keepout_zone`(robot_id, name, x_min, y_min, x_max, y_max, created_by, created_at). 목록은 바뀔 때마다,
+그리고 5초마다 `/inspection/keepout` 으로 다시 보낸다(로봇이 다시 떠도 따로 할 일이 없다).
+구역이 목적지를 덮으면 그 지점은 `BLOCKED_NO_PATH`(진입 불가)로 끝난다.
+
 ### A4 설정
 
 | 메서드 · 경로 | 역할 | 내용 |
@@ -689,6 +708,7 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 가까운 감지를 한 사건으로 묶는 거리 | 설정 `incident.merge_radius_m` | 1.0 |
 | 투척 뒤 현장 감시 간격 · 종료 기준 | 설정 `incident.monitor_interval_sec`, `incident.monitor_clear_count` | 10, 2 |
 | 닫은 뒤에도 감지가 계속될 때 다시 여는 유예 | 설정 `incident.reopen_grace_sec` | 60 |
+| 지도에 제어기 방향(주황 실선) 표시 | 설정 `display.control_direction`(관제 지도 · 대시보드 지도) | `false`(숨김) |
 | 열화상 인쇄물의 색상표 · 열원 기준 | 감지 설정 `detect.thermal`(= `THERMAL` 규칙의 `params` · `grading`) | `iron`, 3.3 의 예 |
 | 감지 보고에 필요한 연속 프레임 수 | 설정 `detect.report_frames` | 5 |
 | 계기판 · 표시등의 실제 대상, 눈금 · 색 | 규칙의 `params` | — (규칙을 만들 때 입력) |

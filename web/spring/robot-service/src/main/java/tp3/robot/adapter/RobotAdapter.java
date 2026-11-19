@@ -42,7 +42,11 @@ public interface RobotAdapter extends AutoCloseable {
     }
 
     /** 지도 위 실시간 표시: 지도 좌표의 로봇 위치, 라이다 점, 계획 경로(주행 중일 때). */
-    record MapView(Pose pose, java.util.List<double[]> scan, java.util.List<double[]> path) {
+    record MapView(Pose pose, java.util.List<double[]> scan, java.util.List<double[]> path, DrivePlan control) {
+    }
+
+    /** 제어기가 지금 내는 속도 명령(v m/s, w rad/s)과 그 명령으로 갈 예상 호(지도 좌표). 주행 중이 아니면 MapView.control 은 null. */
+    record DrivePlan(double v, double w, java.util.List<double[]> traj) {
     }
 
     /** 투척 명령의 결과. state: ACCEPTED / DONE / FAILED. code: NOT_READY, EMPTY, JAMMED, TIMEOUT, ESTOP, UNSUPPORTED. */
@@ -112,6 +116,10 @@ public interface RobotAdapter extends AutoCloseable {
      * 시뮬레이션 전용: 시뮬레이션 도구(fire · target)를 실행하게 한다(sim 의 sim_control.py 가 받는다).
      * 결과는 onSimStatus 로 온다. 시뮬레이션이 아닌 로봇은 지원하지 않는다.
      */
+    /** 금지구역 목록(JSON: {"zones":[{"id","x1","y1","x2","y2"}]})을 로봇에 보낸다. 지원하지 않는 로봇은 무시한다. */
+    default void keepout(String json) {
+    }
+
     default void simCommand(String id, String tool, java.util.List<String> args) {
         throw new UnsupportedOperationException("시뮬레이션 로봇이 아닙니다");
     }

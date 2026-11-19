@@ -38,7 +38,15 @@ import { EmergencyDialog } from './EmergencyDialog';
 import Demo from './pages/admin/Demo';
 import { LaunchDialog } from './LaunchDialog';
 
-const USER_ROLES: Role[] = ['SUPERVISOR', 'MANAGER', 'USER'];
+// 사용자 화면에 들어올 수 있는 역할. ADMIN 은 모든 화면에 들어갈 수 있다(사이드바의 "화면 이동" 링크)
+const USER_ROLES: Role[] = ['ADMIN', 'SUPERVISOR', 'MANAGER', 'USER'];
+
+/** ADMIN 에게만 보이는 화면 이동 링크: 역할마다 다른 세 화면을 로그아웃 없이 오간다. [경로, 이름, 아이콘, 영역] */
+export const AREA_LINKS: [string, string, string, 'admin' | 'user' | 'dashboard'][] = [
+  ['/admin/users', '관리자 화면', 'gearshape', 'admin'],
+  ['/app/monitor', '사용자 화면', 'video', 'user'],
+  ['/dashboard', '관제 대시보드', 'server.rack', 'dashboard'],
+];
 
 export const homeOf = (role: Role) => (role === 'ADMIN' ? '/admin/users' : role === 'DASHBOARD' ? '/dashboard' : '/app/monitor');
 
@@ -152,6 +160,16 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
             <NavLink key={to} to={to}><Icon name={icon} />{label}</NavLink>
           ))}
         </nav>
+        {me.role === 'ADMIN' && (
+          <div className="area-links">
+            <span className="area-title">화면 이동</span>
+            {AREA_LINKS.filter(([, , , a]) => a !== area).map(([to, label, icon, a]) => (a === 'dashboard'
+              // 관제 대시보드는 상황실 모니터용 전체 화면이라 새 창으로 띄운다(하던 화면은 그대로 둔다)
+              ? <a key={to} href={to} target="_blank" rel="noopener"><Icon name={icon} size={18} />{label}<Icon name="arrow.up.right.square" size={14} /></a>
+              : <NavLink key={to} to={to}><Icon name={icon} size={18} />{label}<Icon name="chevron.right" size={14} /></NavLink>
+            ))}
+          </div>
+        )}
         <div className="who">
           <b>{me.name}</b>
           <span>{me.loginId} · {ROLE_LABEL[me.role]}</span>
@@ -175,6 +193,14 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
         {/* 스마트폰: 사이드바가 없으므로 사용자 영역(이름·서버 시간)을 화면 맨 아래에 둔다 */}
         <div className="mobile-who">
           <div><b>{me.name}</b> <span className="muted small">{me.loginId} · {ROLE_LABEL[me.role]}</span></div>
+          {me.role === 'ADMIN' && (
+            <div className="area-links row wrap">
+              {AREA_LINKS.filter(([, , , a]) => a !== area).map(([to, label, icon, a]) => (a === 'dashboard'
+                ? <a key={to} href={to} target="_blank" rel="noopener"><Icon name={icon} size={16} />{label}</a>
+                : <NavLink key={to} to={to}><Icon name={icon} size={16} />{label}</NavLink>
+              ))}
+            </div>
+          )}
           <ServerClock />
         </div>
       </main>

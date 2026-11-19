@@ -129,10 +129,39 @@ POINTS = {'P1': (4.3, 3.9, 180), 'P2': (7.65, 6.1, 90), 'P3': (0.3, 4.6, 180)}
 
 # 시험 때 놓고 치우는 적재물 (sim/tools/obstacle.py): x, y, 크기 x, 크기 y
 OBSTACLES = {
+    # detour · reroute 는 C1 · C2 복도를 따라갈 때만 경로 위다(예: 충전 위치 → C1 동쪽 끝 7.0, -0.1).
+    # 충전 위치 → P2 는 이제 생산동을 가로지르므로 이 둘을 지나지 않는다 → 점검 지점 시험에는 아래 pallet · door 를 쓴다.
     'detour': (5.6, -0.35, 0.5, 0.5),     # C1 복도 가운데 팔레트 → 옆으로 비켜 지나감 (우회 가능)
-    'reroute': (7.65, 1.6, 1.1, 0.4),     # C2 아래쪽 막힘 → 생산동 문으로 돌아서 C2 위쪽으로 (다른 경로)
+    'reroute': (7.65, 1.6, 1.1, 0.4),     # C2 아래쪽 막힘 → C2 로 올라가는 길이 생산동 문뿐
     'block': (7.65, 5.2, 1.1, 0.4),       # C2 위쪽(생산동 문보다 위) 막힘 → P2 진입 불가
+    # ---- 달리는 도중에 놓는 시험용(계획 경로 위에 놓인다. e2e_test.py 가 놓기 직전에 '경로 위'인지 확인한다) ----
+    'pallet': (6.2, 4.1, 0.4, 0.4),       # 생산동 가운데, P1 → P2 직선 경로 위의 팔레트 → 제어기가 옆으로 비켜 지나감
+    'door': (7.1, 4.1, 0.2, 1.0),         # 생산동 → C2 문이 막힘 → C1 · C2 아래쪽으로 크게 돌아 P2 로 (다른 경로)
+    'pallet2': (1.6, 4.85, 0.4, 0.4),     # 전기실 가운데, P1 → P3(문 → P3) 직선 경로 위의 팔레트 → 비켜 지나감
+    # 전기실 → 생산동 문 바로 아래에서 골목(서쪽 벽 ↔ 랙 1, 폭 0.95m)을 막음 → 랙 1 위(폭 0.75m)로 돌아 나와야 P1 에 닿는다.
+    # P3 → P1 로 가는 로봇이 문을 지날 때 놓으면 '가던 길이 막혀 다시 계획'하는 시험이 된다.
+    'aisle': (3.525, 5.1, 0.95, 0.2),
+    # 같은 자리를 서쪽 벽에서부터 일부만 막아 랙 1 쪽에 틈을 남긴다(애매하게 막힌 경우): 남는 폭 0.7m / 0.6m / 0.5m
+    'aisle70': (3.175, 5.1, 0.25, 0.3),
+    'aisle60': (3.225, 5.1, 0.35, 0.3),
+    'aisle50': (3.275, 5.1, 0.45, 0.3),
 }
+# 좁은 통로 시험(obstacle.sh place gap 폭): C1 복도 양쪽 벽에서 상자 둘을 내밀어 가운데에 폭 width 의 틈을 남긴다.
+# 틈은 x 방향으로 GAP_LEN 만큼 이어진다(문틀이 아니라 골목). C2 아래쪽을 reroute 로 함께 막으면 이 틈이 유일한 길이 된다.
+GAP_X, GAP_LEN = 5.6, 0.6
+GAP_THROUGH = (7.0, -0.1, 0)      # 틈을 지나야 닿는 시험 목표(C1 동쪽 끝)
+
+
+def gap_boxes(width):
+    """틈을 만드는 상자 둘: {이름: (x, y, 크기 x, 크기 y)}. 틈의 중심은 복도 가운데다."""
+    lo, hi = Y0 + T / 2, YC - T / 2          # 복도 안쪽 면
+    mid = (lo + hi) / 2
+    a, b = mid - width / 2, mid + width / 2
+    if not 0.3 <= width < hi - lo:
+        raise ValueError(f'틈 폭은 0.3 ~ {hi - lo:.2f}m 사이: {width}')
+    return {'gap_s': (GAP_X, (lo + a) / 2, GAP_LEN, a - lo), 'gap_n': (GAP_X, (b + hi) / 2, GAP_LEN, hi - b)}
+
+
 START = (0.0, 0.0, 0.0)
 
 RES = 0.05
@@ -244,6 +273,8 @@ def world():
     <include><uri>model://sun</uri></include>
     <scene><shadows>false</shadows><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
     <physics type="ode"><max_step_size>0.004</max_step_size><real_time_update_rate>250</real_time_update_rate></physics>
+    <!-- 물체를 즉시 옮기는 서비스(/gazebo/set_entity_state): 시험용 장애물을 정한 순간에 정확히 놓는다(nav_soak.py) -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so"><ros><namespace>/gazebo</namespace></ros><update_rate>1.0</update_rate></plugin>
 {m}  </world>
 </sdf>
 '''

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import type { MapInfo, MapView, Point, RobotStatus } from '../../api/types';
+import type { KeepoutZone, MapInfo, MapView, Point, RobotStatus } from '../../api/types';
 import { ErrorBox, useAction, useApi, useAuth, usePoll } from '../../util';
 import { Icon } from '../../Icon';
 import { Page, Picker, Segmented } from '../../ui';
-import { mapGeo } from '../../mapGeo';
+import { drawZone, mapGeo } from '../../mapGeo';
 import './user.css';
 
 const CAP_LABEL: Record<string, [string, string]> = {
@@ -259,9 +259,21 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
   const anim = useRef<{ from: Pose | null; to: Pose | null; t0: number }>({ from: null, to: null, t0: 0 });
   const shown = useRef<Pose | null>(null);
   const points = usePoll<Point[]>(() => api.points(), 0);
+  // 설정 "주행 경로 표시(제어기 방향)": 켜 두었을 때만 주황 실선을 그린다(기본은 숨김)
+  const settings = usePoll(() => api.settings().catch(() => null), 10000);
+  const showControl = settings.data?.['display.control_direction'] === true;
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [target, setTarget] = useState<Target | null>(null);
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  // 금지구역: 조회는 모두, 그리기 · 삭제는 ADMIN(0) · 관리자(1)만. 구역 모드에서는 끌기 = 사각형, 누르기 = 구역 선택
+  const { me } = useAuth();
+  const canZone = me != null && me.roleId <= 1;
+  const zones = usePoll<KeepoutZone[]>(() => api.zones(robotId).catch(() => []), 3000, [robotId]);
+  const [zoneMode, setZoneMode] = useState(false);
+  const [zoneName, setZoneName] = useState('');
+  const [draft, setDraft] = useState<{ xMin: number; yMin: number; xMax: number; yMax: number } | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
+  const pickedZone = zones.data?.find((z) => z.zoneId === picked) ?? null;
   const canvas = useRef<HTMLCanvasElement>(null);
   const [cssScale, setCssScale] = useState(1);     // 지도 1칸 = 화면 몇 px (CSS 기준)
   const act = useAction();
@@ -310,6 +322,9 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.imageSmoothingEnabled = true;            // 지도 그림은 4배 해상도로 다듬어 오므로 부드럽게 축소
     g.drawImage(img, 0, 0, cw, ch);
+    // 금지구역: 붉은 빗금 상자. 고른 것은 굵게, 끄는 중인 것은 점선
+    zones.data?.forEach((z) => drawZone(g, toPx, toPy, z, { selected: z.zoneId === picked, label: z.name || '금지구역' }));
+    if (draft) drawZone(g, toPx, toPy, draft, { draft: true });
     const v = view.data;
     // 계획 경로: 점선
     if (v?.path?.length) {
@@ -319,6 +334,23 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
       v.path.forEach(([x, y], i) => (i ? g.lineTo(toPx(x), toPy(y)) : g.moveTo(toPx(x), toPy(y))));
       g.stroke();
       g.setLineDash([]);
+    }
+    // 제어기 방향: 지금 속도 명령을 3초 유지했을 때 갈 호(실선) + 끝의 화살촉. 점선(A* 경로)과 어긋난 만큼이 제어기의 판단이다
+    const ct = showControl ? v?.control?.traj : null;
+    if (ct && ct.length > 1) {
+      g.strokeStyle = '#ff9500'; g.fillStyle = '#ff9500'; g.lineWidth = 3; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.beginPath();
+      ct.forEach(([x, y], i) => (i ? g.lineTo(toPx(x), toPy(y)) : g.moveTo(toPx(x), toPy(y))));
+      g.stroke();
+      const [ax, ay] = ct[ct.length - 2], [bx, by] = ct[ct.length - 1];
+      const ex = toPx(bx), ey = toPy(by), ang = Math.atan2(ey - toPy(ay), ex - toPx(ax));
+      if (Math.hypot(ex - toPx(ct[0][0]), ey - toPy(ct[0][1])) > 6) {      // 제자리 회전이면 화살촉을 그리지 않는다
+        g.beginPath();
+        g.moveTo(ex + 9 * Math.cos(ang), ey + 9 * Math.sin(ang));
+        g.lineTo(ex + 6 * Math.cos(ang + 2.4), ey + 6 * Math.sin(ang + 2.4));
+        g.lineTo(ex + 6 * Math.cos(ang - 2.4), ey + 6 * Math.sin(ang - 2.4));
+        g.closePath(); g.fill();
+      }
     }
     // 라이다: 이웃한 점(0.25m 이내)을 이어 하나의 선으로 그린다
     if (v?.scan?.length) {
@@ -358,7 +390,7 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
         g.closePath(); g.fillStyle = '#af52de'; g.fill();
       }
     }
-  }, [m, img, view.data, points.data, target, cssScale]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [m, img, view.data, points.data, target, cssScale, showControl, zones.data, draft, picked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 새 위치가 오면 지금 그려진 위치에서 새 위치로 POSE_MS 동안 옮겨 간다
   useEffect(() => {
@@ -410,6 +442,7 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     const w = toWorld(cx, cy);
     drag.current = { x: w.x, y: w.y, px: cx, py: cy };
     canvas.current!.setPointerCapture(e.pointerId);
+    if (zoneMode) return;                                      // 구역 모드: 뗄 때 정한다(끌었으면 새 구역, 아니면 선택)
     setTarget({ x: round2(w.x), y: round2(w.y), yaw: null });
   };
   const onMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -417,9 +450,36 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     if (!d) return;
     const { cx, cy } = local(e);
     if (Math.hypot(cx - d.px, cy - d.py) < 8) return;          // 짧은 움직임은 클릭으로 본다
+    if (zoneMode) {                                            // 누른 점 ↔ 지금 점을 두 모서리로 하는 사각형
+      const w = toWorld(cx, cy);
+      setDraft({ xMin: Math.min(d.x, w.x), yMin: Math.min(d.y, w.y), xMax: Math.max(d.x, w.x), yMax: Math.max(d.y, w.y) });
+      return;
+    }
     setTarget({ x: round2(d.x), y: round2(d.y), yaw: Math.atan2(-(cy - d.py), cx - d.px) });
   };
-  const onUp = () => { drag.current = null; };
+  const onUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (!zoneMode || !d) return;
+    if (draft) {                                               // 끌었다 놓음 = 그 사각형을 금지구역으로 설정
+      const r = draft;
+      setDraft(null);
+      act.run(async () => {
+        const list = await api.addZone(robotId, { name: zoneName.trim(), x1: round2(r.xMin), y1: round2(r.yMin), x2: round2(r.xMax), y2: round2(r.yMax) });
+        zones.setData(list);
+        setPicked(list.length ? Math.max(...list.map((z) => z.zoneId)) : null);   // 방금 만든 구역을 골라 둔다(바로 지울 수 있게)
+      });
+      return;
+    }
+    // 누르기만 함 = 그 자리의 구역을 고른다(겹치면 나중에 만든 것). 빈 곳이면 선택 해제
+    const hit = [...(zones.data ?? [])].reverse().find((z) => d.x >= z.xMin && d.x <= z.xMax && d.y >= z.yMin && d.y <= z.yMax);
+    setPicked(hit ? hit.zoneId : null);
+  };
+  const cancelDrag = () => { drag.current = null; setDraft(null); };
+  const removeZone = () => act.run(async () => {
+    zones.setData(await api.deleteZone(robotId, picked!));
+    setPicked(null);
+  });
 
   const go = () => act.run(async () => {
     const p = view.data?.pose;
@@ -435,17 +495,38 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
     <div className="map-view">
       {!m && <div className="novideo map-empty">지도를 기다리는 중… (로봇의 지도 서버·SLAM 이 실행 중이어야 합니다)</div>}
       <div className="map-canvas">
-        <canvas ref={canvas} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}
-          className={iHold ? 'clickable' : ''} />
+        <canvas ref={canvas} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={cancelDrag}
+          className={zoneMode ? 'zoning' : iHold ? 'clickable' : ''} />
         <canvas ref={robotLayer} className="robot-layer" aria-hidden />
       </div>
       <div className="map-legend small">
-        <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로</span>
+        <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로(A*)</span>{showControl && <span><i className="lg control" /> 제어기 방향</span>}
         <span><i className="lg scan" /> 라이다</span><span><i className="lg point" /> 점검 지점</span><span><i className="lg goal" /> 목적지·방향</span>
+        {(canZone || !!zones.data?.length) && <span><i className="lg zone" /> 금지구역</span>}
         {view.data?.pose ? <span className="muted">위치 x {view.data.pose.x.toFixed(2)} · y {view.data.pose.y.toFixed(2)} · θ {(view.data.pose.yaw * 180 / Math.PI).toFixed(0)}°</span>
           : <span className="warn-t">위치 추정 없음</span>}
       </div>
-      <div className="row wrap">
+      {canZone && (
+        <div className="row wrap zone-bar">
+          <button className={zoneMode ? 'primary' : ''} onClick={() => { setZoneMode(!zoneMode); setDraft(null); setPicked(null); setTarget(null); }}>
+            <Icon name="nosign" size={16} />{zoneMode ? '금지구역 설정 끝내기' : '금지구역 설정'}
+          </button>
+          {zoneMode && !pickedZone && (
+            <>
+              <input className="zone-name" placeholder="구역 이름 (선택 · 예: 공사 중)" maxLength={60} value={zoneName} onChange={(e) => setZoneName(e.target.value)} />
+              <span className="muted small">지도에서 누른 채 끌었다 놓으면 그 사각형이 금지구역이 됩니다. 구역을 누르면 고릅니다.</span>
+            </>
+          )}
+          {zoneMode && pickedZone && (
+            <>
+              <span>고른 구역: <b>{pickedZone.name || '금지구역'}</b> · {(pickedZone.xMax - pickedZone.xMin).toFixed(1)} × {(pickedZone.yMax - pickedZone.yMin).toFixed(1)} m · {pickedZone.createdBy}</span>
+              <button className="danger" disabled={act.busy} onClick={removeZone}><Icon name="trash" size={16} />삭제</button>
+              <button onClick={() => setPicked(null)}>선택 해제</button>
+            </>
+          )}
+        </div>
+      )}
+      <div className="row wrap" style={zoneMode ? { display: 'none' } : undefined}>
         {target ? (
           <>
             <span>목적지 ({target.x}, {target.y}){target.yaw != null ? ` · 방향 ${Math.round(target.yaw * 180 / Math.PI)}°` : ''}</span>

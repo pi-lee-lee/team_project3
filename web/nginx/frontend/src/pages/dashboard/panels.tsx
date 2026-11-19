@@ -2,9 +2,9 @@
 // 어디에 얼마나 크게 놓을지는 layout.ts 가 정한다 — 패널을 더하거나 옮길 때 이 두 곳만 고친다.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RobotStatus } from '../../api/types';
-import { STATUS_LABEL, ago, fmtTime, useApi } from '../../util';
+import { STATUS_LABEL, ago, fmtTime, useApi, usePoll } from '../../util';
 import { Icon } from '../../Icon';
-import { mapGeo } from '../../mapGeo';
+import { drawZone, mapGeo } from '../../mapGeo';
 import { drawRobot } from '../user/Monitor';
 import { EVENT_LABEL, eventText } from '../user/inspectionText';
 import { INCIDENT_STATE, LAUNCH_MODE, checkText } from '../user/scenarioText';
@@ -109,6 +109,11 @@ function RobotTabs({ d }: { d: DashData }) {
 
 function MapPanel({ d, open }: PanelProps) {
   const api = useApi();
+  // 설정 "주행 경로 표시(제어기 방향)": 켜 두었을 때만 주황 실선을 그린다(기본은 숨김)
+  const settings = usePoll(() => api.settings().catch(() => null), 10000);
+  const showControl = settings.data?.['display.control_direction'] === true;
+  // 금지구역(관리자가 관제 화면에서 그린 것): 붉은 빗금 상자로 보여 준다
+  const zones = usePoll(() => (d.robotId ? api.zones(d.robotId).catch(() => []) : Promise.resolve([])), 3000, [d.robotId]);
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -134,6 +139,7 @@ function MapPanel({ d, open }: PanelProps) {
     const g = c.getContext('2d')!;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.drawImage(img, 0, 0, geo.cw, geo.ch);
+    zones.data?.forEach((z) => drawZone(g, geo.toPx, geo.toPy, z, { label: z.name || '금지구역' }));
     const v = d.view;
     if (v?.path?.length) {
       g.strokeStyle = '#0a84ff'; g.lineWidth = 3; g.lineJoin = 'round'; g.lineCap = 'round';
@@ -143,8 +149,25 @@ function MapPanel({ d, open }: PanelProps) {
       g.stroke();
       g.setLineDash([]);
     }
+    // 제어기 방향: 지금 속도 명령을 3초 유지했을 때 갈 호(주황 실선) + 화살촉. 점선(A* 경로)과 어긋난 만큼이 제어기의 판단이다
+    const ct = showControl ? v?.control?.traj : null;
+    if (ct && ct.length > 1) {
+      g.strokeStyle = '#ff9500'; g.fillStyle = '#ff9500'; g.lineWidth = 4; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.beginPath();
+      ct.forEach(([x, y], i) => (i ? g.lineTo(geo.toPx(x), geo.toPy(y)) : g.moveTo(geo.toPx(x), geo.toPy(y))));
+      g.stroke();
+      const [ax, ay] = ct[ct.length - 2], [bx, by] = ct[ct.length - 1];
+      const ex = geo.toPx(bx), ey = geo.toPy(by), ang = Math.atan2(ey - geo.toPy(ay), ex - geo.toPx(ax));
+      if (Math.hypot(ex - geo.toPx(ct[0][0]), ey - geo.toPy(ct[0][1])) > 6) {   // 제자리 회전이면 화살촉을 그리지 않는다
+        g.beginPath();
+        g.moveTo(ex + 11 * Math.cos(ang), ey + 11 * Math.sin(ang));
+        g.lineTo(ex + 8 * Math.cos(ang + 2.4), ey + 8 * Math.sin(ang + 2.4));
+        g.lineTo(ex + 8 * Math.cos(ang - 2.4), ey + 8 * Math.sin(ang - 2.4));
+        g.closePath(); g.fill();
+      }
+    }
     if (v?.pose) drawRobot(g, geo.toPx(v.pose.x), geo.toPy(v.pose.y), v.pose.yaw, geo.scale / m.resolution);
-  }, [m, img, d.view, geo?.scale]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [m, img, d.view, geo?.scale, showControl, zones.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="dz-map" ref={box}>
@@ -156,8 +179,11 @@ function MapPanel({ d, open }: PanelProps) {
           {d.overview?.points.map((p) => {
             const st = pointState(p);
             const current = d.view?.mission?.currentPointId === p.point_id;
+            // 로봇과 겹치면 반투명: 로봇(캔버스)이 비쳐 보이게 한다. 단추는 로봇 위에 그대로 있어 눌린다
+            const rp = d.view?.pose;
+            const over = !!rp && Math.hypot(rp.x - p.x, rp.y - p.y) < 0.4;
             return (
-              <button key={p.point_id} className={`dz-pin ${st} ${current ? 'current' : ''}`} style={{ left: geo.toPx(p.x), top: geo.toPy(p.y) }}
+              <button key={p.point_id} className={`dz-pin ${st} ${current ? 'current' : ''} ${over ? 'over' : ''}`} style={{ left: geo.toPx(p.x), top: geo.toPy(p.y) }}
                 title={`${p.code} ${p.name} · ${POINT_STATE_TEXT[st]}`} onClick={() => open({ kind: 'point', id: p.point_id })}>
                 <span>{p.code}</span>
               </button>
@@ -174,6 +200,9 @@ function MapPanel({ d, open }: PanelProps) {
       )}
       <div className="dz-legend">
         {(['ok', 'wait', 'warn', 'bad', 'none'] as const).map((s) => <span key={s}><Dot tone={`pt-${s}`} />{POINT_STATE_TEXT[s]}</span>)}
+        <span style={{ color: '#0a84ff' }}>┄ 계획 경로(A*)</span>
+        {!!zones.data?.length && <span style={{ color: '#ff3b30' }}>▨ 금지구역</span>}
+        {showControl && <span style={{ color: '#ff9500' }}>━▶ 제어기 방향</span>}
       </div>
     </div>
   );

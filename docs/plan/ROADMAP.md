@@ -1,8 +1,8 @@
 # 향후 프로젝트 계획
 
-> **이 문서의 위치:** 소화기 판독은 [SCENARIOS.md](SCENARIOS.md) 의 시나리오 2(소방 관제)에 `OBJECT` 판독기로 들어갔다. 판정 체계(정상 · 경고 · 비상), 규칙 · 결과의 모양, 서비스별 변경은 [SCENARIOS.md](SCENARIOS.md) 와 [INTERFACES.md](INTERFACES.md) 가 기준이다. 아래 내용 가운데 **모델 학습 방식과 학습 데이터**는 그대로 유효하고, "판정 규칙"(비치됨 · 위치 이탈 · 미비치)은 `OBJECT` 판독기가 읽는 값(`IN_REGION` · `OUT_OF_REGION` · `MISSING`)과 등급 설정으로 바뀌었다.
+> **이 문서의 위치:** 소화기 판독은 [SCENARIOS.md](../design/SCENARIOS.md) 의 시나리오 2(소방 관제)에 `OBJECT` 판독기로 들어갔다. 판정 체계(정상 · 경고 · 비상), 규칙 · 결과의 모양, 서비스별 변경은 [SCENARIOS.md](../design/SCENARIOS.md) 와 [INTERFACES.md](../design/INTERFACES.md) 가 기준이다. 아래 내용 가운데 **모델 학습 방식과 학습 데이터**는 그대로 유효하고, "판정 규칙"(비치됨 · 위치 이탈 · 미비치)은 `OBJECT` 판독기가 읽는 값(`IN_REGION` · `OUT_OF_REGION` · `MISSING`)과 등급 설정으로 바뀌었다.
 
-현재 구현 범위와 한계는 [guide/RUNNING.md](../guide/RUNNING.md), 구조는 [architecture/system_architecture.svg](../architecture/system_architecture.svg) 를 본다.
+현재 구현 범위와 한계는 [guide/RUNNING.md](../guide/RUNNING.md), 구조는 [architecture/system_architecture.svg](../architecture/system_architecture.svg) 를 본다. 주행 쪽은 [drive_controller.svg](../navigation/drive_controller.svg) · [drive_layers.svg](../navigation/drive_layers.svg).
 
 ---
 
@@ -87,6 +87,18 @@
 ## 2. 주행 제어기 개선 (별도 작업, 시나리오 구현과 분리)
 
 시나리오 구현(`feat/scenarios-sim`)에 포함하지 않는다. 이후 별도 작업으로 한다.
+
+> **진행(2026-11-18, 브랜치 `feat/drive-controller`, 시뮬레이션):** 제어기를 Regulated Pure Pursuit 에서 MPPI 로 바꿨다.
+> 기준은 "감속 없이 최대 속도로 달리는 시간의 비율"로 잡았다. 측정값과 시험 방법은 `docs/guide/RUNNING.md`, 바꾼 값 · 버린 시도 · 이유는 `nav2_params.yaml` 머리 5).
+> - 원인: 좁은 곳에서 느려지거나 끊긴 것은 계획 쪽이 아니라 제어 쪽이었다(RPP 의 비용 · 곡률 감속과 충돌 예측 정지).
+> - 결과: 이 시설의 경로(직선 · 굽은 길 · 점검 지점)에서 최대속도 유지 50~77% → 84~95%. 폭 0.7m 틈까지는 속도를 유지한다.
+> - 한계: 폭 0.6m 틈은 MPPI 가 멈칫하거나 실패한다(RPP 는 느리게 지났다). 달리는 중 갑자기 놓인 팔레트(남는 폭 0.65m)도 같은 이유로 느리다.
+>   로봇을 원 0.22m 로 보는 한 남는 문제이고, 제어기만 실제 외곽으로 보게 하면 0.9m 문에서 벽에 끼었다. 계획 · 제어 양쪽을 함께 외곽으로 바꾸는 것은 해 보지 않았다.
+> - 계획(2026-11-18~19): 계획기 Smac 2D A\* → Theta\*(직선 + 모퉁이), 처음 계획을 유지하는 행동 트리, 제어기용 비용 지도 0.05 → 0.025m
+>   (폭 0.6m 틈을 속도를 유지하며 통과), 목표 브리지의 몸통 채우기 · 물러나 자세 잡기 · 두 번 막힌 자리 막기.
+>   장애물 시험은 달리는 도중 계획 경로 위에 놓는 여섯 시나리오로 다시 짰다(38개 확인 통과). 자세한 내용은 `docs/guide/RUNNING.md` "계획 방식과 좁은 틈".
+> - 남은 일: 실기(Raspberry Pi 4, Cortex-A72 4코어, ROS 2 Jazzy · Nav2 미설치)에서 제어 주기 10Hz 를 지키는지 재야 한다. 못 지키면 `batch_size` · `time_steps` 를 줄인다.
+>   Jazzy 는 MPPI 파라미터 이름 · 기본값이 Humble 과 달라 설정을 옮겨야 한다.
 
 ### 문제
 
