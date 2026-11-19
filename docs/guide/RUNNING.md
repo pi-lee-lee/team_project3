@@ -102,8 +102,63 @@ docker compose up -d sim                         # 기본(nav) 모드로 재시�
 - 실패한 경유점은 코스트맵을 비우고 한 번 더 시도한 뒤 다음으로 넘어간다.
 - 0.45m 틈(설비 2 ↔ 동쪽 벽)은 로봇 폭(반경 0.22)보다 좁아 지나갈 수 없으므로 계획에 넣지 않는다.
 
-주행 제어기는 Regulated Pure Pursuit 이다. 굽은 곳에서 경로 방향과 26° 넘게 어긋나면 제자리에서 먼저 돌아 경로를 바라본 뒤 출발하고,
-좁은 곳에서는 스스로 느려진다. 주행 품질은 `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'` 로 잰다.
+주행 제어기는 MPPI 다. A\* 경로를 따르면서, 주행 중 지역 비용 지도에 새로 찍힌 장애물은 다시 계획되기를 기다리지 않고 바로 비켜 간다.
+막혀서 길이 없으면 경로부터 다시 계획한다. 좁은 곳에서도 스스로 줄이지 않는다 — 기준은 "감속 없이 최대 속도로 달리는 것"이다.
+로봇 모양은 경로 계획(전역 비용 지도)과 제어기(지역 비용 지도) 모두 반경 0.22m 원이다.
+
+주행 품질은 `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'` 로 잰다.
+걸린 시간 · 평균 속도 · **최대속도 유지**(전진 속도 명령이 최대의 90% 이상이었던 시간 비율) · 벽까지 최소 거리 · 좌우 흔들림 · 전진 멈춤을 낸다.
+
+```bash
+docker compose exec sim /sim/tools/obstacle.sh place reroute      # C2 아래쪽을 막아 틈이 유일한 길이 되게
+docker compose exec sim /sim/tools/obstacle.sh place gap 0.6      # C1 복도에 폭 0.6m 틈만 남김(좁은 통로)
+docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --gap 0.6'
+docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --drop detour 1.6'   # 1.6m 앞에 장애물을 갑자기 놓기
+```
+
+제어기를 바꾸며 잰 값(시뮬레이션, 최대 0.22m/s, 최대속도 유지 / 걸린 시간):
+
+| 시험 | Regulated Pure Pursuit(이전) | MPPI |
+| --- | --- | --- |
+| 직선 3m | 60~77% / 16~20초 | 84~90% / 15~17초 |
+| 굽은 길 8m (C1 ↔ P2) | 50~52% / 48~49초 | 89~93% / 38~39초 |
+| 점검 지점 순회 (P1 → P3 → P2 → P1 → 충전 위치) | 재지 않음 | 69~95%, 모두 도착 (P3 가는 0.9m 문에서 69%) |
+| 폭 0.7m 틈 | 36~41% / 20초 | 80~90% / 16~17초 |
+| 폭 0.6m 틈 | 36~38% / 21초 | **멈칫(51초) 또는 실패** |
+| 달리는 중 1.6m 앞에 놓인 팔레트(남는 폭 0.65m) | 28% / 23초 | 46% / 30초 |
+
+- 3m 구간은 출발 가속 · 도착 감속 · 출발 전 제자리 회전이 10~15% 를 차지해 100% 가 되지 않는다.
+- 위 표는 제어기용(지역) 비용 지도가 한 칸 0.05m 일 때의 값이다. 그때 MPPI 의 한계는 폭 0.7m 였다: 0.6m 틈에서는 로봇 중심이
+  지날 수 있는 띠가 0.16m(세 칸)뿐이라 후보 궤적 대부분이 충돌로 버려졌다.
+- **지역 비용 지도를 0.025m 로 바꾼 뒤에는 0.6m 틈도 속도를 유지하며 지난다**(아래 "계획 방식과 좁은 틈").
+- 로봇 모양을 제어기 쪽만 실제 외곽 사각형으로 바꾸면 0.55m 틈도 85% 로 지나지만, 0.9m 문에서 벽에 끼어 채택하지 않았다
+  (`nav2_params.yaml` 머리 5)).
+
+#### 계획 방식과 좁은 틈
+
+"처음에 출렁임 없는 최단 경로를 한 번 세우고, 그 경로를 제어기가 따라간다."
+
+- **계획기**: Theta\*(any-angle A\*). 격자 칸을 따라가지 않고 서로 보이는 점끼리 직선으로 이어, 곧은 구간 + 모퉁이로만 된 경로를 낸다.
+  벽에서 0.45m 띠만 비용을 두어 그 밖은 직선이다. Smac 2D A\* + 다듬기는 열린 곳에서도 S 자로 출렁였다.
+- **한 번만 계획**: 행동 트리 `config/navigate_fixed_plan.xml`. 다시 계획하는 때는 목표가 바뀌었을 때, 경로가 막혔을 때,
+  제어기 실패 · 복구 동작 뒤뿐이다(기본 트리는 1초마다 다시 계획해 주행 중 경로가 흔들렸다).
+- **계획 경로 측정**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/plan_probe.py'`
+  — 로봇을 움직이지 않고 충전 위치 · P1~P3 사이 경로의 길이 · 꺾임 · 벽 여유를 낸다.
+- **지역 비용 지도 0.025m**: 폭 0.6m 틈(문 바로 아래 골목을 반쯤 막은 `aisle60`)에서 0.05m 일 때는 15~31초 멈칫하거나 실패했고,
+  0.025m 에서는 막지 않았을 때와 같은 시간에 지났다(P3 → P1 30~32초, P1 → P3 25~26초. 최근 12회 모두 틈으로 통과).
+- **로봇 측 목표 브리지가 계획을 돕는 세 가지**(`ros/robot/src/nav2_goal_bridge.py`, 전역 비용 지도의 `virtual_layer`):
+  - 장애물의 몸통 채우기 — 라이다는 새 장애물의 앞면만 선으로 본다. 보인 면 뒤 0.3m 를 막힌 것으로 찍는다(옆의 틈은 그대로).
+  - 물러나 자세 잡기 — 같은 자리에서 제어기가 3번 실패하거나, 목표가 실패했는데 장애물이 0.4m 안에 있으면
+    라이다로 본 가까운 장애물에서 멀어지는 쪽으로(전진 · 후진 중 덜 도는 쪽) 최대 0.45m 또는 사방 0.4m 가 트일 때까지
+    움직인 뒤 다시 계획하게 한다. 실패한 목표는 이렇게 자세를 고쳐 3번까지 다시 보낸다.
+    로봇 중심이 충돌 구역에 들면 Nav2 의 후진 · 회전 복구는 `Collision Ahead` 로 시작하지 못한다.
+  - 두 번 막힌 자리 막기 — 물러났다가 같은 자리에서 또 막히면 그 자리를 막아 다른 길로 계획하게 한다.
+- 한계: 로봇을 반지름 0.22m 원으로 본다. 틈이 0.5m 이하면 계획이 막힌 것으로 보고 돌아간다.
+  두 번 막힌 자리 막기는 아직 작동한 적이 없다.
+- **반복 시험**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py --rounds 3'`
+  — 골목(P3 ↔ P1: 없음 · 폭 0.7 · 0.6 · 0.5m 틈 · 완전 막힘)과 생산동(P1 ↔ P2: 팔레트 · 문 막힘 · 진입 불가)을 장애물이
+  서는 시점(출발 전 · 1.2m 앞 · 0.6m 앞)별로 달려, 맞는 결과(직행 · 우회 · 길 없음)인지와 정지 시간을 낸다(`--sets`, `--only`).
+  한 회 42번 주행에 한 시간 남짓. 최근 연속 3회(126번)에서 틀린 결과 0, 물러나기는 뒤 2회(84번)에서 6번 작동했다.
 
 Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값에서 고친 점을 파일 맨 위에 적어 둠).
 시험하며 확인한 운영상 주의점 — 실제 현장에서도 그대로 적용된다:
@@ -114,11 +169,27 @@ Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값�
 ### 장애물 시험
 
 ```bash
-docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 팔레트: 옆으로 비켜 지나감 (우회 가능)
-docker compose exec sim /sim/tools/obstacle.sh place reroute   # C2 아래쪽 막힘: 생산동을 거쳐 다른 경로로
+docker compose exec sim /sim/tools/obstacle.sh place pallet    # 생산동 가운데 팔레트(P1 → P2 경로 위): 옆으로 비켜 지나감
+docker compose exec sim /sim/tools/obstacle.sh place door      # 생산동 → C2 문 막힘: C1 · C2 로 돌아감
 docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘: P2 진입 불가
+docker compose exec sim /sim/tools/obstacle.sh place aisle     # 전기실 문 바로 아래 골목 막힘(P3 ↔ P1 경로 위): 랙 1 위로 돌아 나옴
+docker compose exec sim /sim/tools/obstacle.sh place aisle60   # 같은 자리를 반쯤 막아 폭 0.6m 틈만 남김(aisle50 은 0.5m)
+docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 복도 팔레트 / reroute: C2 아래쪽 막힘 (C1 · C2 를 따라갈 때만 경로 위)
 docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우기
 ```
+
+`python3 scripts/e2e_test.py --only-obstacles` 의 시나리오는 장애물을 **로봇이 달리는 도중에, 그때의 계획 경로를 막는 자리에** 놓는다
+(놓기 직전에 경로와 겹치는지 검사한다. 계획기를 바꾸면 경로가 달라져, 고정된 자리의 장애물이 경로와 상관없어질 수 있다).
+
+| | 구간 | 장애물 | 기대 |
+| --- | --- | --- | --- |
+| 9-1 | P1 → P2 | `pallet` | 제어기가 비켜 지나감 |
+| 9-2 | P1 → P2 | `door` | 다시 계획해 C1 · C2 로 돌아감 |
+| 9-3 | → P2, P3 | `block`(출발 전) | P2 진입 불가(`BLOCKED_NO_PATH`), P3 은 촬영 |
+| 9-4 | P3 → P1 | `aisle` | 다시 계획해 랙 위로 돌아 나옴 |
+| 9-5 | P3 → P1 | `aisle60` | 틈으로 지남 |
+| 9-6 | P1 → P3 | 9-5 의 장애물을 그대로 둠 | 틈으로 지남 |
+
 
 장애물 처리는 로봇 측 Nav2 가 한다(일시 장애물 대기, 우회 경로 재계획, 복구 동작). Nav2 가 실패하면 목표 브리지(`ros/robot/src/nav2_goal_bridge.py`)가 현재 위치에서 경로를 다시 계산해 원인을 나눈다.
 

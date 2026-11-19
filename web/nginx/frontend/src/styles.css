@@ -213,6 +213,7 @@ main { padding: 20px 32px 90px; width: 100%; min-width: 0; }
 .lg.robot { background: #007aff; } .lg.path { background: none; height: 0; border-top: 3px dotted #007aff; vertical-align: 4px; } .lg.robot { border-radius: 2px; }
 .lg.scan { background: #ff3b30; height: 3px; vertical-align: 3px; } .lg.point { border: 2px solid #30b0c7; border-radius: 6px; }
 .lg.goal { border: 2px solid #af52de; border-radius: 6px; }
+.lg.control { background: #ff9500; height: 3px; vertical-align: 3px; }
 
 /* ---------------------------------------------------------------- 지점 이력 */
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; margin-top: 14px; }

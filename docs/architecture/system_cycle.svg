@@ -187,7 +187,7 @@
 <path d="M1572.0 961.0 L1782.0 961.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
 <text x="1582.0" y="955.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="start" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">지점마다 목표 /inspection/goal (rosbridge) — 사건 MOVING</text>
 <circle cx="1784" cy="999.0" r="7" fill="#ffffff" stroke="#248a3d" stroke-width="2.4"/>
-<text x="1770.0" y="1003.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">nav2_goal_bridge → Nav2 NavigateToPose: Smac A* 경로 + RPP 추종 · 실패하면 코스트맵 비우고 경로 확인 후 1회 재시도</text>
+<text x="1770.0" y="1003.5" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">nav2_goal_bridge → Nav2 NavigateToPose: Theta* 직선 경로(한 번 계획) + MPPI 추종 · 실패하면 코스트맵 비우고 경로 확인 후 1회 재시도</text>
 <circle cx="1784" cy="1037.0" r="4" fill="#248a3d"/>
 <path d="M1784.0 1037.0 L1574.0 1037.0" fill="none" stroke="#248a3d" stroke-width="2" marker-end="url(#a248a3d)"/>
 <text x="1774.0" y="1031.0" font-size="12" font-weight="500" fill="#1c1c1e" text-anchor="end" paint-order="stroke" stroke="#ffffff" stroke-width="5" stroke-linejoin="round">결과 /inspection/goal_status: SUCCEEDED(우회 여부) · BLOCKED_NO_PATH · NAV_FAILED · NO_PROGRESS · NAV_UNAVAILABLE</text>

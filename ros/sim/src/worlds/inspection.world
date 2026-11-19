@@ -6,6 +6,8 @@
     <include><uri>model://sun</uri></include>
     <scene><shadows>false</shadows><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
     <physics type="ode"><max_step_size>0.004</max_step_size><real_time_update_rate>250</real_time_update_rate></physics>
+    <!-- 물체를 즉시 옮기는 서비스(/gazebo/set_entity_state): 시험용 장애물을 정한 순간에 정확히 놓는다(nav_soak.py) -->
+    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so"><ros><namespace>/gazebo</namespace></ros><update_rate>1.0</update_rate></plugin>
     <model name="outer_south_0">
       <static>true</static>
       <pose>3.600 -0.800 0.300 0 0 0</pose>

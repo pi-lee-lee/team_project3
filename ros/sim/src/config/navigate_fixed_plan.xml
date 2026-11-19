@@ -1,0 +1,54 @@
+<!--
+  처음 한 번 계획한 경로를 끝까지 따라간다(제어기가 그 경로 위에서 실시간으로 비켜 간다).
+  다시 계획하는 때: 목표가 바뀌었을 때, 또는 전역 비용 지도에서 경로가 막혔을 때(IsPathValid, 1초마다 확인).
+  Nav2 의 navigate_w_recovery_and_replanning_only_if_path_becomes_invalid.xml 에서 한 가지를 바꿨다:
+  제어기가 실패했거나 복구 동작(회전·대기·후진)을 한 뒤에는 현재 위치에서 다시 계획한다. 제어기는 새 주행을 시작할 때 경로의
+  앞부분(prune_distance)에서만 자기 위치를 찾으므로, 이미 지나온 옛 경로를 다시 주면 "Resulting plan has 0 poses" 로 계속 실패한다.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <PipelineSequence>
+        <RateController hz="1.0" name="RateControllerComputePathToPose">
+          <RecoveryNode number_of_retries="1" name="RecoveryComputePathToPose">
+            <Fallback name="FallbackComputePathToPose">
+              <ReactiveSequence name="CheckIfNewPathNeeded">
+                <Inverter>
+                  <GlobalUpdatedGoal/>
+                </Inverter>
+                <IsPathValid path="{path}"/>
+              </ReactiveSequence>
+              <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            </Fallback>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="RecoveryFollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <Sequence name="ClearAndReplan">
+            <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+          </Sequence>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="FallbackRecoveries">
+        <GoalUpdated/>
+        <Sequence name="RecoverThenReplan">
+        <RoundRobin name="RecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <Spin name="SpinRecovery" spin_dist="1.57"/>
+          <Wait name="WaitRecovery" wait_duration="5"/>
+          <BackUp name="BackUpRecovery" backup_dist="0.30" backup_speed="0.05"/>
+        </RoundRobin>
+        <!-- 여기서 계획이 안 나와도(벽에 붙어 출발점이 충돌 구역일 때 등) 포기하지 않고 다음 복구 동작(회전·대기·후진)으로 넘어간다 -->
+        <ForceSuccess>
+          <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+        </ForceSuccess>
+        </Sequence>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

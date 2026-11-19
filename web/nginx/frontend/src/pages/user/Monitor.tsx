@@ -320,6 +320,23 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
       g.stroke();
       g.setLineDash([]);
     }
+    // 제어기 방향: 지금 속도 명령을 3초 유지했을 때 갈 호(실선) + 끝의 화살촉. 점선(A* 경로)과 어긋난 만큼이 제어기의 판단이다
+    const ct = v?.control?.traj;
+    if (ct && ct.length > 1) {
+      g.strokeStyle = '#ff9500'; g.fillStyle = '#ff9500'; g.lineWidth = 3; g.lineJoin = 'round'; g.lineCap = 'round';
+      g.beginPath();
+      ct.forEach(([x, y], i) => (i ? g.lineTo(toPx(x), toPy(y)) : g.moveTo(toPx(x), toPy(y))));
+      g.stroke();
+      const [ax, ay] = ct[ct.length - 2], [bx, by] = ct[ct.length - 1];
+      const ex = toPx(bx), ey = toPy(by), ang = Math.atan2(ey - toPy(ay), ex - toPx(ax));
+      if (Math.hypot(ex - toPx(ct[0][0]), ey - toPy(ct[0][1])) > 6) {      // 제자리 회전이면 화살촉을 그리지 않는다
+        g.beginPath();
+        g.moveTo(ex + 9 * Math.cos(ang), ey + 9 * Math.sin(ang));
+        g.lineTo(ex + 6 * Math.cos(ang + 2.4), ey + 6 * Math.sin(ang + 2.4));
+        g.lineTo(ex + 6 * Math.cos(ang - 2.4), ey + 6 * Math.sin(ang - 2.4));
+        g.closePath(); g.fill();
+      }
+    }
     // 라이다: 이웃한 점(0.25m 이내)을 이어 하나의 선으로 그린다
     if (v?.scan?.length) {
       g.strokeStyle = 'rgba(255, 59, 48, 0.85)'; g.lineWidth = 1.5; g.lineJoin = 'round'; g.lineCap = 'round';
@@ -440,7 +457,7 @@ function MapPanel({ robotId, iHold }: { robotId: number; iHold: boolean }) {
         <canvas ref={robotLayer} className="robot-layer" aria-hidden />
       </div>
       <div className="map-legend small">
-        <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로</span>
+        <span><i className="lg robot" /> 로봇</span><span><i className="lg path" /> 계획 경로(A*)</span><span><i className="lg control" /> 제어기 방향</span>
         <span><i className="lg scan" /> 라이다</span><span><i className="lg point" /> 점검 지점</span><span><i className="lg goal" /> 목적지·방향</span>
         {view.data?.pose ? <span className="muted">위치 x {view.data.pose.x.toFixed(2)} · y {view.data.pose.y.toFixed(2)} · θ {(view.data.pose.yaw * 180 / Math.PI).toFixed(0)}°</span>
           : <span className="warn-t">위치 추정 없음</span>}

@@ -15,6 +15,9 @@ from pathlib import Path
 
 BASE = 'http://localhost:8080'
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / 'ros/sim/src/worlds'))
+from world_spec import OBSTACLES  # noqa: E402  (장애물 자리: 계획 경로 위인지 확인하는 데 쓴다)
+
 ENV_FILE = ROOT / '.env' if (ROOT / '.env').exists() else ROOT / '.env.example'   # .env 가 없으면 기본값
 ENV = dict(line.split('=', 1) for line in ENV_FILE.read_text().splitlines()
            if '=' in line and not line.startswith('#'))
@@ -82,23 +85,44 @@ def run_task(user, rid, point_ids, note, timeout=600):
         *user.get(f"/api/inspections/{t['task_id']}")), timeout, f'{note} 종료', every=5)
 
 
-def obstacle_scenarios(user, rid, by):
-    """시험 시설의 적재물 시나리오: 우회 가능 / 다른 경로로 우회 / 진입 불가."""
-    print('9-1. 장애물: C1 팔레트 (돌아갈 수 있음)')
-    obstacle('clear')
-    check(obstacle('place', 'detour'), 'C1 복도에 팔레트 놓기')
-    d = run_task(user, rid, [by['P2']], '팔레트 우회')
-    ev = [(e['type'], e['detail']) for e in d['events']]
-    print('     사건:', ' → '.join(t for t, _ in ev))
-    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '팔레트를 지나 P2 도착·촬영')
+def drive_and_block(user, rid, point_id, note, name, reached, timeout=600):
+    """점검 작업을 시작하고, 로봇이 reached(pose) 자리에 오면 장애물 name 을 놓는다(달리는 도중에 생기는 장애물).
+    놓기 직전에 그 자리가 지금 계획 경로를 막는지 확인한다 — 경로와 상관없는 곳에 놓으면 시험이 아니다."""
+    s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [point_id], 'note': note})
+    check(s == 201, f"작업 #{t.get('task_id')} 생성 ({note})", str(t))
+    view = {}
 
-    print('9-2. 장애물: C2 아래쪽 막힘 (생산동으로 돌아감)')
-    obstacle('clear')
-    check(obstacle('place', 'reroute'), 'C2 아래쪽 막기')
-    d = run_task(user, rid, [by['P1'], by['P2']], '다른 경로 우회')
+    def there():
+        view.update(user.get(f'/api/robots/{rid}/mapview')[1] or {})
+        return view.get('pose') and view.get('path') and reached(view['pose'])
+    wait(there, 180, f'{note}: 장애물을 놓을 자리 도착', every=0.3)
+    ox, oy, sx, sy = OBSTACLES[name]
+    # 경로가 장애물에서 로봇 반지름(0.22m) + 여유 안으로 지나가면 '경로를 막는다'. 통로를 반만 막는 장애물(aisle60)은
+    # 경로 선 바로 옆에 놓이므로 선과 겹치는지로 보면 안 된다.
+    reach = 0.22 + 0.08
+    on_path = any(abs(x - ox) <= sx / 2 + reach and abs(y - oy) <= sy / 2 + reach for x, y in view['path'])
+    check(on_path, f'{name} 자리가 지금 계획 경로를 막음(로봇이 지나갈 자리와 겹침)')
+    check(obstacle('place', name), f'달리는 도중에 {name} 놓기')
+    d = wait(lambda: (lambda s, d: d if d['status'] in ('COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED') else None)(
+        *user.get(f"/api/inspections/{t['task_id']}")), timeout, f'{note} 종료', every=5)
     print('     사건:', ' → '.join(e['type'] for e in d['events']))
-    check(d['status'] == 'COMPLETED' and all(o['status'] == 'CAPTURED' for o in d['observations']),
-          '생산동 문을 거쳐 P2 도착·촬영')
+    return d
+
+
+def obstacle_scenarios(user, rid, by):
+    """시험 시설의 적재물 시나리오. 장애물은 로봇이 달리는 도중에, 그때의 계획 경로 위에 놓는다(9-3 만 출발 전에 막는다).
+    장애물이 실제로 서기까지 2.5초쯤 걸리므로 0.5m 쯤 앞서 놓으라고 한다."""
+    print('9-1. 장애물: 경로 위 팔레트 (P1 → P2, 제어기가 비켜 지나감)')
+    obstacle('clear')
+    run_task(user, rid, [by['P1']], 'P1 로 이동')
+    d = drive_and_block(user, rid, by['P2'], '팔레트 비켜 가기', 'pallet', lambda p: p['x'] > 4.9 and p['y'] > 3.5)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '팔레트를 비켜 P2 도착·촬영')
+
+    print('9-2. 장애물: 가던 문이 막힘 (P1 → P2, 생산동 → C2 문 막힘 → C1 · C2 로 돌아감)')
+    obstacle('clear')
+    run_task(user, rid, [by['P1']], 'P1 로 이동')
+    d = drive_and_block(user, rid, by['P2'], '문 막힘', 'door', lambda p: p['x'] > 5.6 and p['y'] > 3.5)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 C1 · C2 로 돌아 P2 도착·촬영')
 
     print('9-3. 장애물: C2 위쪽 막힘 (진입 불가)')
     obstacle('clear')
@@ -112,6 +136,25 @@ def obstacle_scenarios(user, rid, by):
           f"P2 확인 불가 · 사유 코드 {o2['reason_code']} ({o2['reason']})")
     check('ARRIVAL_BLOCKED' in [e['type'] for e in d['events']], '사건 기록 ARRIVAL_BLOCKED')
     check(o3['status'] == 'CAPTURED', '막힌 지점은 건너뛰고 다음 지점(P3)은 촬영')
+
+    print('9-4. 장애물: 가던 골목이 막힘 (P3 → P1, 전기실 문 바로 아래 막힘 → 랙 위로 돌아 나옴)')
+    obstacle('clear')                                                    # 로봇은 9-3 을 마치고 P3 에 있다
+    # 놓으라는 명령에서 실제로 서기까지 2.5~4초 → 문 0.7m 앞에서 명령한다(늦으면 블록이 로봇 위에 생긴다)
+    d = drive_and_block(user, rid, by['P1'], '골목 막힘', 'aisle', lambda p: p['x'] > 2.3 and p['y'] > 4.9)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 랙 위로 돌아 P1 도착·촬영')
+
+    print('9-5. 장애물: 같은 자리가 반쯤 막힘 (P3 → P1, 문을 지날 때 폭 0.6m 틈만 남음)')
+    obstacle('clear')
+    run_task(user, rid, [by['P3']], 'P3 로 이동')                          # 9-4 를 마치고 P1 에 있다
+    d = drive_and_block(user, rid, by['P1'], '골목 반쯤 막힘(P3 → P1)', 'aisle60', lambda p: p['x'] > 2.6 and p['y'] > 5.0)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '틈으로 지나거나 랙 위로 돌아 P1 도착·촬영')
+
+    # P1 은 그 자리에서 1.6m 뿐이라, 출발한 뒤에 놓으면 장애물이 로봇 코앞(0.3m)에 생긴다(실제로 서기까지 2.5초).
+    # 그래서 되돌아가는 길은 9-5 의 장애물을 치우지 않고 그대로 둔다.
+    print('9-6. 장애물: 그 장애물을 둔 채 되돌아감 (P1 → P3, 같은 자리 폭 0.6m 틈)')
+    d = run_task(user, rid, [by['P3']], '반쯤 막힌 골목으로 되돌아감')
+    print('     사건:', ' → '.join(e['type'] for e in d['events']))
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '틈으로 지나거나 랙 위로 돌아 P3 도착·촬영')
     obstacle('clear')
 
 

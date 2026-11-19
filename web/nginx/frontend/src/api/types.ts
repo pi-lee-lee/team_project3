@@ -151,6 +151,8 @@ export interface MapView {
   pose: Pose | null;
   scan: [number, number][];
   path: [number, number][];
+  /** 제어기가 지금 내는 속도 명령과 그 명령으로 갈 예상 호(지도 좌표). 주행 중이 아니면 null */
+  control?: { v: number; w: number; traj: [number, number][] } | null;
   manualGoal: ManualGoal | null;
   mission: { missionId: number; currentPointId: number | null } | null;
 }

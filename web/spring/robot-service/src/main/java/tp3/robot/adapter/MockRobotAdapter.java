@@ -238,7 +238,7 @@ public class MockRobotAdapter implements RobotAdapter {
     @Override
     public MapView mapView() {
         double[] g = goal;
-        return new MapView(new Pose(x, y, yaw), List.of(), g == null ? List.of() : List.of(new double[]{x, y}, new double[]{g[0], g[1]}));
+        return new MapView(new Pose(x, y, yaw), List.of(), g == null ? List.of() : List.of(new double[]{x, y}, new double[]{g[0], g[1]}), null);
     }
 
     @Override

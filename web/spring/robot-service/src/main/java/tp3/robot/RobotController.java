@@ -107,7 +107,7 @@ public class RobotController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).header("Cache-Control", "no-cache").body(png);
     }
 
-    /** 지도 위 실시간 표시: 로봇 위치(지도 좌표), 라이다 점, 계획 경로, 지도 이동 목적지 상태. */
+    /** 지도 위 실시간 표시: 로봇 위치(지도 좌표), 라이다 점, 계획 경로, 제어기 방향(control), 지도 이동 목적지 상태. */
     @GetMapping("/api/robots/{id}/mapview")
     public Map<String, Object> mapView(@PathVariable long id) {
         RobotAdapter.MapView v = registry.adapter(id).mapView();
@@ -115,6 +115,7 @@ public class RobotController {
         m.put("pose", v.pose());
         m.put("scan", v.scan());
         m.put("path", v.path());
+        m.put("control", v.control());
         m.put("manualGoal", missions.manualGoal(id));
         m.put("mission", missions.active(id));
         return m;

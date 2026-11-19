@@ -68,6 +68,8 @@
 | `/inspection/map_pose` | 로봇 → 서버, 5Hz | `geometry_msgs/PoseStamped` (frame `map`) |
 | `/inspection/map` | 터틀봇 → 서버, 5초 | `nav_msgs/OccupancyGrid` — 공용 지도는 터틀봇만 낸다 |
 | `/inspection/scan_map` | 터틀봇 → 서버 | `{"pts": [[x, y], ...]}` |
+| `/inspection/drive_plan` | 터틀봇 → 서버 | `{"v": 0.22, "w": 0.1, "traj": [[x, y], ...]}` — 제어기가 지금 내는 속도 명령과 그 명령으로 3초간 갈 호(지도 좌표). 주행 명령이 있을 때만 5Hz. 관제 지도의 "제어기 방향"(브랜치 `feat/drive-controller` 에서만) |
+| `/inspection/virtual_map` | 로봇 안(브리지 → Nav2 전역 비용 지도) | `nav_msgs/OccupancyGrid`, 지도와 같은 크기. 계획에만 쓰는 가상 장애물: 새 장애물의 몸통, 두 번 막힌 자리. 서버는 쓰지 않는다 |
 | 영상 | 로봇 → 서버 | web_video_server(MJPEG) · 스냅샷 — 지금과 같음 |
 | `cmd_vel` | 서버 → 로봇 | `geometry_msgs/Twist`, 워치독 경유 — 지금과 같음 |
 
