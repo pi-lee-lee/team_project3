@@ -10,6 +10,8 @@
 
 나머지 9개(cdn · web · gateway · 서비스 4개 · db · sim)는 계속 떠 있는 실행 컨테이너다.
 
+그림으로 보려면 [build_containers.svg](../architecture/build_containers.svg) 를 본다(시작 순서 · 두 컨테이너의 입력과 결과).
+
 ## 1. 왜 따로 두는가
 
 이 저장소는 **코드를 이미지에 굽지 않는다.** 이미지에는 실행 환경(JDK · Maven, Node, nginx)만 있고, 코드는 폴더를 볼륨으로 연결해 쓴다.

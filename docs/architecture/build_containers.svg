@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="2018" viewBox="0 0 1640 2018" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a248a3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#248a3d"/></marker><marker id="a5856d6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5856d6"/></marker><marker id="a636366" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#636366"/></marker><marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker><marker id="ac93400" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c93400"/></marker></defs>
+<rect width="1640" height="2018" fill="#f2f2f7"/>
+<text x="40.0" y="48.0" font-size="24" font-weight="700" fill="#1c1c1e" text-anchor="start">빌드용 컨테이너 — 어떻게 동작하고 왜 필요한가</text>
+<text x="40.0" y="74.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">common-build · frontend-build 는 코드를 빌드하고 바로 끝나는 컨테이너다. docker compose ps -a 에서 Exited (0) 으로 보이는 것이 정상이다 (실행 컨테이너 9 · 빌드용 2).</text>
+<rect x="40.0" y="106.0" width="30.0" height="30.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="55.0" y="127.0" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<text x="82.0" y="128.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">왜 필요한가</text>
+<text x="82.0" y="150.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">이 저장소는 코드를 이미지에 굽지 않는다(폴더를 볼륨으로 연결해 실행). 그래서 실행 전에 누군가 코드를 빌드해 두어야 한다.</text>
+<rect x="40.0" y="172.0" width="506.7" height="158.0" rx="12" fill="#fff5f5" stroke="#d70015" stroke-width="1.2"/>
+<text x="56.0" y="200.0" font-size="15" font-weight="700" fill="#d70015" text-anchor="start">방법 A · 호스트에서 빌드</text>
+<rect x="467.9" y="184.0" width="66.8" height="20.0" rx="10" fill="#d70015" stroke="#d70015" stroke-width="1.0"/>
+<text x="501.3" y="198.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">쓰지 않음</text>
+<text x="56.0" y="226.0" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">각자 PC 에 Maven · JDK 21 · Node 20 을 설치한다.</text>
+<text x="56.0" y="254.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✗ 사람마다 버전이 달라 결과가 달라진다</text>
+<text x="56.0" y="278.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✗ 새로 온 사람은 설치부터 해야 한다</text>
+<text x="56.0" y="302.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✗ Windows · macOS · Linux 마다 명령이 다르다</text>
+<rect x="566.7" y="172.0" width="506.7" height="158.0" rx="12" fill="#fff5f5" stroke="#d70015" stroke-width="1.2"/>
+<text x="582.7" y="200.0" font-size="15" font-weight="700" fill="#d70015" text-anchor="start">방법 B · 이미지에 코드를 굽기</text>
+<rect x="926.5" y="184.0" width="134.8" height="20.0" rx="10" fill="#d70015" stroke="#d70015" stroke-width="1.0"/>
+<text x="993.9" y="198.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">개발 중에는 쓰지 않음</text>
+<text x="582.7" y="226.0" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">Dockerfile 안에서 빌드해 jar · dist 를 이미지에 넣는다.</text>
+<text x="582.7" y="254.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✗ 한 줄 고칠 때마다 이미지를 다시 만든다(느리다)</text>
+<text x="582.7" y="278.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✗ 화면만 고쳐도 web 이미지를 새로 만들어야 한다</text>
+<text x="582.7" y="302.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">○ 실제 배포에는 이 방식이 맞다(CI 가 한다)</text>
+<rect x="1093.3" y="172.0" width="506.7" height="158.0" rx="12" fill="#f1faf4" stroke="#248a3d" stroke-width="2.4"/>
+<text x="1109.3" y="200.0" font-size="15" font-weight="700" fill="#248a3d" text-anchor="start">방법 C · 빌드용 컨테이너</text>
+<rect x="1521.2" y="184.0" width="66.8" height="20.0" rx="10" fill="#248a3d" stroke="#248a3d" stroke-width="1.0"/>
+<text x="1554.6" y="198.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">지금 방식</text>
+<text x="1109.3" y="226.0" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">빌드 도구가 든 공개 이미지를 띄워 코드를 빌드하고 끝낸다.</text>
+<text x="1109.3" y="254.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✓ Docker 만 있으면 된다. 모두 같은 버전으로 빌드</text>
+<text x="1109.3" y="278.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✓ 실행 컨테이너가 가볍다(web 은 nginx 뿐)</text>
+<text x="1109.3" y="302.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">✓ 한 번 빌드해 여럿이 쓴다 · 순서는 compose 가 지킨다</text>
+<rect x="40.0" y="370.0" width="30.0" height="30.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="55.0" y="391.0" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="82.0" y="392.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">어떻게 동작하나 — 시작 순서</text>
+<text x="82.0" y="414.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">docker compose up -d 뒤. 가로가 시간이다(길이는 실제 시간이 아니라 순서를 보인다).</text>
+<rect x="40.0" y="432.0" width="1560.0" height="356.0" rx="12" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="250.0" y="458.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="start">▶ docker compose up</text>
+<path d="M250 466 V754" stroke="#1c1c1e" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text x="56.0" y="496.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">common-build</text>
+<text x="56.0" y="512.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">빌드용 · 끝나면 종료</text>
+<rect x="250.0" y="484.0" width="399.0" height="28.0" rx="7" fill="#fff4e5" stroke="#b25000" stroke-width="1.4"/>
+<text x="260.0" y="502.5" font-size="11.5" font-weight="600" fill="#b25000" text-anchor="start">mvn install — tp3:common 을 m2 볼륨에 설치</text>
+<rect x="655.0" y="487.0" width="86.0" height="22.0" rx="11" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="698.0" y="502.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Exited (0)</text>
+<text x="56.0" y="542.0" font-size="13.5" font-weight="700" fill="#c93400" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">db</text>
+<text x="56.0" y="558.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">PostgreSQL</text>
+<path d="M48 522 H1592" stroke="#f2f2f7" stroke-width="1"/>
+<rect x="250.0" y="530.0" width="212.8" height="28.0" rx="7" fill="#fff1e8" stroke="#c93400" stroke-width="1.4"/>
+<text x="260.0" y="548.5" font-size="11.5" font-weight="600" fill="#c93400" text-anchor="start">시작 → healthy</text>
+<rect x="462.8" y="530.0" width="1117.2" height="28.0" rx="7" fill="#ffffff" stroke="#c93400" stroke-width="1.4"/>
+<text x="472.8" y="548.5" font-size="11.5" font-weight="600" fill="#c93400" text-anchor="start">실행 중</text>
+<text x="56.0" y="588.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">Spring 서비스 4개</text>
+<text x="56.0" y="604.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">gateway · user · inspection · robot</text>
+<path d="M48 568 H1592" stroke="#f2f2f7" stroke-width="1"/>
+<rect x="250.0" y="576.0" width="399.0" height="28.0" rx="7" fill="#fafafc" stroke="#aeaeb2" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="260.0" y="594.5" font-size="11.5" font-weight="600" fill="#8e8e93" text-anchor="start">기다림 (common-build 성공 + db healthy)</text>
+<rect x="649.0" y="576.0" width="345.8" height="28.0" rx="7" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.4"/>
+<text x="659.0" y="594.5" font-size="11.5" font-weight="600" fill="#248a3d" text-anchor="start">mvn package — 자기 코드 빌드(m2 에서 tp3:common 사용)</text>
+<rect x="994.8" y="576.0" width="585.2" height="28.0" rx="7" fill="#ffffff" stroke="#248a3d" stroke-width="1.4"/>
+<text x="1004.8" y="594.5" font-size="11.5" font-weight="600" fill="#248a3d" text-anchor="start">java -jar · 실행 중</text>
+<text x="56.0" y="634.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">frontend-build</text>
+<text x="56.0" y="650.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">빌드용 · 끝나면 종료</text>
+<path d="M48 614 H1592" stroke="#f2f2f7" stroke-width="1"/>
+<rect x="250.0" y="622.0" width="532.0" height="28.0" rx="7" fill="#fff4e5" stroke="#b25000" stroke-width="1.4"/>
+<text x="260.0" y="640.5" font-size="11.5" font-weight="600" fill="#b25000" text-anchor="start">npm install → npm run build — dist/ 를 만든다</text>
+<rect x="788.0" y="625.0" width="86.0" height="22.0" rx="11" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="831.0" y="640.0" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Exited (0)</text>
+<text x="56.0" y="680.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">web</text>
+<text x="56.0" y="696.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">nginx 원본 서버</text>
+<path d="M48 660 H1592" stroke="#f2f2f7" stroke-width="1"/>
+<rect x="250.0" y="668.0" width="877.8" height="28.0" rx="7" fill="#fafafc" stroke="#aeaeb2" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="260.0" y="686.5" font-size="11.5" font-weight="600" fill="#8e8e93" text-anchor="start">기다림 (frontend-build 성공 + gateway 시작)</text>
+<rect x="1127.8" y="668.0" width="452.2" height="28.0" rx="7" fill="#ffffff" stroke="#5856d6" stroke-width="1.4"/>
+<text x="1137.8" y="686.5" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="start">실행 중 — dist/ 를 그대로 내준다</text>
+<text x="56.0" y="726.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">cdn</text>
+<text x="56.0" y="742.0" font-size="10.5" font-weight="400" fill="#8e8e93" text-anchor="start">nginx 엣지 캐시 · 외부 :8080</text>
+<path d="M48 706 H1592" stroke="#f2f2f7" stroke-width="1"/>
+<rect x="250.0" y="714.0" width="957.6" height="28.0" rx="7" fill="#fafafc" stroke="#aeaeb2" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="260.0" y="732.5" font-size="11.5" font-weight="600" fill="#8e8e93" text-anchor="start">기다림 (web 시작)</text>
+<rect x="1207.6" y="714.0" width="372.4" height="28.0" rx="7" fill="#ffffff" stroke="#5856d6" stroke-width="1.4"/>
+<text x="1217.6" y="732.5" font-size="11.5" font-weight="600" fill="#5856d6" text-anchor="start">실행 중 — 접속 가능</text>
+<text x="56.0" y="774.0" font-size="12" font-weight="600" fill="#3a3a3c" text-anchor="start">depends_on: { condition: service_completed_successfully } — 빌드용 컨테이너가 성공해서 끝난 뒤에만 뒤 컨테이너가 시작한다. 빌드가 실패(Exited 1)하면 뒤 컨테이너는 뜨지 않는다.</text>
+<rect x="40.0" y="828.0" width="30.0" height="30.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="55.0" y="849.0" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<text x="82.0" y="850.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">두 컨테이너의 안 — 무엇을 읽어 무엇을 만들고, 누가 쓰는가</text>
+<text x="82.0" y="872.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">굵은 주황 상자 = 빌드용 컨테이너(끝나면 사라진다) · 점선 상자 = 결과가 남는 곳(볼륨 · 폴더) · 결과물은 컨테이너가 끝나도 남는다</text>
+<rect x="40.0" y="890.0" width="768.0" height="520.0" rx="12" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="58.0" y="920.0" font-size="16" font-weight="700" fill="#b25000" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">common-build</text>
+<text x="182.8" y="920.0" font-size="12.5" font-weight="500" fill="#636366" text-anchor="start">공유 라이브러리를 한 번 설치한다</text>
+<rect x="58.0" y="938.0" width="732.0" height="88.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.6"/>
+<text x="72.0" y="963.0" font-size="14" font-weight="700" fill="#3a3a3c" text-anchor="start">호스트 폴더  web/spring/common</text>
+<rect x="704.0" y="948.0" width="74.0" height="19.0" rx="9" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="1.0"/>
+<text x="741.0" y="961.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">입력 · 코드</text>
+<text x="72.0" y="985.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">pom.xml · src/ — 서비스들이 함께 지키는 약속</text>
+<text x="72.0" y="1004.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">JwtCodec(토큰 발급 · 검증) · AuthHeaders(X-User-*) · CurrentUser</text>
+<rect x="58.0" y="1056.0" width="732.0" height="88.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="2.6"/>
+<text x="72.0" y="1081.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="start">common-build 컨테이너</text>
+<rect x="602.3" y="1066.0" width="175.7" height="19.0" rx="9" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="690.1" y="1079.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">maven:3.9-eclipse-temurin-21</text>
+<text x="72.0" y="1103.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">mvn -q -B install -DskipTests</text>
+<text x="72.0" y="1122.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">빌드해서 로컬 Maven 저장소에 설치하고 종료(restart: "no")</text>
+<rect x="58.0" y="1174.0" width="732.0" height="88.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="72.0" y="1199.0" font-size="14" font-weight="700" fill="#3a3a3c" text-anchor="start">볼륨  m2</text>
+<rect x="693.3" y="1184.0" width="84.7" height="19.0" rx="9" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="1.0"/>
+<text x="735.6" y="1197.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">결과 · 남는다</text>
+<text x="72.0" y="1221.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">tp3:common:0.1.0.jar</text>
+<text x="72.0" y="1240.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">+ 내려받은 의존 라이브러리(두 번째부터는 다시 받지 않는다)</text>
+<rect x="58.0" y="1292.0" width="732.0" height="88.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="72.0" y="1317.0" font-size="14" font-weight="700" fill="#248a3d" text-anchor="start">gateway · user-service · inspection-service · robot-service</text>
+<rect x="639.0" y="1302.0" width="138.9" height="19.0" rx="9" fill="#248a3d" stroke="#248a3d" stroke-width="1.0"/>
+<text x="708.5" y="1315.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">쓰는 쪽 · 실행 컨테이너</text>
+<text x="72.0" y="1339.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">시작할 때 mvn package 로 자기 코드를 빌드한다</text>
+<text x="72.0" y="1358.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">이때 tp3:common 을 인터넷이 아니라 m2 볼륨에서 찾는다</text>
+<rect x="832.0" y="890.0" width="768.0" height="520.0" rx="12" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="850.0" y="920.0" font-size="16" font-weight="700" fill="#b25000" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">frontend-build</text>
+<text x="994.3" y="920.0" font-size="12.5" font-weight="500" fill="#636366" text-anchor="start">React 화면을 브라우저가 읽는 파일로 바꾼다</text>
+<rect x="850.0" y="938.0" width="732.0" height="88.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.6"/>
+<text x="864.0" y="963.0" font-size="14" font-weight="700" fill="#3a3a3c" text-anchor="start">호스트 폴더  web/nginx/frontend</text>
+<rect x="1496.0" y="948.0" width="74.0" height="19.0" rx="9" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="1.0"/>
+<text x="1533.0" y="961.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">입력 · 코드</text>
+<text x="864.0" y="985.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">src/*.tsx · package.json — TypeScript · JSX</text>
+<text x="864.0" y="1004.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">브라우저가 그대로는 읽지 못하는 코드다</text>
+<rect x="850.0" y="1056.0" width="732.0" height="88.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="2.6"/>
+<text x="864.0" y="1081.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="start">frontend-build 컨테이너</text>
+<rect x="1475.2" y="1066.0" width="94.8" height="19.0" rx="9" fill="#b25000" stroke="#b25000" stroke-width="1.0"/>
+<text x="1522.6" y="1079.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">node:20-alpine</text>
+<text x="864.0" y="1103.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">npm install → npm run build (Vite)</text>
+<text x="864.0" y="1122.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">node_modules 는 볼륨 frontend_modules 에 둔다(호스트와 안 섞임)</text>
+<rect x="850.0" y="1174.0" width="732.0" height="88.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.4" stroke-dasharray="6 4"/>
+<text x="864.0" y="1199.0" font-size="14" font-weight="700" fill="#3a3a3c" text-anchor="start">호스트 폴더  web/nginx/frontend/dist/</text>
+<rect x="1485.3" y="1184.0" width="84.7" height="19.0" rx="9" fill="#3a3a3c" stroke="#3a3a3c" stroke-width="1.0"/>
+<text x="1527.7" y="1197.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">결과 · 남는다</text>
+<text x="864.0" y="1221.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">index.html + assets/*.js · *.css</text>
+<text x="864.0" y="1240.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">파일 이름에 해시가 붙어 새 빌드는 이름이 달라진다</text>
+<rect x="850.0" y="1292.0" width="732.0" height="88.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="864.0" y="1317.0" font-size="14" font-weight="700" fill="#5856d6" text-anchor="start">web (nginx)  →  cdn  →  브라우저</text>
+<rect x="1431.0" y="1302.0" width="138.9" height="19.0" rx="9" fill="#5856d6" stroke="#5856d6" stroke-width="1.0"/>
+<text x="1500.5" y="1315.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">쓰는 쪽 · 실행 컨테이너</text>
+<text x="864.0" y="1339.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">web 은 dist/ 를 그대로 내준다(web 안에는 Node 도 React 도 없다)</text>
+<text x="864.0" y="1358.0" font-size="12" font-weight="400" fill="#3a3a3c" text-anchor="start">cdn 은 assets/ 만 보관한다. 다시 빌드해도 web · cdn 재시작이 필요 없다</text>
+<rect x="40.0" y="1450.0" width="30.0" height="30.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="55.0" y="1471.0" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<text x="82.0" y="1472.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">코드를 고친 뒤 — 무엇을 다시 돌리는가</text>
+<rect x="40.0" y="1494.0" width="1560.0" height="34.0" rx="10" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="56.0" y="1516.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">고친 곳</text>
+<text x="356.0" y="1516.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">할 일</text>
+<text x="1216.0" y="1516.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">빌드용 컨테이너</text>
+<rect x="40.0" y="1534.0" width="1560.0" height="38.0" rx="9" fill="#fff4e5" stroke="#b25000" stroke-width="1.4"/>
+<text x="56.0" y="1558.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">화면  web/nginx/frontend</text>
+<text x="356.0" y="1558.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">docker compose run --rm frontend-build   → 브라우저 새로고침</text>
+<text x="1216.0" y="1558.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">frontend-build 를 다시</text>
+<rect x="40.0" y="1578.0" width="1560.0" height="38.0" rx="9" fill="#fff4e5" stroke="#b25000" stroke-width="1.4"/>
+<text x="56.0" y="1602.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">공유 라이브러리  web/spring/common</text>
+<text x="356.0" y="1602.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">docker compose run --rm common-build   → Spring 서비스 4개 restart</text>
+<text x="1216.0" y="1602.0" font-size="12.5" font-weight="700" fill="#b25000" text-anchor="start">common-build 를 다시</text>
+<rect x="40.0" y="1622.0" width="1560.0" height="38.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1"/>
+<text x="56.0" y="1646.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring 서비스 하나</text>
+<text x="356.0" y="1646.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">docker compose up -d --force-recreate &lt;서비스&gt;</text>
+<text x="1216.0" y="1646.0" font-size="12.5" font-weight="400" fill="#8e8e93" text-anchor="start">필요 없음 — 서비스가 시작하며 스스로 빌드</text>
+<rect x="40.0" y="1666.0" width="1560.0" height="38.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1"/>
+<text x="56.0" y="1690.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">분석 서비스(Python) · ROS 코드</text>
+<text x="356.0" y="1690.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">docker compose restart analysis-service  /  sim</text>
+<text x="1216.0" y="1690.0" font-size="12.5" font-weight="400" fill="#8e8e93" text-anchor="start">필요 없음 — 빌드 단계가 없다</text>
+<rect x="40.0" y="1710.0" width="1560.0" height="38.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1"/>
+<text x="56.0" y="1734.0" font-size="13" font-weight="700" fill="#1c1c1e" text-anchor="start">nginx 설정</text>
+<text x="356.0" y="1734.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">docker compose exec web nginx -s reload   (cdn 도 같음)</text>
+<text x="1216.0" y="1734.0" font-size="12.5" font-weight="400" fill="#8e8e93" text-anchor="start">필요 없음</text>
+<rect x="40.0" y="1782.0" width="30.0" height="30.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="55.0" y="1803.0" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<text x="82.0" y="1804.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">헷갈리기 쉬운 것 — 이미지 빌드와는 다른 단계다</text>
+<rect x="40.0" y="1826.0" width="768.0" height="132.0" rx="12" fill="#ffffff" stroke="#8e8e93" stroke-width="1.4"/>
+<text x="58.0" y="1854.0" font-size="14.5" font-weight="700" fill="#3a3a3c" text-anchor="start">이미지 빌드  (docker compose up --build)</text>
+<text x="58.0" y="1880.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">Dockerfile 로 실행 환경을 만든다: Spring 서비스 · analysis-service · sim.</text>
+<text x="58.0" y="1903.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">안에 든 것 = JDK · Maven · Python · ROS 같은 도구. 우리 코드는 들어 있지 않다.</text>
+<text x="58.0" y="1926.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">도구나 Dockerfile 을 바꿨을 때만 다시 한다.</text>
+<rect x="832.0" y="1826.0" width="768.0" height="132.0" rx="12" fill="#fff4e5" stroke="#b25000" stroke-width="2.4"/>
+<text x="850.0" y="1854.0" font-size="14.5" font-weight="700" fill="#b25000" text-anchor="start">빌드용 컨테이너  (common-build · frontend-build)</text>
+<text x="850.0" y="1880.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">공개 이미지를 그대로 띄워 우리 코드를 빌드한다(Dockerfile 없음).</text>
+<text x="850.0" y="1903.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">결과물 = jar · dist. 볼륨과 폴더에 남고, 컨테이너는 Exited (0) 으로 끝난다.</text>
+<text x="850.0" y="1926.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">공유 라이브러리나 화면 코드를 고칠 때마다 다시 한다.</text>
+<text x="40.0" y="1980.0" font-size="12.5" font-weight="500" fill="#636366" text-anchor="start">실제 배포에서는 CI 가 jar · dist 를 미리 만들어 이미지에 넣는다(방법 B). 그때는 이 두 컨테이너의 일이 CI 단계로 옮겨 간다. 글 설명과 문제 해결은 docs/guide/BUILD_CONTAINERS.md</text>
+<path d="M649.0 512.0 L649.0 576.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<path d="M462.8 558.0 L462.8 576.0" fill="none" stroke="#c93400" stroke-width="1.6" marker-end="url(#ac93400)"/>
+<path d="M782.0 650.0 L782.0 668.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
+<path d="M1034.8 604.0 L1034.8 608.0 L1113.8 608.0 L1113.8 668.0" fill="none" stroke="#248a3d" stroke-width="1.4" marker-end="url(#a248a3d)"/>
+<path d="M1199.6 696.0 L1199.6 714.0" fill="none" stroke="#5856d6" stroke-width="1.4" marker-end="url(#a5856d6)"/>
+<path d="M424.0 1026.0 L424.0 1056.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="436.0" y="1046.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">/workspace 로 연결</text>
+<path d="M424.0 1144.0 L424.0 1174.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="436.0" y="1164.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">/root/.m2 에 쓴다</text>
+<path d="M424.0 1262.0 L424.0 1292.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="436.0" y="1282.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">네 서비스가 같은 볼륨을 연결</text>
+<path d="M1216.0 1026.0 L1216.0 1056.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="1228.0" y="1046.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">/app 으로 연결</text>
+<path d="M1216.0 1144.0 L1216.0 1174.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="1228.0" y="1164.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">dist/ 에 쓴다</text>
+<path d="M1216.0 1262.0 L1216.0 1292.0" fill="none" stroke="#636366" stroke-width="1.8" marker-end="url(#a636366)"/>
+<text x="1228.0" y="1282.0" font-size="11.5" font-weight="600" fill="#636366" text-anchor="start">읽기 전용으로 연결</text>
+</svg>
