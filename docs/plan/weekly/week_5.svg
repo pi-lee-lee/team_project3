@@ -1,0 +1,349 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1820" height="1606" viewBox="0 0 1820 1606" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a8944ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8944ab"/></marker><marker id="a8e8e93" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8e8e93"/></marker><marker id="ac93400" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c93400"/></marker></defs>
+<rect width="1820" height="1606" fill="#f2f2f7"/>
+<text x="40.0" y="46.0" font-size="24" font-weight="700" fill="#1c1c1e" text-anchor="start">주차별 진행 도면 — 5주차 (12-21 ~ 12-24)</text>
+<text x="40.0" y="72.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">시스템 구성도와 같은 노드 그래프 위에 이번 주에 하는 일(금주)과 다음 주에 할 일(차주)을 표시했다. 노드 하나 = 구성 요소 하나, 색 = 맡은 파트.</text>
+<rect x="40.0" y="96.0" width="186.2" height="50.0" rx="10" fill="#e5e5ea" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="52.0" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">1주차 ✓</text>
+<text x="52.0" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">11-23 ~ 11-27</text>
+<rect x="234.2" y="96.0" width="186.2" height="50.0" rx="10" fill="#e5e5ea" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="246.2" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">2주차 ✓</text>
+<text x="246.2" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">11-30 ~ 12-04</text>
+<text x="327.3" y="164.0" font-size="11" font-weight="600" fill="#aeaeb2" text-anchor="middle">▲ 2주차 끝: 뼈대 · 계약 확정</text>
+<rect x="428.4" y="96.0" width="186.2" height="50.0" rx="10" fill="#e5e5ea" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="440.4" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">3주차 ✓</text>
+<text x="440.4" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">12-07 ~ 12-11</text>
+<rect x="622.7" y="96.0" width="186.2" height="50.0" rx="10" fill="#e5e5ea" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="634.7" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">4주차 ✓</text>
+<text x="634.7" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">12-14 ~ 12-18</text>
+<text x="715.8" y="164.0" font-size="11" font-weight="600" fill="#aeaeb2" text-anchor="middle">▲ 4주차 끝: 기본 점검(시뮬)</text>
+<rect x="816.9" y="96.0" width="186.2" height="50.0" rx="10" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="828.9" y="117.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="start">5주차 · 금주</text>
+<text x="828.9" y="136.0" font-size="11.5" font-weight="500" fill="#d1d1d6" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">12-21 ~ 12-24  (4일)</text>
+<rect x="1011.1" y="96.0" width="186.2" height="50.0" rx="10" fill="#ffffff" stroke="#1c1c1e" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="1023.1" y="117.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">6주차 · 차주</text>
+<text x="1023.1" y="136.0" font-size="11.5" font-weight="500" fill="#636366" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">12-28 ~ 12-31  (4일)</text>
+<text x="1104.2" y="164.0" font-size="11" font-weight="600" fill="#636366" text-anchor="middle">▲ 6주차 끝: 두 시나리오(시뮬)</text>
+<rect x="1205.3" y="96.0" width="186.2" height="50.0" rx="10" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="1217.3" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">7주차</text>
+<text x="1217.3" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">01-04 ~ 01-08</text>
+<rect x="1399.6" y="96.0" width="186.2" height="50.0" rx="10" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="1411.6" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">8주차</text>
+<text x="1411.6" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">01-11 ~ 01-15</text>
+<text x="1492.7" y="164.0" font-size="11" font-weight="600" fill="#636366" text-anchor="middle">▲ 8주차 끝: 실물 연결</text>
+<rect x="1593.8" y="96.0" width="186.2" height="50.0" rx="10" fill="#ffffff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="1605.8" y="117.0" font-size="13.5" font-weight="700" fill="#8e8e93" text-anchor="start">9주차</text>
+<text x="1605.8" y="136.0" font-size="11.5" font-weight="500" fill="#aeaeb2" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">01-18 ~ 01-22</text>
+<text x="1686.9" y="164.0" font-size="11" font-weight="600" fill="#636366" text-anchor="middle">▲ 9주차 끝: 통합 테스트</text>
+<text x="40.0" y="210.0" font-size="12.5" font-weight="700" fill="#636366" text-anchor="start">표시</text>
+<rect x="84.0" y="196.0" width="30.0" height="20.0" rx="6" fill="#eaf3ff" stroke="#007aff" stroke-width="3"/>
+<text x="122.0" y="210.5" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start">이번 주에 손대는 노드</text>
+<rect x="274.0" y="196.0" width="30.0" height="20.0" rx="6" fill="#ffffff" stroke="#007aff" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="312.0" y="210.5" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start">다음 주에 시작(재개)</text>
+<rect x="454.0" y="196.0" width="30.0" height="20.0" rx="6" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="492.0" y="210.5" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start">끝났거나 아직 차례가 아님</text>
+<text x="674.0" y="210.0" font-size="12.5" font-weight="700" fill="#636366" text-anchor="start">파트</text>
+<rect x="718.0" y="197.0" width="39.3" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="737.6" y="210.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="765.3" y="197.0" width="61.6" height="19.0" rx="9" fill="#b25000" stroke="none" stroke-width="0"/>
+<text x="796.1" y="210.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">B 카메라</text>
+<rect x="834.9" y="197.0" width="102.2" height="19.0" rx="9" fill="#0071a4" stroke="none" stroke-width="0"/>
+<text x="886.0" y="210.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">C 터틀봇 · 시뮬</text>
+<rect x="945.1" y="197.0" width="50.5" height="19.0" rx="9" fill="#8944ab" stroke="none" stroke-width="0"/>
+<text x="970.3" y="210.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">D 젯봇</text>
+<rect x="1003.6" y="197.0" width="102.2" height="19.0" rx="9" fill="#c93400" stroke="none" stroke-width="0"/>
+<text x="1054.6" y="210.5" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">E 투척기 · 시험</text>
+<rect x="20.0" y="244.0" width="1040.0" height="668.0" rx="14" fill="#ffffff" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.75"/>
+<text x="36.0" y="270.0" font-size="14.5" font-weight="700" fill="#3a3a3c" text-anchor="start">웹 스택 (Docker Compose)</text>
+<text x="231.8" y="270.0" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">요청이 지나는 길: 화면 → nginx → gateway → 서비스 · 서비스마다 자기 DB</text>
+<rect x="1080.0" y="292.0" width="700.0" height="494.0" rx="14" fill="#ffffff" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.75"/>
+<text x="1096.0" y="318.0" font-size="14.5" font-weight="700" fill="#3a3a3c" text-anchor="start">터틀봇 · 시뮬레이션</text>
+<text x="1245.9" y="318.0" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">ROS 2 · rosbridge 로 robot-service 와 연결</text>
+<rect x="1080.0" y="804.0" width="700.0" height="376.0" rx="14" fill="#ffffff" stroke="#c7c7cc" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.75"/>
+<text x="1096.0" y="830.0" font-size="14.5" font-weight="700" fill="#3a3a3c" text-anchor="start">젯봇</text>
+<text x="1133.5" y="830.0" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">순찰 · 화재 감지 · 같은 토픽 계약</text>
+<path d="M540.0 392.0 L540.0 420.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M540.0 512.0 L540.0 540.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M540.0 632.0 L540.0 670.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M540.0 762.0 L540.0 800.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<text x="548.0" y="785.0" font-size="10.5" font-weight="500" fill="#8e8e93" text-anchor="start">사진 판독</text>
+<path d="M1260.0 436.0 L1260.0 454.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M1260.0 546.0 L1260.0 564.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M1260.0 656.0 L1260.0 674.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<text x="1268.0" y="669.0" font-size="10.5" font-weight="500" fill="#8e8e93" text-anchor="start">같은 코드</text>
+<path d="M1600.0 546.0 L1600.0 564.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<text x="1608.0" y="559.0" font-size="10.5" font-weight="500" fill="#8e8e93" text-anchor="start">시리얼</text>
+<path d="M1260.0 940.0 L1260.0 958.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M1260.0 1050.0 L1260.0 1068.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M540.0 651.0 L200.0 651.0 L200.0 670.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M540.0 651.0 L880.0 651.0 L880.0 670.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M200.0 762.0 L200.0 800.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M410.0 762.0 L410.0 781.0 L320.0 781.0 L320.0 800.0" fill="none" stroke="#8e8e93" stroke-width="1.5" marker-end="url(#a8e8e93)"/>
+<path d="M1040.0 716.0 L1068.0 716.0 L1068.0 390.0 L1100.0 390.0" fill="none" stroke="#8944ab" stroke-width="1.8" marker-end="url(#a8944ab)" marker-start="url(#a8944ab)"/>
+<path d="M1040.0 716.0 L1068.0 716.0 L1068.0 894.0 L1100.0 894.0" fill="none" stroke="#8944ab" stroke-width="1.8" marker-end="url(#a8944ab)" marker-start="url(#a8944ab)"/>
+<text x="734.0" y="780.0" font-size="10.5" font-weight="600" fill="#8944ab" text-anchor="start">rosbridge 로 로봇과 연결: 목표 · 상태 · 영상 · 감지 보고</text>
+<path d="M1420.0 390.0 L1440.0 390.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M1420.0 894.0 L1440.0 894.0" fill="none" stroke="#8e8e93" stroke-width="1.5"/>
+<path d="M360.0 346.0 L380.0 346.0" fill="none" stroke="#c93400" stroke-width="1.5" marker-end="url(#ac93400)" stroke-dasharray="5 4"/>
+<text x="54.0" y="410.0" font-size="10.5" font-weight="500" fill="#8e8e93" text-anchor="start">실제 스택에 대고 흐름 전체를 확인</text>
+<rect x="40.0" y="300.0" width="320.0" height="92.0" rx="12" fill="#fff1e8" stroke="#c93400" stroke-width="3"/>
+<text x="54.0" y="325.0" font-size="14.5" font-weight="700" fill="#c93400" text-anchor="start">전 구간 시험 · 시연 스크립트</text>
+<rect x="253.8" y="310.0" width="96.2" height="19.0" rx="9" fill="#c93400" stroke="none" stroke-width="0"/>
+<text x="301.9" y="323.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">E 투척기 · 시험</text>
+<rect x="54.0" y="338.0" width="36.0" height="18.0" rx="5" fill="#c93400" stroke="#c93400" stroke-width="1.2"/>
+<text x="72.0" y="351.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="98.0" y="351.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">장애물 · 금지구역 시험</text>
+<rect x="54.0" y="363.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#c93400" stroke-width="1.2"/>
+<text x="72.0" y="376.0" font-size="10.5" font-weight="700" fill="#c93400" text-anchor="middle">차주</text>
+<text x="98.0" y="376.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">시나리오 전 구간 시험 · 시연 스크립트</text>
+<rect x="380.0" y="300.0" width="320.0" height="92.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="3"/>
+<text x="394.0" y="325.0" font-size="14.5" font-weight="700" fill="#007aff" text-anchor="start">화면 (React SPA)</text>
+<rect x="653.8" y="310.0" width="36.2" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="671.9" y="323.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="394.0" y="338.0" width="36.0" height="18.0" rx="5" fill="#007aff" stroke="#007aff" stroke-width="1.2"/>
+<text x="412.0" y="351.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="438.0" y="351.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">규칙 편집 · 경고 · 관제 대시보드</text>
+<rect x="394.0" y="363.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#007aff" stroke-width="1.2"/>
+<text x="412.0" y="376.0" font-size="10.5" font-weight="700" fill="#007aff" text-anchor="middle">차주</text>
+<text x="438.0" y="376.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">사건 · 팝업 2종 · 시연 화면</text>
+<rect x="380.0" y="420.0" width="320.0" height="92.0" rx="12" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="394.0" y="445.0" font-size="14.5" font-weight="700" fill="#8e8e93" text-anchor="start">cdn · web (nginx)</text>
+<rect x="653.8" y="430.0" width="36.2" height="19.0" rx="9" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<text x="671.9" y="443.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="394.0" y="458.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="412.0" y="471.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="438.0" y="471.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">✓ 끝남</text>
+<rect x="394.0" y="483.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="412.0" y="496.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="438.0" y="496.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="380.0" y="540.0" width="320.0" height="92.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="3"/>
+<text x="394.0" y="565.0" font-size="14.5" font-weight="700" fill="#007aff" text-anchor="start">gateway</text>
+<rect x="653.8" y="550.0" width="36.2" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="671.9" y="563.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="394.0" y="578.0" width="36.0" height="18.0" rx="5" fill="#007aff" stroke="#007aff" stroke-width="1.2"/>
+<text x="412.0" y="591.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="438.0" y="591.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">대시보드 전용 역할(조회 전용)</text>
+<rect x="394.0" y="603.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="412.0" y="616.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="438.0" y="616.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="40.0" y="670.0" width="320.0" height="92.0" rx="12" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="54.0" y="695.0" font-size="14.5" font-weight="700" fill="#8e8e93" text-anchor="start">user-service</text>
+<rect x="313.8" y="680.0" width="36.2" height="19.0" rx="9" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<text x="331.9" y="693.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="54.0" y="708.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="72.0" y="721.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="98.0" y="721.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">✓ 끝남</text>
+<rect x="54.0" y="733.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="72.0" y="746.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="98.0" y="746.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="380.0" y="670.0" width="320.0" height="92.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="3"/>
+<text x="394.0" y="695.0" font-size="14.5" font-weight="700" fill="#007aff" text-anchor="start">inspection-service</text>
+<rect x="653.8" y="680.0" width="36.2" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="671.9" y="693.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="394.0" y="708.0" width="36.0" height="18.0" rx="5" fill="#007aff" stroke="#007aff" stroke-width="1.2"/>
+<text x="412.0" y="721.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="438.0" y="721.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">규칙 · 판독 결과 · 경고 · 설정</text>
+<rect x="394.0" y="733.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#007aff" stroke-width="1.2"/>
+<text x="412.0" y="746.0" font-size="10.5" font-weight="700" fill="#007aff" text-anchor="middle">차주</text>
+<text x="438.0" y="746.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">사건 흐름 · 투척 두 모드 · 시연 실행기</text>
+<rect x="720.0" y="670.0" width="320.0" height="92.0" rx="12" fill="#ffffff" stroke="#007aff" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="734.0" y="695.0" font-size="14.5" font-weight="700" fill="#007aff" text-anchor="start">robot-service</text>
+<rect x="993.8" y="680.0" width="36.2" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="1011.9" y="693.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="734.0" y="708.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="752.0" y="721.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="778.0" y="721.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">쉬어 감 · 6주차에 이어서</text>
+<rect x="734.0" y="733.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#007aff" stroke-width="1.2"/>
+<text x="752.0" y="746.0" font-size="10.5" font-weight="700" fill="#007aff" text-anchor="middle">차주</text>
+<text x="778.0" y="746.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">출동 미션 · 투척 명령 · 투척 위치</text>
+<rect x="40.0" y="800.0" width="320.0" height="92.0" rx="12" fill="#eaf3ff" stroke="#007aff" stroke-width="3"/>
+<text x="54.0" y="825.0" font-size="14.5" font-weight="700" fill="#007aff" text-anchor="start">db (PostgreSQL)</text>
+<rect x="313.8" y="810.0" width="36.2" height="19.0" rx="9" fill="#007aff" stroke="none" stroke-width="0"/>
+<text x="331.9" y="823.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">A 웹</text>
+<rect x="54.0" y="838.0" width="36.0" height="18.0" rx="5" fill="#007aff" stroke="#007aff" stroke-width="1.2"/>
+<text x="72.0" y="851.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="98.0" y="851.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">규칙 · 경고 · 설정 표</text>
+<rect x="54.0" y="863.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#007aff" stroke-width="1.2"/>
+<text x="72.0" y="876.0" font-size="10.5" font-weight="700" fill="#007aff" text-anchor="middle">차주</text>
+<text x="98.0" y="876.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">사건 표</text>
+<rect x="380.0" y="800.0" width="320.0" height="92.0" rx="12" fill="#fff4e5" stroke="#b25000" stroke-width="3"/>
+<text x="394.0" y="825.0" font-size="14.5" font-weight="700" fill="#b25000" text-anchor="start">analysis-service · 판독기</text>
+<rect x="632.4" y="810.0" width="57.6" height="19.0" rx="9" fill="#b25000" stroke="none" stroke-width="0"/>
+<text x="661.2" y="823.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">B 카메라</text>
+<rect x="394.0" y="838.0" width="36.0" height="18.0" rx="5" fill="#b25000" stroke="#b25000" stroke-width="1.2"/>
+<text x="412.0" y="851.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="438.0" y="851.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">소화기 인식 모델 · 즉시 판독</text>
+<rect x="394.0" y="863.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#b25000" stroke-width="1.2"/>
+<text x="412.0" y="876.0" font-size="10.5" font-weight="700" fill="#b25000" text-anchor="middle">차주</text>
+<text x="438.0" y="876.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">도착 후 재판독(오탐 가르기)</text>
+<rect x="1100.0" y="344.0" width="320.0" height="92.0" rx="12" fill="#e6f5fb" stroke="#0071a4" stroke-width="3"/>
+<text x="1114.0" y="369.0" font-size="14.5" font-weight="700" fill="#0071a4" text-anchor="start">목표 브리지</text>
+<rect x="1313.8" y="354.0" width="96.2" height="19.0" rx="9" fill="#0071a4" stroke="none" stroke-width="0"/>
+<text x="1361.9" y="367.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">C 터틀봇 · 시뮬</text>
+<rect x="1114.0" y="382.0" width="36.0" height="18.0" rx="5" fill="#0071a4" stroke="#0071a4" stroke-width="1.2"/>
+<text x="1132.0" y="395.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="1158.0" y="395.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">금지구역 · 가상 장애물 층</text>
+<rect x="1114.0" y="407.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#0071a4" stroke-width="1.2"/>
+<text x="1132.0" y="420.0" font-size="10.5" font-weight="700" fill="#0071a4" text-anchor="middle">차주</text>
+<text x="1158.0" y="420.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">출동 주행 · 조준 회전</text>
+<rect x="1100.0" y="454.0" width="320.0" height="92.0" rx="12" fill="#e6f5fb" stroke="#0071a4" stroke-width="3"/>
+<text x="1114.0" y="479.0" font-size="14.5" font-weight="700" fill="#0071a4" text-anchor="start">Nav2 · 지도</text>
+<rect x="1313.8" y="464.0" width="96.2" height="19.0" rx="9" fill="#0071a4" stroke="none" stroke-width="0"/>
+<text x="1361.9" y="477.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">C 터틀봇 · 시뮬</text>
+<rect x="1114.0" y="492.0" width="36.0" height="18.0" rx="5" fill="#0071a4" stroke="#0071a4" stroke-width="1.2"/>
+<text x="1132.0" y="505.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="1158.0" y="505.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">주행 제어기 개선(좁은 통로)</text>
+<rect x="1114.0" y="517.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="530.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1158.0" y="530.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1100.0" y="564.0" width="320.0" height="92.0" rx="12" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="1114.0" y="589.0" font-size="14.5" font-weight="700" fill="#8e8e93" text-anchor="start">시뮬레이션 · 월드 (Gazebo)</text>
+<rect x="1313.8" y="574.0" width="96.2" height="19.0" rx="9" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<text x="1361.9" y="587.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">C 터틀봇 · 시뮬</text>
+<rect x="1114.0" y="602.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="615.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1158.0" y="615.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">✓ 끝남</text>
+<rect x="1114.0" y="627.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="640.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1158.0" y="640.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1100.0" y="674.0" width="320.0" height="92.0" rx="12" fill="#ffffff" stroke="#0071a4" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="1114.0" y="699.0" font-size="14.5" font-weight="700" fill="#0071a4" text-anchor="start">터틀봇 실기</text>
+<rect x="1313.8" y="684.0" width="96.2" height="19.0" rx="9" fill="#0071a4" stroke="none" stroke-width="0"/>
+<text x="1361.9" y="697.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">C 터틀봇 · 시뮬</text>
+<rect x="1114.0" y="712.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="725.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1158.0" y="725.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">아직 시작 전 · 6주차부터</text>
+<rect x="1114.0" y="737.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#0071a4" stroke-width="1.2"/>
+<text x="1132.0" y="750.0" font-size="10.5" font-weight="700" fill="#0071a4" text-anchor="middle">차주</text>
+<text x="1158.0" y="750.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">실기 조립 · 기본 구동</text>
+<rect x="1440.0" y="344.0" width="320.0" height="92.0" rx="12" fill="#ffffff" stroke="#b25000" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="1454.0" y="369.0" font-size="14.5" font-weight="700" fill="#b25000" text-anchor="start">터틀봇 카메라 · 영상</text>
+<rect x="1692.4" y="354.0" width="57.6" height="19.0" rx="9" fill="#b25000" stroke="none" stroke-width="0"/>
+<text x="1721.2" y="367.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">B 카메라</text>
+<rect x="1454.0" y="382.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1472.0" y="395.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1498.0" y="395.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">쉬어 감 · 6주차에 이어서</text>
+<rect x="1454.0" y="407.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#b25000" stroke-width="1.2"/>
+<text x="1472.0" y="420.0" font-size="10.5" font-weight="700" fill="#b25000" text-anchor="middle">차주</text>
+<text x="1498.0" y="420.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">조준용 대상 찾기 · 승인 팝업 영상</text>
+<rect x="1440.0" y="454.0" width="320.0" height="92.0" rx="12" fill="#fff1e8" stroke="#c93400" stroke-width="3"/>
+<text x="1454.0" y="479.0" font-size="14.5" font-weight="700" fill="#c93400" text-anchor="start">투척 브리지</text>
+<rect x="1653.8" y="464.0" width="96.2" height="19.0" rx="9" fill="#c93400" stroke="none" stroke-width="0"/>
+<text x="1701.9" y="477.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">E 투척기 · 시험</text>
+<rect x="1454.0" y="492.0" width="36.0" height="18.0" rx="5" fill="#c93400" stroke="#c93400" stroke-width="1.2"/>
+<text x="1472.0" y="505.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="1498.0" y="505.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">모의 투척기</text>
+<rect x="1454.0" y="517.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1472.0" y="530.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1498.0" y="530.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1440.0" y="564.0" width="320.0" height="92.0" rx="12" fill="#fff1e8" stroke="#c93400" stroke-width="3"/>
+<text x="1454.0" y="589.0" font-size="14.5" font-weight="700" fill="#c93400" text-anchor="start">투척기 (아두이노 + SG90)</text>
+<rect x="1653.8" y="574.0" width="96.2" height="19.0" rx="9" fill="#c93400" stroke="none" stroke-width="0"/>
+<text x="1701.9" y="587.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">E 투척기 · 시험</text>
+<rect x="1454.0" y="602.0" width="36.0" height="18.0" rx="5" fill="#c93400" stroke="#c93400" stroke-width="1.2"/>
+<text x="1472.0" y="615.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="1498.0" y="615.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">탁상에서 사거리 재기</text>
+<rect x="1454.0" y="627.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1472.0" y="640.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1498.0" y="640.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1100.0" y="848.0" width="320.0" height="92.0" rx="12" fill="#ffffff" stroke="#8944ab" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="1114.0" y="873.0" font-size="14.5" font-weight="700" fill="#8944ab" text-anchor="start">젯봇 브리지 · 순찰</text>
+<rect x="1363.1" y="858.0" width="46.9" height="19.0" rx="9" fill="#8944ab" stroke="none" stroke-width="0"/>
+<text x="1386.5" y="871.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">D 젯봇</text>
+<rect x="1114.0" y="886.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="899.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1158.0" y="899.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">쉬어 감 · 6주차에 이어서</text>
+<rect x="1114.0" y="911.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#8944ab" stroke-width="1.2"/>
+<text x="1132.0" y="924.0" font-size="10.5" font-weight="700" fill="#8944ab" text-anchor="middle">차주</text>
+<text x="1158.0" y="924.5" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="start">목표 계약(자체 주행) · 순찰</text>
+<rect x="1100.0" y="958.0" width="320.0" height="92.0" rx="12" fill="#f5ecfa" stroke="#8944ab" stroke-width="3"/>
+<text x="1114.0" y="983.0" font-size="14.5" font-weight="700" fill="#8944ab" text-anchor="start">젯봇 위치 추정</text>
+<rect x="1363.1" y="968.0" width="46.9" height="19.0" rx="9" fill="#8944ab" stroke="none" stroke-width="0"/>
+<text x="1386.5" y="981.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">D 젯봇</text>
+<rect x="1114.0" y="996.0" width="36.0" height="18.0" rx="5" fill="#8944ab" stroke="#8944ab" stroke-width="1.2"/>
+<text x="1132.0" y="1009.0" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">금주</text>
+<text x="1158.0" y="1009.5" font-size="11.5" font-weight="600" fill="#1c1c1e" text-anchor="start">스테레오 오도메트리 · 지도 위 위치</text>
+<rect x="1114.0" y="1021.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="1034.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1158.0" y="1034.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1100.0" y="1068.0" width="320.0" height="92.0" rx="12" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="1114.0" y="1093.0" font-size="14.5" font-weight="700" fill="#8e8e93" text-anchor="start">젯봇 구동 · ROS 2 환경</text>
+<rect x="1363.1" y="1078.0" width="46.9" height="19.0" rx="9" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<text x="1386.5" y="1091.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">D 젯봇</text>
+<rect x="1114.0" y="1106.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="1119.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1158.0" y="1119.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">✓ 끝남</text>
+<rect x="1114.0" y="1131.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1132.0" y="1144.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1158.0" y="1144.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="1440.0" y="848.0" width="320.0" height="92.0" rx="12" fill="#fafafc" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="1454.0" y="873.0" font-size="14.5" font-weight="700" fill="#8e8e93" text-anchor="start">젯봇 카메라 · 감지</text>
+<rect x="1692.4" y="858.0" width="57.6" height="19.0" rx="9" fill="#c7c7cc" stroke="none" stroke-width="0"/>
+<text x="1721.2" y="871.5" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">B 카메라</text>
+<rect x="1454.0" y="886.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1472.0" y="899.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">금주</text>
+<text x="1498.0" y="899.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">쉬어 감 · 7주차에 이어서</text>
+<rect x="1454.0" y="911.0" width="36.0" height="18.0" rx="5" fill="#ffffff" stroke="#aeaeb2" stroke-width="1.2"/>
+<text x="1472.0" y="924.0" font-size="10.5" font-weight="700" fill="#aeaeb2" text-anchor="middle">차주</text>
+<text x="1498.0" y="924.5" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">—</text>
+<rect x="20.0" y="936.0" width="1040.0" height="250.0" rx="14" fill="#ffffff" stroke="#c7c7cc" stroke-width="1.2"/>
+<text x="36.0" y="964.0" font-size="14.5" font-weight="700" fill="#3a3a3c" text-anchor="start">단계 목표</text>
+<text x="112.0" y="964.0" font-size="11.5" font-weight="400" fill="#8e8e93" text-anchor="start">금요일 통합 때 확인한다</text>
+<rect x="32.0" y="978.0" width="1016.0" height="34.0" rx="8" fill="#f2f2f7" stroke="#e5e5ea" stroke-width="1.0"/>
+<text x="46.0" y="1000.0" font-size="12.5" font-weight="700" fill="#8e8e93" text-anchor="start">2주차 끝</text>
+<text x="124.0" y="1000.0" font-size="11.5" font-weight="600" fill="#8e8e93" text-anchor="start">✓ 지남</text>
+<text x="220.0" y="1000.0" font-size="12" font-weight="500" fill="#8e8e93" text-anchor="start">스택이 한 번에 뜨고, 로그인이 되고, 시뮬레이션 로봇이 웹 명령으로 한 지점에 간다. 토픽 계약 · API 확정</text>
+<rect x="32.0" y="1018.0" width="1016.0" height="34.0" rx="8" fill="#f2f2f7" stroke="#e5e5ea" stroke-width="1.0"/>
+<text x="46.0" y="1040.0" font-size="12.5" font-weight="700" fill="#8e8e93" text-anchor="start">4주차 끝</text>
+<text x="124.0" y="1040.0" font-size="11.5" font-weight="600" fill="#8e8e93" text-anchor="start">✓ 지남</text>
+<text x="220.0" y="1040.0" font-size="12" font-weight="500" fill="#8e8e93" text-anchor="start">점검 요청 → 이동 → 촬영 → 품질 분석 → 판정이 시뮬레이션에서 끝까지 된다</text>
+<rect x="32.0" y="1058.0" width="1016.0" height="34.0" rx="8" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="46.0" y="1080.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">6주차 끝</text>
+<text x="124.0" y="1080.0" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="start">1주 뒤</text>
+<text x="220.0" y="1080.0" font-size="12" font-weight="500" fill="#ffffff" text-anchor="start">소방 관제 · 소화액 투척 두 시나리오가 시뮬레이션에서 된다. 대시보드와 팝업</text>
+<rect x="32.0" y="1098.0" width="1016.0" height="34.0" rx="8" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<text x="46.0" y="1120.0" font-size="12.5" font-weight="700" fill="#3a3a3c" text-anchor="start">8주차 끝</text>
+<text x="124.0" y="1120.0" font-size="11.5" font-weight="600" fill="#3a3a3c" text-anchor="start">3주 뒤</text>
+<text x="220.0" y="1120.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start">터틀봇 실기 주행 · 촬영, 투척기 발사, 젯봇 순찰 · 감지 보고가 같은 지도에서 된다</text>
+<rect x="32.0" y="1138.0" width="1016.0" height="34.0" rx="8" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<text x="46.0" y="1160.0" font-size="12.5" font-weight="700" fill="#3a3a3c" text-anchor="start">9주차 끝</text>
+<text x="124.0" y="1160.0" font-size="11.5" font-weight="600" fill="#3a3a3c" text-anchor="start">4주 뒤</text>
+<text x="220.0" y="1160.0" font-size="12" font-weight="500" fill="#3a3a3c" text-anchor="start">두 시나리오가 실물로 처음부터 끝까지 연속 3회 끝난다</text>
+<text x="40.0" y="1244.0" font-size="17" font-weight="700" fill="#1c1c1e" text-anchor="start">파트별 요약 — 5주차(금주)와 6주차(차주)</text>
+<text x="40.0" y="1266.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">docs/plan/SCHEDULE.md 의 "주차별 한눈에 보기" 표에서 읽어 온 한 줄 요약이다.</text>
+<rect x="40.0" y="1282.0" width="1740.0" height="34.0" rx="10" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
+<text x="56.0" y="1304.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">파트</text>
+<text x="246.0" y="1304.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">금주 · 5주차 (12-21 ~ 12-24)</text>
+<text x="1021.0" y="1304.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">차주 · 6주차 (12-28 ~ 12-31)</text>
+<rect x="40.0" y="1322.0" width="1740.0" height="42.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<rect x="40.0" y="1322.0" width="190.0" height="42.0" rx="9" fill="#eaf3ff" stroke="#007aff" stroke-width="1.4"/>
+<text x="56.0" y="1348.5" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="start">A  웹</text>
+<text x="246.0" y="1348.5" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">규칙 · 결과 · 경고 · 설정, 규칙 편집 · 경고 화면, 관제 대시보드</text>
+<text x="1021.0" y="1348.5" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">사건 흐름, 투척 명령, 두 모드, 사건 · 팝업 2종 · 시연 화면</text>
+<path d="M1005.0 1330 V1356" stroke="#e5e5ea" stroke-width="1"/>
+<rect x="40.0" y="1370.0" width="1740.0" height="42.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<rect x="40.0" y="1370.0" width="190.0" height="42.0" rx="9" fill="#fff4e5" stroke="#b25000" stroke-width="1.4"/>
+<text x="56.0" y="1396.5" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start">B  카메라</text>
+<text x="246.0" y="1396.5" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">소화기 인식 모델, 규칙 시험용 즉시 판독</text>
+<text x="1021.0" y="1396.5" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">도착 후 재판독, 조준용 대상 찾기, 승인 팝업 영상</text>
+<path d="M1005.0 1378 V1404" stroke="#e5e5ea" stroke-width="1"/>
+<rect x="40.0" y="1418.0" width="1740.0" height="42.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<rect x="40.0" y="1418.0" width="190.0" height="42.0" rx="9" fill="#e6f5fb" stroke="#0071a4" stroke-width="1.4"/>
+<text x="56.0" y="1444.5" font-size="13.5" font-weight="700" fill="#0071a4" text-anchor="start">C  터틀봇 · 시뮬</text>
+<text x="246.0" y="1444.5" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">주행 제어기 개선(좁은 통로 · 실시간 회피)</text>
+<text x="1021.0" y="1444.5" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">출동 주행, 조준 보정, 터틀봇 실기 시작</text>
+<path d="M1005.0 1426 V1452" stroke="#e5e5ea" stroke-width="1"/>
+<rect x="40.0" y="1466.0" width="1740.0" height="42.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<rect x="40.0" y="1466.0" width="190.0" height="42.0" rx="9" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.4"/>
+<text x="56.0" y="1492.5" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="start">D  젯봇</text>
+<text x="246.0" y="1492.5" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">스테레오 오도메트리, 지도 위 위치 내기</text>
+<text x="1021.0" y="1492.5" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">목표 계약(자체 주행), 순찰</text>
+<path d="M1005.0 1474 V1500" stroke="#e5e5ea" stroke-width="1"/>
+<rect x="40.0" y="1514.0" width="1740.0" height="42.0" rx="9" fill="#ffffff" stroke="#e5e5ea" stroke-width="1.0"/>
+<rect x="40.0" y="1514.0" width="190.0" height="42.0" rx="9" fill="#fff1e8" stroke="#c93400" stroke-width="1.4"/>
+<text x="56.0" y="1540.5" font-size="13.5" font-weight="700" fill="#c93400" text-anchor="start">E  투척기 · 시험</text>
+<text x="246.0" y="1540.5" font-size="12.5" font-weight="600" fill="#1c1c1e" text-anchor="start">모의 투척기, 장애물 · 금지구역 시험</text>
+<text x="1021.0" y="1540.5" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">시나리오 전 구간 시험, 시연 스크립트</text>
+<path d="M1005.0 1522 V1548" stroke="#e5e5ea" stroke-width="1"/>
+<text x="40.0" y="1580.0" font-size="12.5" font-weight="600" fill="#636366" text-anchor="start">이번 주에 손대는 노드 11개 · 다음 주에 손대는 노드 10개 (전체 20개)</text>
+</svg>
