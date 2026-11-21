@@ -1,0 +1,107 @@
+/*
+ * 픽셀 모드 스킨(시제품). <html data-theme="pixel"> 일 때만 적용된다(theme.tsx).
+ *  - 글꼴: Galmuri14(한글 픽셀 글꼴, OFL 1.1). 기본 글자 크기 15px 에서 또렷하다
+ *  - 색: 어두운 한 벌(시스템 다크/라이트와 무관). 의미 색(파랑=동작, 초록=정상, 주황=주의, 빨강=위험)은 그대로 둔다
+ *  - 형태: 모서리 0, 번짐 없는 딱딱한 그림자, 2px 윤곽
+ *  - 비상 · 투척 승인 팝업(.emg-scrim)은 건드리지 않는다(반드시 원래 모양으로 눈에 띄어야 한다)
+ *  - 아이콘(Material Symbols)과 지도 캔버스에 직접 적힌 색은 아직 그대로다
+ *  - 관제 대시보드는 꾸미지 않는다: 픽셀 모드에서는 그 자리에 포격전(pages/dashboard/Duel.tsx)이 뜬다
+ * styles.css 와 화면별 CSS 뒤에 불러온다(main.tsx).
+ */
+@font-face {
+  font-family: "Galmuri14";
+  font-weight: 400; font-style: normal; font-display: swap;
+  src: url("galmuri/dist/Galmuri14.woff2") format("woff2");
+}
+
+:root[data-theme="pixel"] {
+  color-scheme: dark;
+  --blue: #4aa8ff; --green: #5ee06a; --orange: #ffa53a; --red: #ff5a4d; --teal: #40d8e0; --indigo: #9a98ff; --purple: #c77dff;
+  --label: #f4f0e0; --label2: #b8b2cc; --label3: #7d7799;
+  --fill: rgba(255, 255, 255, 0.12); --fill2: rgba(255, 255, 255, 0.07);
+  --bg: #14121f; --bg-grouped: #211c33; --bg-elevated: #2b2542;
+  --sidebar: #1a1729;
+  --border: #5a4f74;
+  --separator: #3a3352;
+  --surface-ring: 0 0 0 2px var(--border), 4px 4px 0 2px #000;
+  --ink-blue: var(--blue); --ink-green: var(--green); --ink-orange: var(--orange); --ink-red: var(--red);
+  --ink-teal: var(--teal); --ink-indigo: var(--indigo); --ink-purple: var(--purple);
+  --material: #1a1729;
+  --seg-on: #5a4f74;
+  --radius: 0px;
+  font-family: "Galmuri14", ui-monospace, "Apple SD Gothic Neo", "Malgun Gothic", monospace;
+  letter-spacing: 0;
+  -webkit-font-smoothing: none; font-smooth: never;
+}
+
+/* 모서리 · 번짐 · 자간을 한꺼번에 없앤다. 비상 팝업 안쪽은 뺀다 */
+:root[data-theme="pixel"] *:not(.emg-scrim, .emg-scrim *),
+:root[data-theme="pixel"] *:not(.emg-scrim, .emg-scrim *)::before,
+:root[data-theme="pixel"] *:not(.emg-scrim, .emg-scrim *)::after {
+  border-radius: 0 !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  letter-spacing: 0 !important;
+}
+/* 비상 팝업은 원래 글꼴로 */
+:root[data-theme="pixel"] .emg-scrim {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Segoe UI", "Malgun Gothic", "Noto Sans KR", Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 바탕: 2px 점 무늬 */
+:root[data-theme="pixel"] body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(45deg, #1a1729 25%, transparent 25%, transparent 75%, #1a1729 75%),
+    linear-gradient(45deg, #1a1729 25%, transparent 25%, transparent 75%, #1a1729 75%);
+  background-size: 4px 4px; background-position: 0 0, 2px 2px;
+}
+
+/* 버튼: 윤곽 + 안쪽 명암(위·왼쪽 밝게, 아래·오른쪽 어둡게), 누르면 1px 내려앉는다 */
+:root[data-theme="pixel"] button:not(.emg-scrim *) {
+  border: 2px solid #000; background: var(--bg-elevated); transition: none;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.4), inset 2px 2px 0 rgba(255, 255, 255, 0.16);
+}
+:root[data-theme="pixel"] button:not(.emg-scrim *):hover { background: #3a3358; opacity: 1; }
+:root[data-theme="pixel"] button:not(.emg-scrim *):active { transform: translate(1px, 1px); opacity: 1; box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4); }
+:root[data-theme="pixel"] button.primary:not(.emg-scrim *) { background: var(--accent); color: #0a0814; }
+:root[data-theme="pixel"] button.danger:not(.emg-scrim *) { background: var(--red); color: #0a0814; }
+:root[data-theme="pixel"] button.warn:not(.emg-scrim *) { background: var(--orange); color: #0a0814; }
+:root[data-theme="pixel"] button.primary:hover, :root[data-theme="pixel"] button.danger:hover, :root[data-theme="pixel"] button.warn:hover { filter: brightness(1.12); }
+/* 글자뿐인 단추 · 칸 안의 단추는 윤곽 없이 */
+:root[data-theme="pixel"] button.link, :root[data-theme="pixel"] .segmented button, :root[data-theme="pixel"] .group-header button,
+:root[data-theme="pixel"] .sidebar .who button, :root[data-theme="pixel"] .picker button {
+  border: 0; box-shadow: none; background: none;
+}
+:root[data-theme="pixel"] .segmented { border: 2px solid var(--border); background: #0e0c18; }
+:root[data-theme="pixel"] .segmented button.on { background: var(--accent); color: #0a0814; box-shadow: none; }
+
+/* 입력 칸: 파인 모양 */
+:root[data-theme="pixel"] input, :root[data-theme="pixel"] select, :root[data-theme="pixel"] textarea {
+  background: #0e0c18; border: 2px solid var(--border);
+}
+:root[data-theme="pixel"] input:focus, :root[data-theme="pixel"] select:focus, :root[data-theme="pixel"] textarea:focus {
+  border-color: var(--accent); box-shadow: none;
+}
+:root[data-theme="pixel"] .field-control input:not([type=checkbox]), :root[data-theme="pixel"] .field-control select, :root[data-theme="pixel"] .field-control textarea { border: 0; background: none; }
+
+/* 사이드바 · 탭 바 */
+:root[data-theme="pixel"] .sidebar { background: var(--sidebar); border-right: 2px solid var(--border); }
+:root[data-theme="pixel"] .sidebar nav a { color: var(--label2); }
+:root[data-theme="pixel"] .sidebar nav a:hover { background: var(--fill2); color: var(--label); }
+:root[data-theme="pixel"] .sidebar nav a.active { background: var(--accent); color: #0a0814; box-shadow: 3px 3px 0 #000; }
+:root[data-theme="pixel"] .sidebar nav a.active .icon { color: inherit; }
+:root[data-theme="pixel"] .sidebar .brand .badge-area { color: #0a0814; }
+:root[data-theme="pixel"] .tabbar { background: var(--sidebar); border-top: 2px solid var(--border); }
+
+/* 꼬리표: 윤곽선 */
+:root[data-theme="pixel"] .tag { border: 1px solid currentColor; }
+
+/* 로그인 */
+:root[data-theme="pixel"] .login .logo { background: none; width: auto; height: auto; }
+.login .theme-toggle { margin: 4px auto 0; }
+
+/* 픽셀 이펙트 캔버스: 확대해도 번지지 않게 */
+.pixelfx { image-rendering: pixelated; display: block; }
+/* 전환 연출: 화면 전체, 비상 팝업(10000) 아래, 누르기를 막지 않는다 */
+.pixel-transition { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 9000; pointer-events: none; }
