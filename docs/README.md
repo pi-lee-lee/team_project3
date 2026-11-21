@@ -8,7 +8,7 @@
 | [`architecture/`](architecture/) | 시스템이 어떻게 짜여 있는가 (컨테이너 · 서비스 · 요청 흐름) | SVG 도면 |
 | [`navigation/`](navigation/) | 로봇이 어떻게 달리는가 (지도 · 계획 · 제어 · 장애물) | SVG 설명서 |
 | [`design/`](design/) | 무엇을 만들고, 서로 무엇을 주고받는가 (시나리오 · 인터페이스) | Markdown |
-| [`plan/`](plan/) | 앞으로 무엇을 언제 하는가 (향후 계획 · 일정) | Markdown |
+| [`plan/`](plan/) | 앞으로 무엇을 언제 하는가 (향후 계획 · 일정 · 주차별 진행 도면) | Markdown · SVG 도면 |
 | [`storyboard/`](storyboard/) | 화면이 어떻게 생겼고 어떻게 이어지는가 | SVG 도면 |
 | `_lib/` | (문서 아님) SVG 생성 스크립트가 함께 쓰는 그리기 도구 | Python |
 
@@ -55,6 +55,7 @@
 | --- | --- |
 | [ROADMAP.md](plan/ROADMAP.md) | 향후 계획: analysis-service 소화기 AI 판독(방식 · 데이터 · 단계 · 완료 기준) · 주행 제어기 개선 |
 | [SCHEDULE.md](plan/SCHEDULE.md) | 주간 계획서(2026-11-23 ~ 2027-01-22, 9주): 파트별(웹 · 카메라 · 터틀봇 · 젯봇 · 투척기) 주차 계획 · 단계 목표 · 통합 테스트 주 · 위험과 대응 |
+| [weekly/week_1.svg](plan/weekly/week_1.svg) ~ [week_9.svg](plan/weekly/week_9.svg) | 주차별 진행 도면(주마다 한 장): 시스템 구성도와 같은 노드 그래프 위에 그 주에 손대는 구성 요소(금주)와 다음 주에 할 일(차주)을 표시. 아래에 단계 목표와 파트별 금주 · 차주 요약 |
 
 ## storyboard — 화면
 
@@ -77,10 +78,12 @@ SVG 를 직접 고치지 않는다. 같은 폴더의 `build_*.py` 를 고친 뒤
 | `navigation/drive_layers.svg` | `python3 docs/navigation/build_drive_layers.py` |
 | `navigation/theta_star.svg` | `python3 docs/navigation/build_theta_star.py` (numpy 필요) |
 | `navigation/mppi.svg` | `python3 docs/navigation/build_mppi.py` (numpy 필요) |
+| `plan/weekly/week_1.svg` ~ `week_9.svg` | `python3 docs/plan/weekly/build_weekly.py` (9장을 한 번에) |
 | `storyboard/web_storyboard.svg` | `python3 docs/storyboard/build_storyboard.py` |
 | `storyboard/web_screen_tree.svg` | `python3 docs/storyboard/build_screen_tree.py` |
 | `storyboard/web_service_scenario.svg` | `python3 docs/storyboard/build_service_scenario.py` |
 
+- `plan/weekly/` 는 파트별 요약을 `plan/SCHEDULE.md` 의 "주차별 한눈에 보기" 표에서 읽고, 노드별 할 일은 스크립트의 `NODES` 에 적는다. 계획서를 바꾸면 `NODES` 도 고친 뒤 다시 생성한다.
 - `architecture/` · `navigation/` 의 스크립트는 `_lib/svg.py`(색 · 글자 폭 · 도형)를 함께 쓴다.
 - `navigation/` 의 `theta_star` · `mppi` 는 숫자를 `ros/sim/src/config/nav2_params.yaml` 에서 읽고(`_lib/nav2cfg.py`), 그림 속 경로 · 후보 궤적은
   Nav2 의 식을 옮긴 작은 계산(`theta_sim.py` · `mppi_sim.py`)으로 그린다. 설정을 바꾸면 다시 생성한다(실행 기록이 아니라 계산이다 — 실측은 `drive_probe.py` · `plan_probe.py`).
