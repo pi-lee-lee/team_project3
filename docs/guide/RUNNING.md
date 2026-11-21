@@ -72,6 +72,8 @@ scripts/                   E2E 시험
 | 화면 | `docker compose run --rm frontend-build` |
 | 분석 서비스 · ROS | `docker compose restart analysis-service` / `sim` |
 
+`common-build` · `frontend-build` 는 빌드하고 끝나는 컨테이너다. 자세한 설명은 [BUILD_CONTAINERS.md](BUILD_CONTAINERS.md) 를 본다.
+
 네트워크: `front`(cdn ↔ web, 외부 포트 8080 하나) · `edge`(web ↔ gateway) · `backend`(gateway ↔ 서비스 ↔ db) · `robot`(robot-service ↔ sim). rosbridge 는 robot-service 만 접근한다.
 
 권한: `web/spring/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 규칙에 `methods` 를 적으면 그 메서드에만 맞는다 — 대시보드 역할(DASHBOARD)은 GET 만 허용되고 변경 요청·조종 WebSocket 은 거부된다. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.

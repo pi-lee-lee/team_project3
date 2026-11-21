@@ -20,6 +20,7 @@
 | --- | --- |
 | [RUNNING.md](guide/RUNNING.md) | 구성 · 폴더 구조 · 시험 시설과 지도 · 주행 설정 · 화면 · 시나리오 해 보기 · 알려진 한계 |
 | [DOCKER_GUIDE.md](guide/DOCKER_GUIDE.md) | 설치부터 실행 · 초기화 · 문제 해결까지 단계별 안내(macOS · Linux · Windows PowerShell) |
+| [BUILD_CONTAINERS.md](guide/BUILD_CONTAINERS.md) | 빌드용 컨테이너(`common-build` · `frontend-build`): 무엇을 만들어 어디에 놓는가, 왜 따로 두는가, 언제 다시 돌리는가, 문제 해결 |
 
 ## architecture — 시스템 구조
 
