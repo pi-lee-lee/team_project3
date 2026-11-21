@@ -4,3 +4,5 @@
 web/nginx/frontend/dist/
 __pycache__/
 *.tsbuildinfo
+로보테크*
+개선초안/
