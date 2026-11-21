@@ -29,7 +29,7 @@
 | [system_architecture.svg](architecture/system_architecture.svg) | 구성도: 컨테이너(cdn 엣지 캐시 → web 원본 → gateway) · Docker 네트워크 · MSA 서비스와 Spring Boot 내부 계층 · 서비스별 DB · 로봇 브리지 |
 | [system_cycle.svg](architecture/system_cycle.svg) | 시스템 사이클: 화면 불러오기(CDN 캐시) · 인증 · 점검 미션 · 사진 분석 · 판정 · 재점검 · 관제 · 조종 · 예외 · 복구를 번호 순서로 |
 | [spa_cycle.svg](architecture/spa_cycle.svg) | React SPA 사이클: 브라우저가 화면을 조립하는 과정(첫 접속 · 데이터 채우기 · 화면 이동 · 실시간 화면 · 새 빌드 반영) |
-| [build_containers.svg](architecture/build_containers.svg) | 빌드용 컨테이너(`common-build` · `frontend-build`): 왜 필요한가(빌드하는 세 방법 비교) · 시작 순서 · 무엇을 읽어 무엇을 만들고 누가 쓰는가 · 고친 뒤 다시 돌릴 것 · 이미지 빌드와의 차이 |
+| [build_containers.svg](architecture/build_containers.svg) | 빌드용 컨테이너(`common-build` · `frontend-build`): compose 에 선언된 컨테이너 11개 가운데 빌드용 둘만 표시한 목록 · 왜 필요한가(빌드하는 세 방법 비교) · 시작 순서 · 무엇을 읽어 무엇을 만들고 누가 쓰는가 · 고친 뒤 다시 돌릴 것 · 이미지 빌드와의 차이 |
 
 ## navigation — 주행
 

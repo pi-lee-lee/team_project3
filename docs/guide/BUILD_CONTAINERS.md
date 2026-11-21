@@ -12,6 +12,27 @@
 
 그림으로 보려면 [build_containers.svg](../architecture/build_containers.svg) 를 본다(시작 순서 · 두 컨테이너의 입력과 결과).
 
+## 0. 전체 컨테이너 가운데 빌드용은 둘뿐이다
+
+`compose.yaml` 에 선언된 컨테이너 전부다(선언 순서 그대로). **굵은 두 줄만 빌드용**이고, 나머지는 계속 떠 있는 실행 컨테이너다.
+
+| # | 컨테이너 | 종류 | 하는 일 | 평소 상태 |
+| --- | --- | --- | --- | --- |
+| 1 | **`common-build`** | **빌드용** | **공유 라이브러리 `tp3:common` 설치** | **`Exited (0)` — 빌드하고 끝남** |
+| 2 | `db` | 실행 | 서비스별 DB | Up |
+| 3 | `user-service` | 실행 | 로그인 · 사용자 · 역할 | Up |
+| 4 | `inspection-service` | 실행 | 점검 · 판정 · 사건 · 예약 | Up |
+| 5 | `robot-service` | 실행 | 로봇 연결 계층 | Up |
+| 6 | `gateway` | 실행 | 인증 · 경로별 권한 | Up |
+| 7 | `analysis-service` | 실행 | 사진 분석 · 판독 | Up |
+| 8 | **`frontend-build`** | **빌드용** | **React 화면을 `dist/` 로 빌드** | **`Exited (0)` — 빌드하고 끝남** |
+| 9 | `web` | 실행 | 원본 서버(화면 · 프록시) | Up |
+| 10 | `cdn` | 실행 | 엣지 캐시 · 외부 포트 8080 | Up |
+| 11 | `sim` | 실행 | 시뮬레이션 · Nav2 · 브리지 | Up |
+
+빌드용 컨테이너는 **서비스가 아니다.** 요청을 받지 않고, 포트를 열지 않고, `restart: "no"` 라 다시 뜨지 않는다.
+compose 에 함께 선언해 둔 이유는 하나다 — 실행 컨테이너가 "빌드가 성공해서 끝난 뒤에만" 시작하도록 순서를 걸기 위해서다. 다시 쓰이는 때는 코드를 고쳐 다시 빌드할 때뿐이다(4장).
+
 ## 1. 왜 따로 두는가
 
 이 저장소는 **코드를 이미지에 굽지 않는다.** 이미지에는 실행 환경(JDK · Maven, Node, nginx)만 있고, 코드는 폴더를 볼륨으로 연결해 쓴다.
@@ -30,7 +51,7 @@
 | 명령 | `mvn -q -B install -DskipTests` |
 | 읽는 곳 | `web/spring/common` → 컨테이너 안 `/workspace` |
 | 쓰는 곳 | 볼륨 `m2` → `/root/.m2` (로컬 Maven 저장소에 `tp3:common:0.1.0` 설치) |
-| 네트워크 | 없음(다른 컨테이너와 통신하지 않는다. 처음에는 의존 라이브러리를 인터넷에서 내려받는다) |
+| 네트워크 | 서비스용 네트워크(front · edge · backend · robot)에 붙지 않는다(다른 컨테이너와 통신하지 않는다. 처음에는 의존 라이브러리를 인터넷에서 내려받는다) |
 
 `tp3:common` 은 서비스들이 함께 지켜야 하는 약속을 담은 작은 라이브러리다: JWT 발급 · 검증(`JwtCodec`), 게이트웨이가 붙이는 사용자 헤더(`AuthHeaders`), 현재 사용자(`CurrentUser`).
 
@@ -50,7 +71,7 @@ common-build (설치하고 끝남)  →  gateway · user-service · inspection-s
 | 명령 | `npm install --no-audit --no-fund && npm run build` |
 | 읽는 곳 | `web/nginx/frontend` → 컨테이너 안 `/app` |
 | 쓰는 곳 | `web/nginx/frontend/dist/` (호스트 폴더에 그대로 생긴다), 볼륨 `frontend_modules` → `/app/node_modules` |
-| 네트워크 | 없음(처음에는 npm 패키지를 인터넷에서 내려받는다) |
+| 네트워크 | 서비스용 네트워크(front · edge · backend · robot)에 붙지 않는다(처음에는 npm 패키지를 인터넷에서 내려받는다) |
 
 React 화면은 브라우저가 바로 읽을 수 없는 코드(TypeScript · JSX)로 쓰여 있다. `npm run build`(Vite)가 이것을 `index.html` 하나와 `assets/` 아래 JS · CSS 파일로 바꿔 `dist/` 에 놓는다.
 

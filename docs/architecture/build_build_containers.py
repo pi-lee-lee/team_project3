@@ -1,10 +1,12 @@
 """빌드용 컨테이너 도면: common-build · frontend-build 가 어떻게 동작하고 왜 필요한가.
 
 읽는 법
-- 1절: 빌드를 어디서 할지의 세 가지 방법과 지금 방식(빌드용 컨테이너)을 고른 이유.
-- 2절: docker compose up 뒤의 시작 순서. 가로가 시간이다. 빌드용 컨테이너가 '성공해서 끝난 뒤에만' 뒤 컨테이너가 시작한다.
-- 3절: 두 컨테이너가 각각 무엇을 읽어 무엇을 만들고, 그 결과를 누가 쓰는가(위에서 아래로).
-- 4절: 코드를 고친 뒤 무엇을 다시 돌리는가. 5절: 이미지 빌드와의 차이.
+- 1절: compose.yaml 에 선언된 컨테이너 11개 전부(선언 순서 그대로). 빌드용 둘만 색을 넣고 나머지는 흐리게 했다 —
+  빌드용 컨테이너는 계속 떠 있지 않고 빌드할 때만 쓰인다는 것을 보이기 위해서다.
+- 2절: 빌드를 어디서 할지의 세 가지 방법과 지금 방식(빌드용 컨테이너)을 고른 이유.
+- 3절: docker compose up 뒤의 시작 순서. 가로가 시간이다. 빌드용 컨테이너가 '성공해서 끝난 뒤에만' 뒤 컨테이너가 시작한다.
+- 4절: 두 컨테이너가 각각 무엇을 읽어 무엇을 만들고, 그 결과를 누가 쓰는가(위에서 아래로).
+- 5절: 코드를 고친 뒤 무엇을 다시 돌리는가. 6절: 이미지 빌드와의 차이.
 글 설명은 docs/guide/BUILD_CONTAINERS.md, 값의 원본은 compose.yaml 이다. compose 를 바꾸면 이 스크립트도 고친 뒤 다시 생성한다.
 실행: python3 docs/architecture/build_build_containers.py  →  docs/architecture/build_containers.svg
 """
@@ -34,9 +36,73 @@ def lines(x, y, rows, size=12.5, gap=20, color='#3a3a3c', mono=False):
         S.text(x, y + i * gap, r, size, 400, color, mono=mono)
 
 
-# ---------------------------------------------------------------- 1 왜 필요한가
+# ---------------------------------------------------------------- 1 전체 컨테이너 목록
+# compose.yaml 의 services 선언 순서 그대로: (이름, 이미지, 하는 일, 빌드용인가)
+ROSTER = [
+    ('common-build', 'maven:3.9-eclipse-temurin-21', '공유 라이브러리 tp3:common 설치', True),
+    ('db', 'postgres:17', '서비스별 DB', False),
+    ('user-service', '직접 만든 이미지(Maven · JDK)', '로그인 · 사용자 · 역할', False),
+    ('inspection-service', '직접 만든 이미지(Maven · JDK)', '점검 · 판정 · 사건 · 예약', False),
+    ('robot-service', '직접 만든 이미지(Maven · JDK)', '로봇 연결 계층', False),
+    ('gateway', '직접 만든 이미지(Maven · JDK)', '인증 · 경로별 권한', False),
+    ('analysis-service', '직접 만든 이미지(Python)', '사진 분석 · 판독', False),
+    ('frontend-build', 'node:20-alpine', 'React 화면을 dist/ 로 빌드', True),
+    ('web', 'nginx:1.27-alpine', '원본 서버(화면 · 프록시)', False),
+    ('cdn', 'nginx:1.27-alpine', '엣지 캐시 · 외부 :8080', False),
+    ('sim', '직접 만든 이미지(ROS 2)', '시뮬레이션 · Nav2 · 브리지', False),
+]
+
+
+def roster(y):
+    n_build = sum(1 for r in ROSTER if r[3])
+    heading(y, 1, f'compose 에 선언된 컨테이너 {len(ROSTER)}개 — 그중 빌드용은 {n_build}개뿐이다',
+            'compose.yaml 의 선언 순서 그대로 늘어놓았다. 색이 있는 상자 = 빌드용(빌드할 때만 쓰이고 끝난다) · 흐린 상자 = 실행 컨테이너(계속 떠 있다)')
+    y += 44
+    cols, gap = 6, 14
+    cw, ch = (W - 80 - (cols - 1) * gap) / cols, 124
+    for i, (name, image, role, is_build) in enumerate(ROSTER):
+        x, by = 40 + (i % cols) * (cw + gap), y + (i // cols) * (ch + gap)
+        if is_build:
+            S.rect(x, by, cw, ch, fill=BUILD[1], stroke=BUILD[0], sw=3.2, rx=12)
+            c1, c2, c3 = BUILD[0], '#1c1c1e', '#3a3a3c'
+        else:
+            S.rect(x, by, cw, ch, fill='#f7f7fa', stroke='#d1d1d6', sw=1, rx=12, dash='4 4')
+            c1, c2, c3 = '#aeaeb2', '#aeaeb2', '#c7c7cc'
+        S.text(x + 14, by + 20, f'{i + 1:02d}', 10.5, 700, c3, mono=True)
+        S.text(x + 14, by + 43, name, 14.5, 700, c1, mono=True)
+        S.text(x + 14, by + 63, role, 11.5, 600 if is_build else 400, c2)
+        S.text(x + 14, by + 81, image, 10.5, 400, c3)
+        if is_build:
+            S.rect(x + 14, by + 92, 96, 22, fill='#1c1c1e', stroke='#1c1c1e', rx=11)
+            S.text(x + 62, by + 107, 'Exited (0)', 11, 700, '#ffffff', 'middle', mono=True)
+            S.text(x + 118, by + 107, '빌드하고 끝남', 11.5, 700, BUILD[0])
+            S.rect(x + cw - 62, by + 9, 50, 19, fill=BUILD[0], stroke=BUILD[0], rx=9)
+            S.text(x + cw - 37, by + 22.5, '빌드용', 10.5, 700, '#ffffff', 'middle')
+        else:
+            S.rect(x + 14, by + 92, 42, 22, fill='#ffffff', stroke='#d1d1d6', rx=11)
+            S.text(x + 35, by + 107, 'Up', 11, 700, '#aeaeb2', 'middle', mono=True)
+            S.text(x + 64, by + 107, '계속 실행', 11.5, 400, '#aeaeb2')
+    # 마지막 칸: 셈
+    i = len(ROSTER)
+    x, by = 40 + (i % cols) * (cw + gap), y + (i // cols) * (ch + gap)
+    S.rect(x, by, cw, ch, fill='#1c1c1e', stroke='#1c1c1e', rx=12)
+    S.text(x + 14, by + 28, f'선언 {len(ROSTER)}개', 15, 700, '#ffffff')
+    S.text(x + 14, by + 54, f'= 계속 실행 {len(ROSTER) - n_build}개', 13, 500, '#d1d1d6')
+    S.text(x + 14, by + 76, f'+ 빌드하고 끝남 {n_build}개', 13, 700, '#ffb340')
+    S.text(x + 14, by + 104, 'docker compose ps -a 로 확인', 10.5, 400, '#aeaeb2')
+    y += 2 * ch + gap + 14
+    S.rect(40, y, W - 80, 62, fill=BUILD[1], stroke=BUILD[0], sw=1.4, rx=10)
+    S.text(56, y + 25, '빌드용 컨테이너는 서비스가 아니다.', 13.5, 700, BUILD[0])
+    S.text(56 + text_width('빌드용 컨테이너는 서비스가 아니다.', False, 13.5) + 10, y + 25,
+           '요청을 받지 않고, 포트를 열지 않고, 서비스용 네트워크(front · edge · backend · robot)에도 붙지 않고, restart: "no" 라 다시 뜨지 않는다. 마치면 끝난다.', 12.5, 500, '#3a3a3c')
+    S.text(56, y + 47, 'compose 에 함께 선언해 둔 이유는 하나다: 실행 컨테이너가 "빌드가 성공해서 끝난 뒤에만" 시작하도록 순서를 걸기 위해서다(3절). '
+                       '다시 쓰이는 때는 코드를 고쳐 다시 빌드할 때뿐이다(5절).', 12.5, 500, '#3a3a3c')
+    return y + 62
+
+
+# ---------------------------------------------------------------- 2 왜 필요한가
 def why(y):
-    heading(y, 1, '왜 필요한가', '이 저장소는 코드를 이미지에 굽지 않는다(폴더를 볼륨으로 연결해 실행). 그래서 실행 전에 누군가 코드를 빌드해 두어야 한다.')
+    heading(y, 2, '왜 필요한가', '이 저장소는 코드를 이미지에 굽지 않는다(폴더를 볼륨으로 연결해 실행). 그래서 실행 전에 누군가 코드를 빌드해 두어야 한다.')
     y += 44
     cw = (W - 80 - 40) / 3
     cards = [
@@ -68,9 +134,9 @@ def why(y):
     return y + 158
 
 
-# ---------------------------------------------------------------- 2 시작 순서
+# ---------------------------------------------------------------- 3 시작 순서
 def order(y):
-    heading(y, 2, '어떻게 동작하나 — 시작 순서', 'docker compose up -d 뒤. 가로가 시간이다(길이는 실제 시간이 아니라 순서를 보인다).')
+    heading(y, 3, '어떻게 동작하나 — 시작 순서', 'docker compose up -d 뒤. 가로가 시간이다(길이는 실제 시간이 아니라 순서를 보인다).')
     y += 40
     X0, X1 = 250, W - 60
     S.rect(40, y, W - 80, 356, fill='#ffffff', stroke='#d1d1d6', rx=12)
@@ -128,7 +194,7 @@ def order(y):
     return y + 356
 
 
-# ---------------------------------------------------------------- 3 두 컨테이너의 안
+# ---------------------------------------------------------------- 4 두 컨테이너의 안
 def flow(x, y, w, title, sub, steps):
     """위에서 아래로 흐르는 상자 네 개. steps: (종류, 이름, 꼬리표, 줄들, 화살표 이름표)"""
     S.rect(x, y, w, 520, fill='#ffffff', stroke='#d1d1d6', rx=12)
@@ -155,7 +221,7 @@ def flow(x, y, w, title, sub, steps):
 
 
 def inside(y):
-    heading(y, 3, '두 컨테이너의 안 — 무엇을 읽어 무엇을 만들고, 누가 쓰는가',
+    heading(y, 4, '두 컨테이너의 안 — 무엇을 읽어 무엇을 만들고, 누가 쓰는가',
             '굵은 주황 상자 = 빌드용 컨테이너(끝나면 사라진다) · 점선 상자 = 결과가 남는 곳(볼륨 · 폴더) · 결과물은 컨테이너가 끝나도 남는다')
     y += 40
     pw = (W - 80 - 24) / 2
@@ -190,9 +256,9 @@ def inside(y):
     return y + 520
 
 
-# ---------------------------------------------------------------- 4 고친 뒤
+# ---------------------------------------------------------------- 5 고친 뒤
 def after(y):
-    heading(y, 4, '코드를 고친 뒤 — 무엇을 다시 돌리는가')
+    heading(y, 5, '코드를 고친 뒤 — 무엇을 다시 돌리는가')
     y += 22
     cols = [(40, 300, '고친 곳'), (340, 860, '할 일'), (1200, 400, '빌드용 컨테이너')]
     S.rect(40, y, W - 80, 34, fill='#1c1c1e', stroke='#1c1c1e', rx=10)
@@ -216,9 +282,9 @@ def after(y):
     return y
 
 
-# ---------------------------------------------------------------- 5 헷갈리기 쉬운 것
+# ---------------------------------------------------------------- 6 헷갈리기 쉬운 것
 def confuse(y):
-    heading(y, 5, '헷갈리기 쉬운 것 — 이미지 빌드와는 다른 단계다')
+    heading(y, 6, '헷갈리기 쉬운 것 — 이미지 빌드와는 다른 단계다')
     y += 22
     cw = (W - 80 - 24) / 2
     S.rect(40, y, cw, 132, fill='#ffffff', stroke='#8e8e93', sw=1.4, rx=12)
@@ -242,7 +308,8 @@ def build():
     S.text(40, 48, '빌드용 컨테이너 — 어떻게 동작하고 왜 필요한가', 24, 700)
     S.text(40, 74, 'common-build · frontend-build 는 코드를 빌드하고 바로 끝나는 컨테이너다. docker compose ps -a 에서 Exited (0) 으로 보이는 것이 정상이다 '
                    '(실행 컨테이너 9 · 빌드용 2).', 13, 400, GRAY)
-    y = why(128)
+    y = roster(128)
+    y = why(y + 62)
     y = order(y + 62)
     y = inside(y + 62)
     y = after(y + 62)
