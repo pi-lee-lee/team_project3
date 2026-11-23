@@ -1,0 +1,396 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="1788" viewBox="0 0 1640 1788" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<defs><marker id="a8e8e93" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8e8e93"/></marker></defs>
+<rect width="1640" height="1788" fill="#f2f2f7"/>
+<text x="40.0" y="46.0" font-size="24" font-weight="700" fill="#1c1c1e" text-anchor="start">화재 점검 로봇 서비스 — 기술 스택</text>
+<text x="40.0" y="72.0" font-size="13" font-weight="400" fill="#636366" text-anchor="start">시스템 구성도(system_architecture.svg)의 영역마다 쓰는 기술 · 띠 하나 = 구성도의 한 영역(같은 색) · 카드 하나 = 기술 하나(이름 · 버전 · 하는 일) · 모두 60개</text>
+<text x="40.0" y="129.0" font-size="12.5" font-weight="700" fill="#636366" text-anchor="start">요청이 지나는 길</text>
+<rect x="150.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="1.6"/>
+<text x="252.5" y="120.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">브라우저</text>
+<text x="252.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">React 18 · TypeScript</text>
+<rect x="399.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="501.5" y="120.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">cdn</text>
+<text x="501.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">nginx 캐시</text>
+<rect x="648.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="750.5" y="120.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">web</text>
+<text x="750.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">nginx 원본</text>
+<rect x="897.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="1.6"/>
+<text x="999.5" y="120.0" font-size="13.5" font-weight="700" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">gateway</text>
+<text x="999.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">Spring Cloud Gateway</text>
+<rect x="1146.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="1248.5" y="120.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">서비스 ×4</text>
+<text x="1248.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">Spring Boot 3 · FastAPI</text>
+<rect x="1395.0" y="98.0" width="205.0" height="52.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="1.6"/>
+<text x="1497.5" y="120.0" font-size="13.5" font-weight="700" fill="#c93400" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">db</text>
+<text x="1497.5" y="139.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">PostgreSQL 17</text>
+<text x="40.0" y="195.0" font-size="12.5" font-weight="700" fill="#636366" text-anchor="start">로봇 쪽 연결</text>
+<rect x="150.0" y="164.0" width="254.8" height="52.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="1.6"/>
+<text x="277.4" y="186.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">robot-service</text>
+<text x="277.4" y="205.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">RosbridgeRobotAdapter</text>
+<rect x="448.8" y="164.0" width="254.8" height="52.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.6"/>
+<text x="576.2" y="186.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">rosbridge</text>
+<text x="576.2" y="205.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">WebSocket(JSON) :9090</text>
+<rect x="747.6" y="164.0" width="254.8" height="52.0" rx="10" fill="#f5ecfa" stroke="#8944ab" stroke-width="1.6"/>
+<text x="875.0" y="186.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_goal_bridge</text>
+<text x="875.0" y="205.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">rclpy · 목표 단위 계약</text>
+<rect x="1046.4" y="164.0" width="254.8" height="52.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="1.6"/>
+<text x="1173.8" y="186.0" font-size="13.5" font-weight="700" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Nav2</text>
+<text x="1173.8" y="205.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">Theta* · MPPI · AMCL</text>
+<rect x="1345.2" y="164.0" width="254.8" height="52.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="1.6"/>
+<text x="1472.6" y="186.0" font-size="13.5" font-weight="700" fill="#3a3a3c" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Gazebo</text>
+<text x="1472.6" y="205.0" font-size="11.5" font-weight="500" fill="#3a3a3c" text-anchor="middle">TurtleBot3 Waffle Pi</text>
+<rect x="40.0" y="242.0" width="1560.0" height="168.0" rx="14" fill="#eaf3ff" stroke="#007aff" stroke-width="2"/>
+<text x="58.0" y="274.0" font-size="18" font-weight="700" fill="#007aff" text-anchor="start">화면</text>
+<text x="58.0" y="296.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">frontend-build → web</text>
+<text x="58.0" y="318.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">브라우저에서 도는 React SPA</text>
+<text x="58.0" y="336.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">빌드 결과 dist/ 를 web 이 서빙</text>
+<rect x="310.0" y="258.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="322.0" y="283.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">React</text>
+<rect x="557.2" y="268.0" width="52.3" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="583.3" y="282.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">18.3.1</text>
+<text x="322.0" y="305.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">화면 조립(SPA) · 함수형 컴포넌트</text>
+<rect x="631.5" y="258.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="643.5" y="283.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">TypeScript</text>
+<rect x="885.1" y="268.0" width="45.9" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="908.0" y="282.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">5.6.3</text>
+<text x="643.5" y="305.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">타입 검사(tsc -b) 후 빌드</text>
+<rect x="953.0" y="258.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="965.0" y="283.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Vite</text>
+<rect x="1200.2" y="268.0" width="52.3" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="1226.3" y="282.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">5.4.11</text>
+<text x="965.0" y="305.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">개발 서버 · 번들 빌드(dist/)</text>
+<rect x="1274.5" y="258.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="1286.5" y="283.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">React Router</text>
+<rect x="1521.7" y="268.0" width="52.3" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="1547.8" y="282.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">6.28.0</text>
+<text x="1286.5" y="305.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">주소 ↔ 화면 연결(화면 이동)</text>
+<rect x="310.0" y="332.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="322.0" y="357.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Material Symbols</text>
+<rect x="557.2" y="342.0" width="52.3" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="583.3" y="356.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.27.2</text>
+<text x="322.0" y="379.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">아이콘 글꼴</text>
+<rect x="631.5" y="332.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="643.5" y="357.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Galmuri</text>
+<rect x="891.5" y="342.0" width="39.5" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="911.2" y="356.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">2.40</text>
+<text x="643.5" y="379.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">픽셀 표시 모드 글꼴(OFL)</text>
+<rect x="953.0" y="332.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="965.0" y="357.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Canvas 2D</text>
+<rect x="1168.1" y="342.0" width="84.4" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="1210.3" y="356.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">브라우저 표준</text>
+<text x="965.0" y="379.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">관제 지도 · 로봇 · 경로 그리기</text>
+<rect x="1274.5" y="332.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#007aff" stroke-width="1.1"/>
+<text x="1286.5" y="357.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">WebSocket · MJPEG</text>
+<rect x="1489.6" y="342.0" width="84.4" height="20.0" rx="10" fill="#eaf3ff" stroke="#007aff" stroke-width="0.8"/>
+<text x="1531.8" y="356.0" font-size="10.5" font-weight="600" fill="#007aff" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">브라우저 표준</text>
+<text x="1286.5" y="379.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">방향키 조종 · 실시간 카메라</text>
+<rect x="40.0" y="424.0" width="1560.0" height="112.0" rx="14" fill="#efeefc" stroke="#5856d6" stroke-width="2"/>
+<text x="58.0" y="456.0" font-size="18" font-weight="700" fill="#5856d6" text-anchor="start">엣지</text>
+<text x="58.0" y="478.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">cdn · web</text>
+<text x="58.0" y="500.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">외부에 열린 유일한 포트 :8080</text>
+<text x="58.0" y="518.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">cdn = 캐시, web = 원본 서버</text>
+<rect x="310.0" y="440.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="322.0" y="465.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">nginx</text>
+<rect x="525.2" y="450.0" width="84.3" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="567.4" y="464.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">1.27-alpine</text>
+<text x="322.0" y="487.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">cdn · web 두 컨테이너의 서버</text>
+<rect x="631.5" y="440.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="643.5" y="465.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">proxy_cache</text>
+<rect x="857.3" y="450.0" width="73.7" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="894.2" y="464.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nginx 기능</text>
+<text x="643.5" y="487.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">cdn: /assets/* 만 보관(1년)</text>
+<rect x="953.0" y="440.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="965.0" y="465.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">정적 서빙 · gzip</text>
+<rect x="1178.8" y="450.0" width="73.7" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="1215.7" y="464.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nginx 기능</text>
+<text x="965.0" y="487.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">web: dist/ 서빙 · Cache-Control</text>
+<rect x="1274.5" y="440.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="1286.5" y="465.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">리버스 프록시</text>
+<rect x="1500.3" y="450.0" width="73.7" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="1537.2" y="464.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nginx 기능</text>
+<text x="1286.5" y="487.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">web: /api · /ws → gateway</text>
+<rect x="40.0" y="550.0" width="1560.0" height="112.0" rx="14" fill="#efeefc" stroke="#5856d6" stroke-width="2"/>
+<text x="58.0" y="582.0" font-size="18" font-weight="700" fill="#5856d6" text-anchor="start">게이트웨이</text>
+<text x="58.0" y="604.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">gateway</text>
+<text x="58.0" y="626.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">인증 · 권한 · 라우팅만</text>
+<text x="58.0" y="644.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">DB 없음 · 업무 기능 없음</text>
+<rect x="310.0" y="566.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="322.0" y="591.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring Cloud Gateway</text>
+<rect x="544.4" y="576.0" width="65.1" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="577.0" y="590.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">2025.0.0</text>
+<text x="322.0" y="613.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">경로별 라우팅 · 필터 체인</text>
+<rect x="631.5" y="566.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="643.5" y="591.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring WebFlux</text>
+<rect x="853.1" y="576.0" width="77.9" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="892.1" y="590.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Boot 3.5.6</text>
+<text x="643.5" y="613.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">논블로킹 서버</text>
+<rect x="953.0" y="566.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="965.0" y="591.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">JWT (jjwt)</text>
+<rect x="1200.2" y="576.0" width="52.3" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="1226.3" y="590.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.12.6</text>
+<text x="965.0" y="613.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">HttpOnly 쿠키 토큰 발급 · 검증</text>
+<rect x="1274.5" y="566.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#5856d6" stroke-width="1.1"/>
+<text x="1286.5" y="591.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring Boot Actuator</text>
+<rect x="1528.1" y="576.0" width="45.9" height="20.0" rx="10" fill="#efeefc" stroke="#5856d6" stroke-width="0.8"/>
+<text x="1551.0" y="590.0" font-size="10.5" font-weight="600" fill="#5856d6" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">3.5.6</text>
+<text x="1286.5" y="613.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">상태 검사(/actuator/health)</text>
+<rect x="40.0" y="676.0" width="1560.0" height="242.0" rx="14" fill="#e9f7ee" stroke="#248a3d" stroke-width="2"/>
+<text x="58.0" y="708.0" font-size="18" font-weight="700" fill="#248a3d" text-anchor="start">업무 서비스</text>
+<text x="58.0" y="730.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">user · inspection · robot-service</text>
+<text x="58.0" y="752.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">컨테이너 하나 = MSA 서비스 하나</text>
+<text x="58.0" y="770.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">자기 jar · 포트 · DB</text>
+<rect x="310.0" y="692.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="322.0" y="717.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Java</text>
+<rect x="518.9" y="702.0" width="90.6" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="564.2" y="716.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">21 (Temurin)</text>
+<text x="322.0" y="739.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">언어 · 실행 환경(JDK)</text>
+<rect x="631.5" y="692.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="643.5" y="717.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring Boot</text>
+<rect x="885.1" y="702.0" width="45.9" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="908.0" y="716.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">3.5.6</text>
+<text x="643.5" y="739.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">서비스 뼈대 · 내장 서버</text>
+<rect x="953.0" y="692.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="965.0" y="717.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring Web MVC</text>
+<rect x="1168.2" y="702.0" width="84.3" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1210.4" y="716.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">starter-web</text>
+<text x="965.0" y="739.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">REST API(@RestController)</text>
+<rect x="1274.5" y="692.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="1286.5" y="717.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring JDBC</text>
+<rect x="1496.1" y="702.0" width="77.9" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1535.1" y="716.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">JdbcClient</text>
+<text x="1286.5" y="739.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">SQL 직접 작성(JPA 안 씀)</text>
+<rect x="310.0" y="766.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="322.0" y="791.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Flyway</text>
+<rect x="514.5" y="776.0" width="95.0" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="562.0" y="790.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Boot 관리 버전</text>
+<text x="322.0" y="813.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">스키마 마이그레이션(V…sql)</text>
+<rect x="631.5" y="766.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="643.5" y="791.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">PostgreSQL JDBC</text>
+<rect x="836.0" y="776.0" width="95.0" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="883.5" y="790.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Boot 관리 버전</text>
+<text x="643.5" y="813.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">DB 드라이버</text>
+<rect x="953.0" y="766.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="965.0" y="791.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">RestClient</text>
+<rect x="1187.4" y="776.0" width="65.1" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1220.0" y="790.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Spring 6</text>
+<text x="965.0" y="813.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">서비스 간 /internal 호출</text>
+<rect x="1274.5" y="766.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="1286.5" y="791.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring WebSocket</text>
+<rect x="1451.4" y="776.0" width="122.6" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1512.7" y="790.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">starter-websocket</text>
+<text x="1286.5" y="813.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">조종 채널(robot-service)</text>
+<rect x="310.0" y="840.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="322.0" y="865.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">java.net.http</text>
+<rect x="548.6" y="850.0" width="60.9" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="579.0" y="864.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">JDK 내장</text>
+<text x="322.0" y="887.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">rosbridge WebSocket · 영상 HTTP</text>
+<rect x="631.5" y="840.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="643.5" y="865.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Spring Security Crypto</text>
+<rect x="878.7" y="850.0" width="52.3" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="904.8" y="864.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">BCrypt</text>
+<text x="643.5" y="887.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">비밀번호 해시(user-service)</text>
+<rect x="953.0" y="840.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="965.0" y="865.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Bean Validation</text>
+<rect x="1123.5" y="850.0" width="129.0" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1188.0" y="864.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">starter-validation</text>
+<text x="965.0" y="887.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">요청 값 검증</text>
+<rect x="1274.5" y="840.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#248a3d" stroke-width="1.1"/>
+<text x="1286.5" y="865.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Maven</text>
+<rect x="1540.8" y="850.0" width="33.2" height="20.0" rx="10" fill="#e9f7ee" stroke="#248a3d" stroke-width="0.8"/>
+<text x="1557.4" y="864.0" font-size="10.5" font-weight="600" fill="#248a3d" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">3.9</text>
+<text x="1286.5" y="887.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">빌드 · 공유 jar tp3:common</text>
+<rect x="40.0" y="932.0" width="1560.0" height="168.0" rx="14" fill="#fff4e5" stroke="#b25000" stroke-width="2"/>
+<text x="58.0" y="964.0" font-size="18" font-weight="700" fill="#b25000" text-anchor="start">분석 서비스</text>
+<text x="58.0" y="986.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">analysis-service</text>
+<text x="58.0" y="1008.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">Spring 이 아닌 Python 서비스</text>
+<text x="58.0" y="1026.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">사진 품질 분석 · 판독기</text>
+<rect x="310.0" y="948.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="322.0" y="973.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Python</text>
+<rect x="538.0" y="958.0" width="71.5" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="573.8" y="972.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">3.12-slim</text>
+<text x="322.0" y="995.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">언어 · 실행 환경</text>
+<rect x="631.5" y="948.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="643.5" y="973.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">FastAPI</text>
+<rect x="872.3" y="958.0" width="58.7" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="901.6" y="972.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.115.6</text>
+<text x="643.5" y="995.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">API(/jobs · /check · /checkers)</text>
+<rect x="953.0" y="948.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="965.0" y="973.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Uvicorn</text>
+<rect x="1200.2" y="958.0" width="52.3" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="1226.3" y="972.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.32.1</text>
+<text x="965.0" y="995.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">ASGI 서버 :8084</text>
+<rect x="1274.5" y="948.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="1286.5" y="973.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">psycopg</text>
+<rect x="1528.1" y="958.0" width="45.9" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="1551.0" y="972.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">3.2.3</text>
+<text x="1286.5" y="995.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">DB 접속 · LISTEN 작업 큐</text>
+<rect x="310.0" y="1022.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="322.0" y="1047.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">NumPy</text>
+<rect x="563.6" y="1032.0" width="45.9" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="586.5" y="1046.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">2.1.3</text>
+<text x="322.0" y="1069.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">영상 계산(밝기 · 선명도 · 색)</text>
+<rect x="631.5" y="1022.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="643.5" y="1047.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Pillow</text>
+<rect x="878.7" y="1032.0" width="52.3" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="904.8" y="1046.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">11.0.0</text>
+<text x="643.5" y="1069.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">사진 열기 · 영역 자르기</text>
+<rect x="953.0" y="1022.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="965.0" y="1047.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">httpx</text>
+<rect x="1200.2" y="1032.0" width="52.3" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="1226.3" y="1046.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.28.1</text>
+<text x="965.0" y="1069.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">사진 받기 · 결과 보내기</text>
+<rect x="1274.5" y="1022.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#b25000" stroke-width="1.1"/>
+<text x="1286.5" y="1047.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">python-multipart</text>
+<rect x="1521.7" y="1032.0" width="52.3" height="20.0" rx="10" fill="#fff4e5" stroke="#b25000" stroke-width="0.8"/>
+<text x="1547.8" y="1046.0" font-size="10.5" font-weight="600" fill="#b25000" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">0.0.20</text>
+<text x="1286.5" y="1069.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">사진 업로드 받기(POST /check)</text>
+<rect x="40.0" y="1114.0" width="1560.0" height="112.0" rx="14" fill="#fff1e8" stroke="#c93400" stroke-width="2"/>
+<text x="58.0" y="1146.0" font-size="18" font-weight="700" fill="#c93400" text-anchor="start">저장소</text>
+<text x="58.0" y="1168.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">db</text>
+<text x="58.0" y="1190.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">계층이 아니라 서비스 옆에 붙는 저장소</text>
+<text x="58.0" y="1208.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">서비스마다 자기 DB · 자기 계정</text>
+<rect x="310.0" y="1130.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#c93400" stroke-width="1.1"/>
+<text x="322.0" y="1155.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">PostgreSQL</text>
+<rect x="582.7" y="1140.0" width="26.8" height="20.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="0.8"/>
+<text x="596.1" y="1154.0" font-size="10.5" font-weight="600" fill="#c93400" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">17</text>
+<text x="322.0" y="1177.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">서비스마다 자기 DB(4개)</text>
+<rect x="631.5" y="1130.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#c93400" stroke-width="1.1"/>
+<text x="643.5" y="1155.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">LISTEN / NOTIFY</text>
+<rect x="825.4" y="1140.0" width="105.6" height="20.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="0.8"/>
+<text x="878.2" y="1154.0" font-size="10.5" font-weight="600" fill="#c93400" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">PostgreSQL 기능</text>
+<text x="643.5" y="1177.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">분석 작업 알림(폴링 없이)</text>
+<rect x="953.0" y="1130.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#c93400" stroke-width="1.1"/>
+<text x="965.0" y="1155.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">FOR UPDATE SKIP LOCKED</text>
+<rect x="1146.9" y="1140.0" width="105.6" height="20.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="0.8"/>
+<text x="1199.7" y="1154.0" font-size="10.5" font-weight="600" fill="#c93400" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">PostgreSQL 기능</text>
+<text x="965.0" y="1177.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">작업 큐: 한 작업은 한 워커만</text>
+<rect x="1274.5" y="1130.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#c93400" stroke-width="1.1"/>
+<text x="1286.5" y="1155.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Docker 볼륨</text>
+<rect x="1464.2" y="1140.0" width="109.8" height="20.0" rx="10" fill="#fff1e8" stroke="#c93400" stroke-width="0.8"/>
+<text x="1519.1" y="1154.0" font-size="10.5" font-weight="600" fill="#c93400" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">pgdata · photos</text>
+<text x="1286.5" y="1177.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">DB 파일 · 관측 사진 보관</text>
+<rect x="40.0" y="1240.0" width="1560.0" height="242.0" rx="14" fill="#e6f5fb" stroke="#0071a4" stroke-width="2"/>
+<text x="58.0" y="1272.0" font-size="18" font-weight="700" fill="#0071a4" text-anchor="start">로봇</text>
+<text x="58.0" y="1294.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">sim</text>
+<text x="58.0" y="1316.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">시뮬레이션 컨테이너(amd64)</text>
+<text x="58.0" y="1334.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">실제 로봇은 이 상자 전체를 대체</text>
+<rect x="310.0" y="1256.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="322.0" y="1281.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">ROS 2</text>
+<rect x="557.2" y="1266.0" width="52.3" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="583.3" y="1280.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Humble</text>
+<text x="322.0" y="1303.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">로봇 미들웨어(토픽 · 액션)</text>
+<rect x="631.5" y="1256.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="643.5" y="1281.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Gazebo Classic</text>
+<rect x="840.4" y="1266.0" width="90.6" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="885.7" y="1280.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">amd64 · Xvfb</text>
+<text x="643.5" y="1303.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">물리 시뮬레이션(헤드리스)</text>
+<rect x="953.0" y="1256.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="965.0" y="1281.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">TurtleBot3</text>
+<rect x="1181.0" y="1266.0" width="71.5" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1216.8" y="1280.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Waffle Pi</text>
+<text x="965.0" y="1303.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">로봇 모델(라이다 · 카메라)</text>
+<rect x="1274.5" y="1256.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="1286.5" y="1281.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Nav2</text>
+<rect x="1521.7" y="1266.0" width="52.3" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1547.8" y="1280.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Humble</text>
+<text x="1286.5" y="1303.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">자율 주행 묶음(계획 · 제어)</text>
+<rect x="310.0" y="1330.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="322.0" y="1355.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Theta* 계획기</text>
+<rect x="499.7" y="1340.0" width="109.8" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="554.6" y="1354.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_theta_star</text>
+<text x="322.0" y="1377.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">직선 위주 전역 경로</text>
+<rect x="631.5" y="1330.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="643.5" y="1355.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">MPPI 제어기</text>
+<rect x="859.5" y="1340.0" width="71.5" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="895.3" y="1354.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_mppi</text>
+<text x="643.5" y="1377.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">경로 추종 · 실시간 회피</text>
+<rect x="953.0" y="1330.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="965.0" y="1355.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">AMCL</text>
+<rect x="1181.0" y="1340.0" width="71.5" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1216.8" y="1354.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">nav2_amcl</text>
+<text x="965.0" y="1377.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">저장 지도에서 위치 추정</text>
+<rect x="1274.5" y="1330.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="1286.5" y="1355.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">slam_toolbox</text>
+<rect x="1521.7" y="1340.0" width="52.3" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1547.8" y="1354.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Humble</text>
+<text x="1286.5" y="1377.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">지도 작성(SLAM 모드)</text>
+<rect x="310.0" y="1404.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="322.0" y="1429.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">rosbridge_server</text>
+<rect x="563.6" y="1414.0" width="45.9" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="586.5" y="1428.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">:9090</text>
+<text x="322.0" y="1451.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">ROS 토픽 ↔ WebSocket(JSON)</text>
+<rect x="631.5" y="1404.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="643.5" y="1429.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">web_video_server</text>
+<rect x="885.1" y="1414.0" width="45.9" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="908.0" y="1428.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">:8080</text>
+<text x="643.5" y="1451.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">카메라 → MJPEG · 스냅샷</text>
+<rect x="953.0" y="1404.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="965.0" y="1429.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">compressed_image_transport</text>
+<rect x="1200.2" y="1414.0" width="52.3" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1226.3" y="1428.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Humble</text>
+<text x="965.0" y="1451.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">카메라 JPEG 압축 전송</text>
+<rect x="1274.5" y="1404.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#0071a4" stroke-width="1.1"/>
+<text x="1286.5" y="1429.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">rclpy</text>
+<rect x="1489.7" y="1414.0" width="84.3" height="20.0" rx="10" fill="#e6f5fb" stroke="#0071a4" stroke-width="0.8"/>
+<text x="1531.9" y="1428.0" font-size="10.5" font-weight="600" fill="#0071a4" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Python 3.10</text>
+<text x="1286.5" y="1451.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">브리지 노드(목표 · 감시 · 투척)</text>
+<rect x="40.0" y="1496.0" width="1560.0" height="112.0" rx="14" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="2"/>
+<text x="58.0" y="1528.0" font-size="18" font-weight="700" fill="#3a3a3c" text-anchor="start">실행 · 빌드 · 시험</text>
+<text x="58.0" y="1550.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start" font-family="'SF Mono', Menlo, Consolas, monospace">compose.yaml</text>
+<text x="58.0" y="1572.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">명령 하나로 전체 실행</text>
+<text x="58.0" y="1590.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">코드는 이미지에 굽지 않고 마운트</text>
+<rect x="310.0" y="1512.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#3a3a3c" stroke-width="1.1"/>
+<text x="322.0" y="1537.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Docker Compose</text>
+<rect x="582.7" y="1522.0" width="26.8" height="20.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="0.8"/>
+<text x="596.1" y="1536.0" font-size="10.5" font-weight="600" fill="#3a3a3c" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">v2</text>
+<text x="322.0" y="1559.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">컨테이너 11개 · 네트워크 4개</text>
+<rect x="631.5" y="1512.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#3a3a3c" stroke-width="1.1"/>
+<text x="643.5" y="1537.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">빌드용 컨테이너</text>
+<rect x="795.6" y="1522.0" width="135.4" height="20.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="0.8"/>
+<text x="863.3" y="1536.0" font-size="10.5" font-weight="600" fill="#3a3a3c" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">maven:3.9 · node:20</text>
+<text x="643.5" y="1559.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">common-build · frontend-build</text>
+<rect x="953.0" y="1512.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#3a3a3c" stroke-width="1.1"/>
+<text x="965.0" y="1537.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">E2E 시험</text>
+<rect x="1099.9" y="1522.0" width="152.6" height="20.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="0.8"/>
+<text x="1176.2" y="1536.0" font-size="10.5" font-weight="600" fill="#3a3a3c" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Python 3 표준 라이브러리</text>
+<text x="965.0" y="1559.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">실제 스택에 대고 전체 흐름 확인</text>
+<rect x="1274.5" y="1512.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#3a3a3c" stroke-width="1.1"/>
+<text x="1286.5" y="1537.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">문서 도면</text>
+<rect x="1479.1" y="1522.0" width="94.9" height="20.0" rx="10" fill="#f2f2f7" stroke="#3a3a3c" stroke-width="0.8"/>
+<text x="1526.5" y="1536.0" font-size="10.5" font-weight="600" fill="#3a3a3c" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">Python → SVG</text>
+<text x="1286.5" y="1559.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">build_*.py 로 SVG 생성</text>
+<rect x="40.0" y="1622.0" width="1560.0" height="112.0" rx="14" fill="#f7f7fa" stroke="#8e8e93" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="58.0" y="1654.0" font-size="18" font-weight="700" fill="#8e8e93" text-anchor="start">실제 로봇</text>
+<text x="58.0" y="1676.0" font-size="12" font-weight="600" fill="#1c1c1e" text-anchor="start">보유 장비 · 연동 예정</text>
+<text x="58.0" y="1698.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">아직 코드가 붙지 않은 하드웨어</text>
+<text x="58.0" y="1716.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">제원은 README 9절</text>
+<rect x="310.0" y="1638.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#8e8e93" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="322.0" y="1663.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">TurtleBot3 Waffle Pi</text>
+<rect x="574.1" y="1648.0" width="35.3" height="20.0" rx="10" fill="#f7f7fa" stroke="#8e8e93" stroke-width="0.8"/>
+<text x="591.8" y="1662.0" font-size="10.5" font-weight="600" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">실물</text>
+<text x="322.0" y="1685.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">Raspberry Pi + OpenCR 보드</text>
+<rect x="631.5" y="1638.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#8e8e93" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="643.5" y="1663.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">LDS 라이다 · IMX219</text>
+<rect x="853.1" y="1648.0" width="77.9" height="20.0" rx="10" fill="#f7f7fa" stroke="#8e8e93" stroke-width="0.8"/>
+<text x="892.1" y="1662.0" font-size="10.5" font-weight="600" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">TurtleBot3</text>
+<text x="643.5" y="1685.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">360° 거리 측정 · 점검 사진</text>
+<rect x="953.0" y="1638.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#8e8e93" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="965.0" y="1663.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">Jetson Nano 4GB</text>
+<rect x="1168.2" y="1648.0" width="84.3" height="20.0" rx="10" fill="#f7f7fa" stroke="#8e8e93" stroke-width="0.8"/>
+<text x="1210.4" y="1662.0" font-size="10.5" font-weight="600" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">JetBot Mini</text>
+<text x="965.0" y="1685.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">순찰 · 화재 감지(예정)</text>
+<rect x="1274.5" y="1638.0" width="309.5" height="62.0" rx="9" fill="#ffffff" stroke="#8e8e93" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="1286.5" y="1663.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start">투척기 시리얼 브리지</text>
+<rect x="1445.0" y="1648.0" width="129.0" height="20.0" rx="10" fill="#f7f7fa" stroke="#8e8e93" stroke-width="0.8"/>
+<text x="1509.5" y="1662.0" font-size="10.5" font-weight="600" fill="#636366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace">launcher_bridge.py</text>
+<text x="1286.5" y="1685.0" font-size="11.5" font-weight="400" fill="#3a3a3c" text-anchor="start">투척 기구 연결(만들어만 둠)</text>
+<text x="40.0" y="1764.0" font-size="12" font-weight="500" fill="#636366" text-anchor="start">버전의 원본: package.json(화면) · pom.xml(Spring) · requirements.txt(Python) · Dockerfile · compose.yaml(이미지). 글 설명과 "왜 쓰는가"는 같은 폴더의 TECH_STACK.md.</text>
+<path d="M359.0 124.0 L395.0 124.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M608.0 124.0 L644.0 124.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M857.0 124.0 L893.0 124.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M1106.0 124.0 L1142.0 124.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M1355.0 124.0 L1391.0 124.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)"/>
+<path d="M408.8 190.0 L444.8 190.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)" marker-start="url(#a8e8e93)"/>
+<path d="M707.6 190.0 L743.6 190.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)" marker-start="url(#a8e8e93)"/>
+<path d="M1006.4 190.0 L1042.4 190.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)" marker-start="url(#a8e8e93)"/>
+<path d="M1305.2 190.0 L1341.2 190.0" fill="none" stroke="#8e8e93" stroke-width="1.6" marker-end="url(#a8e8e93)" marker-start="url(#a8e8e93)"/>
+</svg>
