@@ -1,27 +1,28 @@
 """기술 스택 도면 + 설명서: 시스템 구성도(system_architecture.svg)의 계층마다 무슨 기술을 쓰는가.
 
 읽는 법
-- 맨 위 두 줄: 구성도의 요청 경로(브라우저 → cdn → web → gateway → 서비스 → db)와 로봇 쪽 연결을 기술 이름으로 다시 적은 것.
-- 그 아래 띠 하나 = 구성도의 한 영역(색도 구성도와 같다). 왼쪽 = 영역 이름과 컨테이너, 오른쪽 카드 = 기술 하나(이름 · 버전 · 하는 일).
+- 어두운 머리 영역: 구성도의 요청 경로(브라우저 → cdn → web → gateway → 서비스 → db)와 로봇 쪽 연결을 기술 이름으로 다시 적은 것.
+- 그 아래 흰 판 하나 = 구성도의 한 영역(색도 구성도와 같다). 왼쪽 = 영역 이름과 컨테이너, 오른쪽 카드 = 기술 하나(아이콘 · 이름 · 버전 · 하는 일).
+- 아이콘: 공식 로고는 docs/_lib/icons/ 의 Simple Icons(CC0) SVG, 로고가 없는 것은 이 파일의 GLYPH(직접 그린 선 아이콘). 기술을 더하면 ICON 에도 한 줄 더한다.
 이 파일의 STACK 하나가 SVG 와 Markdown 두 문서의 원본이다. 버전의 원본은 각 항목에 적힌 파일(package.json · pom.xml ·
 requirements.txt · Dockerfile · compose.yaml)이므로, 그 파일을 바꾸면 STACK 도 고친 뒤 다시 생성한다.
 실행: python3 docs/architecture/build_tech_stack.py  →  docs/architecture/tech_stack.svg · TECH_STACK.md
 """
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
-from svg import C, Svg, text_width
+from svg import C, MONO, Svg, text_width
 
 HERE = Path(__file__).resolve().parent
 OUT_SVG, OUT_MD = HERE / 'tech_stack.svg', HERE / 'TECH_STACK.md'
-W = 1640
+W = 1680
 S = Svg(W, 2000)               # 높이는 마지막에 내용에 맞춘다
-GRAY = '#636366'
 
 # 영역: (제목, 색, 컨테이너, 왼쪽 설명 줄, 버전 원본 파일, 한 줄 소개(MD), [(기술, 버전, 하는 일(SVG·MD), 왜 쓰는가(MD))])
 STACK = [
-    ('화면', 'client', 'frontend-build → web', ['브라우저에서 도는 React SPA', '빌드 결과 dist/ 를 web 이 서빙'],
+    ('화면', 'client', 'frontend-build · web', ['브라우저에서 도는 React SPA', '빌드 결과 dist/ 를 web 이 서빙'],
      'web/nginx/frontend/package.json',
      '브라우저가 받아 실행하는 React SPA. `frontend-build` 컨테이너가 `dist/` 로 빌드하고 `web`(nginx)이 그대로 내보낸다.', [
         ('React', '18.3.1', '화면 조립(SPA) · 함수형 컴포넌트', '화면을 부품(컴포넌트)으로 나누고, 상태가 바뀐 부분만 다시 그린다.'),
@@ -49,7 +50,7 @@ STACK = [
         ('JWT (jjwt)', '0.12.6', 'HttpOnly 쿠키 토큰 발급 · 검증', '토큰을 스크립트가 읽지 못하는 쿠키에 둔다. 발급 · 검증 코드는 공유 jar `tp3:common` 의 `JwtCodec`.'),
         ('Spring Boot Actuator', '3.5.6', '상태 검사(/actuator/health)', 'compose 가 컨테이너 상태를 확인하는 데 쓴다(Spring 서비스 공통).'),
      ]),
-    ('업무 서비스', 'spring', 'user · inspection · robot-service', ['컨테이너 하나 = MSA 서비스 하나', '자기 jar · 포트 · DB'],
+    ('업무 서비스', 'spring', 'user-service · inspection-service · robot-service', ['컨테이너 하나 = MSA 서비스 하나', '자기 jar · 포트 · DB'],
      'web/spring/*/pom.xml · web/spring/*/Dockerfile',
      'Spring Boot 서비스 셋(`user-service` · `inspection-service` · `robot-service`). 같은 뼈대를 쓰고 서비스마다 자기 DB 를 가진다.', [
         ('Java', '21 (Temurin)', '언어 · 실행 환경(JDK)', '장기 지원(LTS) 판. 레코드 · 패턴 매칭으로 코드가 짧아진다.'),
@@ -82,7 +83,7 @@ STACK = [
      'PostgreSQL 컨테이너 하나에 서비스별 DB(`userdb` · `inspectiondb` · `robotdb` · `analysisdb`)를 둔다. 서비스는 자기 DB 만 본다.', [
         ('PostgreSQL', '17', '서비스마다 자기 DB(4개)', '컨테이너는 하나지만 DB 와 계정을 나눠 MSA 의 "서비스별 저장소"를 지킨다.'),
         ('LISTEN / NOTIFY', 'PostgreSQL 기능', '분석 작업 알림(폴링 없이)', '메시지 브로커(Kafka · RabbitMQ)를 따로 띄우지 않고 DB 로 작업을 알린다.'),
-        ('FOR UPDATE SKIP LOCKED', 'PostgreSQL 기능', '작업 큐: 한 작업은 한 워커만', '워커가 여럿이어도 같은 작업을 두 번 집지 않는다.'),
+        ('SKIP LOCKED', 'PostgreSQL 기능', '작업 큐: 한 작업은 한 워커만', '`FOR UPDATE SKIP LOCKED` 로 집으면 워커가 여럿이어도 같은 작업을 두 번 집지 않는다.'),
         ('Docker 볼륨', 'pgdata · photos', 'DB 파일 · 관측 사진 보관', '컨테이너를 다시 만들어도 데이터가 남는다.'),
      ]),
     ('로봇', 'ros', 'sim', ['시뮬레이션 컨테이너(amd64)', '실제 로봇은 이 상자 전체를 대체'],
@@ -98,7 +99,7 @@ STACK = [
         ('slam_toolbox', 'Humble', '지도 작성(SLAM 모드)', '운영 지도 `ros/maps/site.*` 를 만든다.'),
         ('rosbridge_server', ':9090', 'ROS 토픽 ↔ WebSocket(JSON)', 'Java 서비스가 ROS 를 설치하지 않고도 토픽을 주고받는다.'),
         ('web_video_server', ':8080', '카메라 → MJPEG · 스냅샷', '카메라 토픽을 HTTP 영상으로 바꿔 브라우저까지 중계할 수 있게 한다.'),
-        ('compressed_image_transport', 'Humble', '카메라 JPEG 압축 전송', '실제 로봇에서 Wi-Fi 로 원본 영상을 보내지 않기 위해서다.'),
+        ('compressed_image_transport', 'JPEG', '카메라 영상 압축 전송', '실제 로봇에서 Wi-Fi 로 원본 영상을 보내지 않기 위해서다.'),
         ('rclpy', 'Python 3.10', '브리지 노드(목표 · 감시 · 투척)', '`nav2_goal_bridge` · `cmd_vel_watchdog` · `mock_launcher` 를 Python 노드로 짠다.'),
      ]),
     ('실행 · 빌드 · 시험', 'dev', 'compose.yaml', ['명령 하나로 전체 실행', '코드는 이미지에 굽지 않고 마운트'],
@@ -109,83 +110,218 @@ STACK = [
         ('E2E 시험', 'Python 3 표준 라이브러리', '실제 스택에 대고 전체 흐름 확인', '단위 테스트 대신 떠 있는 스택에 요청을 보내 본다(`scripts/e2e_test.py` · `e2e_scenarios.py`).'),
         ('문서 도면', 'Python → SVG', 'build_*.py 로 SVG 생성', '도면을 손으로 고치지 않고 스크립트에서 다시 만든다.'),
      ]),
-    ('실제 로봇', 'gray', '보유 장비 · 연동 예정', ['아직 코드가 붙지 않은 하드웨어', '제원은 README 9절'],
+    ('실제 로봇', 'gray', '보유 장비', ['아직 코드가 붙지 않은 하드웨어', '제원은 README 9절'],
      'README.md 9절',
      '보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/SCHEDULE.md` 의 일정대로 한다.', [
         ('TurtleBot3 Waffle Pi', '실물', 'Raspberry Pi + OpenCR 보드', 'sim 컨테이너 자리를 대신한다(같은 노드 · 토픽, 목표 브리지도 같은 코드).'),
         ('LDS 라이다 · IMX219', 'TurtleBot3', '360° 거리 측정 · 점검 사진', '주행(Nav2)과 관측 사진의 입력.'),
         ('Jetson Nano 4GB', 'JetBot Mini', '순찰 · 화재 감지(예정)', '지금은 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다.'),
-        ('투척기 시리얼 브리지', 'launcher_bridge.py', '투척 기구 연결(만들어만 둠)', '시뮬레이션에서는 `mock_launcher.py` 가 투척 계약에 답한다.'),
+        ('투척기 시리얼 브리지', 'rclpy', 'launcher_bridge.py (만들어만 둠)', '시뮬레이션에서는 `mock_launcher.py` 가 투척 계약에 답한다.'),
      ]),
 ]
 
-# 구성도의 요청 경로를 기술 이름으로: (컨테이너, 기술, 색)
-PATH_WEB = [('브라우저', 'React 18 · TypeScript', 'client'), ('cdn', 'nginx 캐시', 'edge'), ('web', 'nginx 원본', 'edge'),
-            ('gateway', 'Spring Cloud Gateway', 'edge'), ('서비스 ×4', 'Spring Boot 3 · FastAPI', 'spring'),
-            ('db', 'PostgreSQL 17', 'data')]
-PATH_ROBOT = [('robot-service', 'RosbridgeRobotAdapter', 'spring'), ('rosbridge', 'WebSocket(JSON) :9090', 'bridge'),
-              ('nav2_goal_bridge', 'rclpy · 목표 단위 계약', 'bridge'), ('Nav2', 'Theta* · MPPI · AMCL', 'ros'),
-              ('Gazebo', 'TurtleBot3 Waffle Pi', 'dev')]
+# 구성도의 요청 경로를 기술 이름으로: (컨테이너, 기술, 아이콘)
+PATH_WEB = [('브라우저', 'React 18 · TypeScript', 'react'), ('cdn', 'nginx 캐시', 'nginx'), ('web', 'nginx 원본', 'nginx'),
+            ('gateway', 'Spring Cloud Gateway', 'spring'), ('서비스 ×4', 'Spring Boot 3 · FastAPI', 'springboot'),
+            ('db', 'PostgreSQL 17', 'postgresql')]
+PATH_ROBOT = [('robot-service', 'RosbridgeRobotAdapter', 'springboot'), ('rosbridge', 'WebSocket(JSON) :9090', 'bridge'),
+              ('nav2_goal_bridge', 'rclpy · 목표 단위 계약', 'python'), ('Nav2', 'Theta* · MPPI · AMCL', 'nav'),
+              ('Gazebo', 'TurtleBot3 Waffle Pi', 'cube')]
 
-LABEL_W, COLS, GAP, CARD_H = 270, 4, 12, 62
-CARD_W = (W - 80 - LABEL_W - 16 - (COLS - 1) * GAP) / COLS
+# ---------------------------------------------------------------- 아이콘
+# 공식 로고: docs/_lib/icons/<이름>.svg (Simple Icons, CC0 — 상표는 각 소유자의 것). 값 = 도면에 칠할 브랜드 색.
+LOGO = {'react': '#149eca', 'typescript': '#3178c6', 'vite': '#646cff', 'reactrouter': '#ca4245', 'googlefonts': '#4285f4',
+        'html5': '#e34f26', 'nginx': '#009639', 'spring': '#6db33f', 'springboot': '#6db33f', 'springsecurity': '#6db33f',
+        'jsonwebtokens': '#d63aff', 'openjdk': '#e76f00', 'apachemaven': '#c71a36', 'flyway': '#cc0200',
+        'postgresql': '#4169e1', 'python': '#3776ab', 'fastapi': '#009688', 'numpy': '#4d77cf', 'docker': '#2496ed',
+        'ros': '#22314e', 'svg': '#e8a100', 'raspberrypi': '#a22846', 'nvidia': '#76b900'}
+# 로고가 없는 기술 · 기능은 직접 그린 선 아이콘(24×24, 선 굵기 2). 색은 영역 색을 따른다.
+GLYPH = {
+    'swap': 'M4 8h13M14 5l3 3-3 3M20 16H7M10 13l-3 3 3 3',
+    'layers': 'M12 3l9 5-9 5-9-5zM3 12.5l9 5 9-5M3 17l9 5 9-5',
+    'file': 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6',
+    'fork': 'M3 12h6M9 12c4 0 3-6 7-6h4M9 12c4 0 3 6 7 6h4M18 4l2 2-2 2M18 16l2 2-2 2',
+    'shield': 'M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6zM8.5 12l2.5 2.5 4.5-5',
+    'server': 'M4 4h16v6H4zM4 14h16v6H4zM7.5 7h.01M7.5 17h.01',
+    'database': 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
+    'image': 'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15.5 9.5h.01',
+    'send': 'M21 3L10 14M21 3l-7 18-4-7-7-4z',
+    'upload': 'M12 16V4M7 9l5-5 5 5M4 20h16',
+    'bell': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+    'lock': 'M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3',
+    'cube': 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9',
+    'robot': 'M5 9h14v10H5zM12 9V5M12 4h.01M9 13.5h.01M15 13.5h.01M9 16.5h6M2 13v3M22 13v3',
+    'nav': 'M12 3l7 18-7-4-7 4z',
+    'route': 'M5.6 17.2L9.3 9.6M11.6 7.5l5.6-1.9M5 17.5a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM10 6.4a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM19 3.4a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z',
+    'fan': 'M4 20c2-8 6-13 16-16M4 20c4-6 8-9 16-10M4 20c5-3 9-4 16-4',
+    'target': 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v4M12 18v4M2 12h4M18 12h4',
+    'map': 'M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14',
+    'bridge': 'M2 17h20M4 17V9M20 17V9M4 9c4 5 12 5 16 0M9 12.2V17M15 12.2V17',
+    'video': 'M3 7h12v10H3zM15 10.5l6-3.5v10l-6-3.5',
+    'shrink': 'M4 4l6 6M10 5v5H5M20 20l-6-6M14 19v-5h5M20 4l-6 6M14 5v5h5M4 20l6-6M10 19v-5H5',
+    'package': 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9M8 5.2l8 4.6',
+    'check': 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM8 12.5l3 3 5-6',
+    'radar': 'M12 12l6-6M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5',
+    'usb': 'M12 2v14M9 5l3-3 3 3M12 16a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM6 8v3l6 3M18 7v3l-6 3',
+    'monitor': 'M3 4h18v12H3zM8 20h8M12 16v4',
+    'cloud': 'M7 18a4 4 0 0 1-.5-8 6 6 0 0 1 11.5 1.5 3.3 3.3 0 0 1-.5 6.5z',
+    'grid': 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    'chart': 'M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6',
+    'terminal': 'M4 5h16v14H4zM7 9l3 3-3 3M12 15h5',
+    'chip': 'M7 7h10v10H7zM10 2v5M14 2v5M10 17v5M14 17v5M2 10h5M2 14h5M17 10h5M17 14h5',
+}
+# 기술 이름 → 아이콘(LOGO 또는 GLYPH 의 키, 'text:글자' 는 글자 그대로)
+ICON = {
+    'React': 'react', 'TypeScript': 'typescript', 'Vite': 'vite', 'React Router': 'reactrouter', 'Material Symbols': 'googlefonts',
+    'Galmuri': 'text:가', 'Canvas 2D': 'html5', 'WebSocket · MJPEG': 'swap',
+    'nginx': 'nginx', 'proxy_cache': 'layers', '정적 서빙 · gzip': 'file', '리버스 프록시': 'fork',
+    'Spring Cloud Gateway': 'spring', 'Spring WebFlux': 'spring', 'JWT (jjwt)': 'jsonwebtokens', 'Spring Boot Actuator': 'springboot',
+    'Java': 'openjdk', 'Spring Boot': 'springboot', 'Spring Web MVC': 'spring', 'Spring JDBC': 'spring', 'Flyway': 'flyway',
+    'PostgreSQL JDBC': 'postgresql', 'RestClient': 'spring', 'Spring WebSocket': 'spring', 'java.net.http': 'openjdk',
+    'Spring Security Crypto': 'springsecurity', 'Bean Validation': 'shield', 'Maven': 'apachemaven',
+    'Python': 'python', 'FastAPI': 'fastapi', 'Uvicorn': 'server', 'psycopg': 'database', 'NumPy': 'numpy', 'Pillow': 'image',
+    'httpx': 'send', 'python-multipart': 'upload',
+    'PostgreSQL': 'postgresql', 'LISTEN / NOTIFY': 'bell', 'SKIP LOCKED': 'lock', 'Docker 볼륨': 'docker',
+    'ROS 2': 'ros', 'Gazebo Classic': 'cube', 'TurtleBot3': 'robot', 'Nav2': 'nav', 'Theta* 계획기': 'route', 'MPPI 제어기': 'fan',
+    'AMCL': 'target', 'slam_toolbox': 'map', 'rosbridge_server': 'bridge', 'web_video_server': 'video',
+    'compressed_image_transport': 'shrink', 'rclpy': 'python',
+    'Docker Compose': 'docker', '빌드용 컨테이너': 'package', 'E2E 시험': 'check', '문서 도면': 'svg',
+    'TurtleBot3 Waffle Pi': 'raspberrypi', 'LDS 라이다 · IMX219': 'radar', 'Jetson Nano 4GB': 'nvidia', '투척기 시리얼 브리지': 'usb',
+}
+SECTION_ICON = {'화면': 'monitor', '엣지': 'cloud', '게이트웨이': 'shield', '업무 서비스': 'grid', '분석 서비스': 'chart',
+                '저장소': 'database', '로봇': 'robot', '실행 · 빌드 · 시험': 'terminal', '실제 로봇': 'chip'}
+ICON_DIR = Path(__file__).resolve().parents[1] / '_lib' / 'icons'
+_used = set()
+
+
+def icon(x, y, size, key, color, late=False):
+    """아이콘을 (x, y) 에 size 크기로. 로고는 <defs> 에 한 번만 넣고 <use> 로 부른다."""
+    k = size / 24
+    if key.startswith('text:'):
+        S.text(x + size / 2, y + size * 0.82, key[5:], size * 0.92, 800, color, 'middle', late=late)
+    elif key in LOGO:
+        _used.add(key)
+        S.raw(f'<use href="#i-{key}" transform="translate({x:.1f} {y:.1f}) scale({k:.3f})" fill="{color}"/>', late)
+    else:
+        S.raw(f'<path d="{GLYPH[key]}" transform="translate({x:.1f} {y:.1f}) scale({k:.3f})" fill="none" stroke="{color}" '
+              f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', late)
+
+
+def defs():
+    logos = ''.join('<path id="i-%s" d="%s"/>' % (k, re.search(r'<path d="([^"]+)"', (ICON_DIR / f'{k}.svg').read_text()).group(1))
+                    for k in sorted(_used))
+    return ('<defs>' + logos +
+            '<linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#16161d"/>'
+            '<stop offset="0.6" stop-color="#1f2233"/><stop offset="1" stop-color="#2b2350"/></linearGradient>'
+            '<filter id="sh" x="-5%" y="-10%" width="110%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="7" '
+            'flood-color="#1c1c1e" flood-opacity="0.09"/></filter></defs>')
+
+
+# ---------------------------------------------------------------- 그리기
+PAD = 40
+LABEL_W, COLS, GAP, CARD_H = 236, 4, 12, 66
+CARD_W = (W - 2 * PAD - LABEL_W - 20 - (COLS - 1) * GAP) / COLS
+TEXT_W = CARD_W - 64 - 12            # 카드에서 아이콘 타일 오른쪽에 글자가 쓸 수 있는 폭
 
 
 def flow(y, label, steps, both):
-    """요청 경로 한 줄. both = 양방향 화살표."""
-    S.text(40, y + 31, label, 12.5, 700, GRAY)
-    x0 = 150
-    bw = (W - 40 - x0 - (len(steps) - 1) * 44) / len(steps)
-    for i, (name, tech, kind) in enumerate(steps):
-        x = x0 + i * (bw + 44)
-        S.rect(x, y, bw, 52, fill=C[kind][1], stroke=C[kind][0], sw=1.6, rx=10)
-        S.text(x + bw / 2, y + 22, name, 13.5, 700, C[kind][0], 'middle', mono=True)
-        S.text(x + bw / 2, y + 41, tech, 11.5, 500, '#3a3a3c', 'middle')
+    """머리 영역의 요청 경로 한 줄(어두운 바탕). both = 양방향 화살표."""
+    S.text(PAD + 32, y + 33, label, 12, 700, '#aeaeb2')
+    x0, x1, gap = PAD + 150, W - PAD - 32, 38
+    bw = (x1 - x0 - (len(steps) - 1) * gap) / len(steps)
+    for i, (name, tech, ic) in enumerate(steps):
+        x = x0 + i * (bw + gap)
+        S.raw(f'<rect x="{x:.1f}" y="{y}" width="{bw:.1f}" height="56" rx="12" fill="#ffffff" fill-opacity="0.07" '
+              f'stroke="#ffffff" stroke-opacity="0.2"/>')
+        S.raw(f'<rect x="{x + 10:.1f}" y="{y + 10}" width="36" height="36" rx="9" fill="#ffffff"/>')
+        icon(x + 17, y + 17, 22, ic, LOGO.get(ic, '#5856d6'))
+        S.text(x + 58, y + 25, name, 13.5, 700, '#ffffff', mono=True)
+        S.text(x + 58, y + 43, tech, 11.5, 400, '#c7c7cc')
         if i:
-            S.line([(x - 40, y + 26), (x - 4, y + 26)], start=both)
-    return y + 52
+            S.line([(x - gap + 5, y + 28), (x - 5, y + 28)], color='#8e8e93', start=both)
+    return y + 56
 
 
-def band(y, title, kind, containers, notes, items):
-    stroke, fill = C[kind]
+def hero(n):
+    h = 318
+    S.raw(f'<rect x="{PAD}" y="28" width="{W - 2 * PAD}" height="{h}" rx="24" fill="url(#hero)"/>')
+    S.raw(f'<text x="{PAD + 32}" y="70" font-size="12" font-weight="700" fill="#a5a3ff" letter-spacing="2.4">TECH STACK</text>')
+    S.text(PAD + 32, 108, '화재 점검 로봇 서비스 — 기술 스택', 30, 700, '#ffffff')
+    S.text(PAD + 32, 136, '시스템 구성도의 영역마다 무슨 기술을 쓰는가 · 영역의 순서와 색은 구성도(system_architecture.svg)와 같다', 13.5, 400, '#c7c7cc')
+    x = W - PAD - 32
+    for num, unit in reversed([(str(n), '기술'), (str(len(STACK)), '영역'), ('11', '컨테이너'), ('4', '네트워크')]):
+        w = 104
+        S.raw(f'<rect x="{x - w}" y="54" width="{w}" height="78" rx="14" fill="#ffffff" fill-opacity="0.07" '
+              f'stroke="#ffffff" stroke-opacity="0.16"/>')
+        S.text(x - w / 2, 98, num, 30, 700, '#ffffff', 'middle')
+        S.text(x - w / 2, 120, unit, 11.5, 500, '#aeaeb2', 'middle')
+        x -= w + 10
+    y = flow(170, '요청이 지나는 길', PATH_WEB, False)
+    flow(y + 16, '로봇 쪽 연결', PATH_ROBOT, True)
+    return 28 + h
+
+
+def band(y, no, title, kind, containers, notes, items):
+    stroke, tint = C[kind]
     planned = kind == 'gray'
-    if planned:
-        fill = '#f7f7fa'
+    ink = '#636366' if planned else stroke
     rows = -(-len(items) // COLS)
-    h = max(16 + rows * (CARD_H + GAP) + 4, 112)
-    S.rect(40, y, W - 80, h, fill=fill, stroke=stroke, sw=2 if not planned else 1.4, rx=14, dash='6 5' if planned else None)
-    S.text(58, y + 32, title, 18, 700, stroke)
-    S.text(58, y + 54, containers, 12, 600, '#1c1c1e', mono=not planned)
+    # 왼쪽 이름표의 컨테이너 표시는 폭에 맞춰 줄을 바꾼다
+    chips, cx, cyo = [], 0, 0
+    for c in containers.split(' · '):
+        cw = text_width(c, True, 11) + 16
+        if cx and cx + cw > LABEL_W - 44:
+            cx, cyo = 0, cyo + 26
+        chips.append((cx, cyo, cw, c))
+        cx += cw + 6
+    label_h = 78 + cyo + 21 + 22 + len(notes) * 18 + 6
+    cards_h = rows * (CARD_H + GAP) - GAP
+    h = max(2 * 18 + cards_h, label_h)
+    top = y + (h - cards_h) / 2          # 카드 묶음은 판 안에서 세로 가운데
+    S.raw(f'<rect x="{PAD}" y="{y}" width="{W - 2 * PAD}" height="{h}" rx="20" fill="#ffffff" filter="url(#sh)"'
+          + (' stroke="#aeaeb2" stroke-dasharray="6 5"' if planned else '') + '/>')
+    S.raw(f'<rect x="{PAD}" y="{y + 22}" width="5" height="{h - 44}" rx="2.5" fill="{ink}"/>')
+    lx = PAD + 26
+    S.raw(f'<rect x="{lx}" y="{y + 20}" width="46" height="46" rx="13" fill="{ink}"/>')
+    icon(lx + 11, y + 31, 24, SECTION_ICON[title], '#ffffff')
+    S.raw(f'<text x="{lx + 60}" y="{y + 36}" font-size="11" font-weight="700" fill="{ink}" letter-spacing="1.5" '
+          f'font-family="{MONO}">{no:02d}{"  예정" if planned else ""}</text>')
+    S.text(lx + 60, y + 60, title, 19, 700, '#1c1c1e')
+    for cx, cyo, cw, c in chips:
+        S.rect(lx + cx, y + 78 + cyo, cw, 21, fill=tint if not planned else '#f2f2f7', stroke=tint if not planned else '#f2f2f7', rx=6)
+        S.text(lx + cx + cw / 2, y + 92.5 + cyo, c, 11, 600, ink, 'middle', mono=True)
+    ny = y + 78 + chips[-1][1] + 21 + 22
     for i, n in enumerate(notes):
-        S.text(58, y + 76 + i * 18, n, 11.5, 400, GRAY)
+        S.text(lx, ny + i * 18, n, 11.5, 400, '#636366')
     for i, (name, ver, role, _) in enumerate(items):
-        x = 40 + LABEL_W + (i % COLS) * (CARD_W + GAP)
-        cy = y + 16 + (i // COLS) * (CARD_H + GAP)
+        x = PAD + LABEL_W + (i % COLS) * (CARD_W + GAP)
+        cy = top + (i // COLS) * (CARD_H + GAP)
         vw = text_width(ver, True, 10.5) + 14
-        for label, used, size in ((role, text_width(role, False, 11.5), 'role'), (name, text_width(name, False, 13.5) + vw + 10, 'name')):
-            if used > CARD_W - 24:
-                print(f'  너무 김({size}): {label} — {used:.0f} > {CARD_W - 24:.0f}')
-        S.rect(x, cy, CARD_W, CARD_H, fill='#ffffff', stroke=stroke, sw=1.1, rx=9, dash='4 3' if planned else None)
-        S.text(x + 12, cy + 25, name, 13.5, 700, '#1c1c1e')
-        S.rect(x + CARD_W - vw - 10, cy + 10, vw, 20, fill=fill, stroke=stroke, sw=0.8, rx=10)
-        S.text(x + CARD_W - 10 - vw / 2, cy + 24, ver, 10.5, 600, stroke if not planned else GRAY, 'middle', mono=True)
-        S.text(x + 12, cy + 47, role, 11.5, 400, '#3a3a3c')
+        for label, used, what in ((role, text_width(role, False, 11.5), '하는 일'), (name, text_width(name, False, 13.5) + vw + 8, '이름+버전')):
+            if used > TEXT_W:
+                print(f'  너무 김({what}): {label} — {used:.0f} > {TEXT_W:.0f}')
+        key = ICON[name]
+        col = LOGO.get(key, ink)
+        S.rect(x, cy, CARD_W, CARD_H, fill='#fbfbfd', stroke='#e5e5ea', sw=1, rx=13, dash='4 3' if planned else None)
+        S.raw(f'<rect x="{x + 11:.1f}" y="{cy + 11}" width="44" height="44" rx="11" fill="{col}" fill-opacity="0.12"/>')
+        icon(x + 21, cy + 21, 24, key, col)
+        S.text(x + 66, cy + 28, name, 13.5, 700, '#1c1c1e')
+        S.rect(x + CARD_W - vw - 11, cy + 13, vw, 20, fill='#f2f2f7', stroke='#f2f2f7', rx=10)
+        S.text(x + CARD_W - 11 - vw / 2, cy + 27, ver, 10.5, 600, '#48484a', 'middle', mono=True)
+        S.text(x + 66, cy + 49, role, 11.5, 400, '#636366')
     return y + h
 
 
 def build_svg():
     n = sum(len(layer[6]) for layer in STACK)
-    S.text(40, 46, '화재 점검 로봇 서비스 — 기술 스택', 24, 700)
-    S.text(40, 72, f'시스템 구성도(system_architecture.svg)의 영역마다 쓰는 기술 · 띠 하나 = 구성도의 한 영역(같은 색) · 카드 하나 = 기술 하나(이름 · 버전 · 하는 일) · 모두 {n}개',
-           13, 400, GRAY)
-    y = flow(98, '요청이 지나는 길', PATH_WEB, False)
-    y = flow(y + 14, '로봇 쪽 연결', PATH_ROBOT, True)
-    y += 26
-    for title, kind, containers, notes, _, _, items in STACK:
-        y = band(y, title, kind, containers, notes, items) + 14
-    S.text(40, y + 16, '버전의 원본: package.json(화면) · pom.xml(Spring) · requirements.txt(Python) · Dockerfile · compose.yaml(이미지). '
-                       '글 설명과 "왜 쓰는가"는 같은 폴더의 TECH_STACK.md.', 12, 500, GRAY)
-    S.h = y + 40
+    defs_idx = len(S.body)
+    y = hero(n) + 20
+    for no, (title, kind, containers, notes, _, _, items) in enumerate(STACK, 1):
+        y = band(y, no, title, kind, containers, notes, items) + 16
+    S.text(PAD + 4, y + 14, '버전의 원본: package.json(화면) · pom.xml(Spring) · requirements.txt(Python) · Dockerfile · compose.yaml(이미지)   |   '
+                            '글 설명과 "왜 쓰는가": TECH_STACK.md   |   로고: Simple Icons(CC0), 상표는 각 소유자의 것 · 선 아이콘은 직접 그림', 11.5, 500, '#8e8e93')
+    S.body.insert(defs_idx, defs())
+    S.h = y + 36
     S.render(OUT_SVG)
 
 

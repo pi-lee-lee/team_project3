@@ -16,21 +16,21 @@
 
 | 영역 | 컨테이너 | 핵심 기술 |
 | --- | --- | --- |
-| [화면](#화면) | frontend-build → web | React 18.3.1 · TypeScript 5.6.3 · Vite 5.4.11 · React Router 6.28.0 |
+| [화면](#화면) | frontend-build · web | React 18.3.1 · TypeScript 5.6.3 · Vite 5.4.11 · React Router 6.28.0 |
 | [엣지](#엣지) | cdn · web | nginx 1.27-alpine · proxy_cache · 정적 서빙 · gzip · 리버스 프록시 |
 | [게이트웨이](#게이트웨이) | gateway | Spring Cloud Gateway 2025.0.0 · Spring WebFlux · JWT (jjwt) 0.12.6 · Spring Boot Actuator 3.5.6 |
-| [업무 서비스](#업무-서비스) | user · inspection · robot-service | Java 21 (Temurin) · Spring Boot 3.5.6 · Spring Web MVC · Spring JDBC |
+| [업무 서비스](#업무-서비스) | user-service · inspection-service · robot-service | Java 21 (Temurin) · Spring Boot 3.5.6 · Spring Web MVC · Spring JDBC |
 | [분석 서비스](#분석-서비스) | analysis-service | Python 3.12-slim · FastAPI 0.115.6 · Uvicorn 0.32.1 · psycopg 3.2.3 |
-| [저장소](#저장소) | db | PostgreSQL 17 · LISTEN / NOTIFY · FOR UPDATE SKIP LOCKED · Docker 볼륨 |
+| [저장소](#저장소) | db | PostgreSQL 17 · LISTEN / NOTIFY · SKIP LOCKED · Docker 볼륨 |
 | [로봇](#로봇) | sim | ROS 2 · Gazebo Classic · TurtleBot3 · Nav2 |
 | [실행 · 빌드 · 시험](#실행--빌드--시험) | compose.yaml | Docker Compose · 빌드용 컨테이너 · E2E 시험 · 문서 도면 |
-| [실제 로봇](#실제-로봇) | 보유 장비 · 연동 예정 | TurtleBot3 Waffle Pi · LDS 라이다 · IMX219 · Jetson Nano 4GB · 투척기 시리얼 브리지 |
+| [실제 로봇](#실제-로봇) | 보유 장비 | TurtleBot3 Waffle Pi · LDS 라이다 · IMX219 · Jetson Nano 4GB · 투척기 시리얼 브리지 |
 
 ## 화면
 
 브라우저가 받아 실행하는 React SPA. `frontend-build` 컨테이너가 `dist/` 로 빌드하고 `web`(nginx)이 그대로 내보낸다.
 
-- 컨테이너: frontend-build → web
+- 컨테이너: frontend-build · web
 - 버전의 원본: `web/nginx/frontend/package.json`
 
 | 기술 | 버전 | 하는 일 | 왜 쓰는가 |
@@ -76,7 +76,7 @@
 
 Spring Boot 서비스 셋(`user-service` · `inspection-service` · `robot-service`). 같은 뼈대를 쓰고 서비스마다 자기 DB 를 가진다.
 
-- 컨테이너: user · inspection · robot-service
+- 컨테이너: user-service · inspection-service · robot-service
 - 버전의 원본: `web/spring/*/pom.xml · web/spring/*/Dockerfile`
 
 | 기술 | 버전 | 하는 일 | 왜 쓰는가 |
@@ -123,7 +123,7 @@ PostgreSQL 컨테이너 하나에 서비스별 DB(`userdb` · `inspectiondb` · 
 | --- | --- | --- | --- |
 | **PostgreSQL** | 17 | 서비스마다 자기 DB(4개) | 컨테이너는 하나지만 DB 와 계정을 나눠 MSA 의 "서비스별 저장소"를 지킨다. |
 | **LISTEN / NOTIFY** | PostgreSQL 기능 | 분석 작업 알림(폴링 없이) | 메시지 브로커(Kafka · RabbitMQ)를 따로 띄우지 않고 DB 로 작업을 알린다. |
-| **FOR UPDATE SKIP LOCKED** | PostgreSQL 기능 | 작업 큐: 한 작업은 한 워커만 | 워커가 여럿이어도 같은 작업을 두 번 집지 않는다. |
+| **SKIP LOCKED** | PostgreSQL 기능 | 작업 큐: 한 작업은 한 워커만 | `FOR UPDATE SKIP LOCKED` 로 집으면 워커가 여럿이어도 같은 작업을 두 번 집지 않는다. |
 | **Docker 볼륨** | pgdata · photos | DB 파일 · 관측 사진 보관 | 컨테이너를 다시 만들어도 데이터가 남는다. |
 
 ## 로봇
@@ -145,7 +145,7 @@ ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도
 | **slam_toolbox** | Humble | 지도 작성(SLAM 모드) | 운영 지도 `ros/maps/site.*` 를 만든다. |
 | **rosbridge_server** | :9090 | ROS 토픽 ↔ WebSocket(JSON) | Java 서비스가 ROS 를 설치하지 않고도 토픽을 주고받는다. |
 | **web_video_server** | :8080 | 카메라 → MJPEG · 스냅샷 | 카메라 토픽을 HTTP 영상으로 바꿔 브라우저까지 중계할 수 있게 한다. |
-| **compressed_image_transport** | Humble | 카메라 JPEG 압축 전송 | 실제 로봇에서 Wi-Fi 로 원본 영상을 보내지 않기 위해서다. |
+| **compressed_image_transport** | JPEG | 카메라 영상 압축 전송 | 실제 로봇에서 Wi-Fi 로 원본 영상을 보내지 않기 위해서다. |
 | **rclpy** | Python 3.10 | 브리지 노드(목표 · 감시 · 투척) | `nav2_goal_bridge` · `cmd_vel_watchdog` · `mock_launcher` 를 Python 노드로 짠다. |
 
 ## 실행 · 빌드 · 시험
@@ -166,7 +166,7 @@ ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도
 
 보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/SCHEDULE.md` 의 일정대로 한다.
 
-- 컨테이너: 보유 장비 · 연동 예정
+- 컨테이너: 보유 장비
 - 버전의 원본: `README.md 9절`
 
 | 기술 | 버전 | 하는 일 | 왜 쓰는가 |
@@ -174,7 +174,7 @@ ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도
 | **TurtleBot3 Waffle Pi** | 실물 | Raspberry Pi + OpenCR 보드 | sim 컨테이너 자리를 대신한다(같은 노드 · 토픽, 목표 브리지도 같은 코드). |
 | **LDS 라이다 · IMX219** | TurtleBot3 | 360° 거리 측정 · 점검 사진 | 주행(Nav2)과 관측 사진의 입력. |
 | **Jetson Nano 4GB** | JetBot Mini | 순찰 · 화재 감지(예정) | 지금은 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다. |
-| **투척기 시리얼 브리지** | launcher_bridge.py | 투척 기구 연결(만들어만 둠) | 시뮬레이션에서는 `mock_launcher.py` 가 투척 계약에 답한다. |
+| **투척기 시리얼 브리지** | rclpy | launcher_bridge.py (만들어만 둠) | 시뮬레이션에서는 `mock_launcher.py` 가 투척 계약에 답한다. |
 
 ## 일부러 쓰지 않는 것
 
