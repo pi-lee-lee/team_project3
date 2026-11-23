@@ -4,3 +4,8 @@
 web/nginx/frontend/dist/
 __pycache__/
 *.tsbuildinfo
+로보테크*
+개선초안/
+
+# 받아둔 외부 오픈소스(pixelfx clone)
+pixel/

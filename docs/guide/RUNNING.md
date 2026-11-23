@@ -72,6 +72,8 @@ scripts/                   E2E 시험
 | 화면 | `docker compose run --rm frontend-build` |
 | 분석 서비스 · ROS | `docker compose restart analysis-service` / `sim` |
 
+`common-build` · `frontend-build` 는 빌드하고 끝나는 컨테이너다. 자세한 설명은 [BUILD_CONTAINERS.md](BUILD_CONTAINERS.md) 를 본다.
+
 네트워크: `front`(cdn ↔ web, 외부 포트 8080 하나) · `edge`(web ↔ gateway) · `backend`(gateway ↔ 서비스 ↔ db) · `robot`(robot-service ↔ sim). rosbridge 는 robot-service 만 접근한다.
 
 권한: `web/spring/gateway/src/main/resources/application.yml` 의 `gateway.rules` 표 한 곳에서 정한다. 지금은 `/api/admin/**` = ADMIN, 나머지 = 모든 역할. 규칙에 `methods` 를 적으면 그 메서드에만 맞는다 — 대시보드 역할(DASHBOARD)은 GET 만 허용되고 변경 요청·조종 WebSocket 은 거부된다. 역할 1·2·3 의 차이는 구현 단계에서 이 표에 줄을 추가한다.
@@ -178,7 +180,7 @@ Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값�
 실제 장애물이 없어도 로봇이 가지 않게 막아 두는 구역이다(예: 공사 중인 구역).
 
 - **설정**: ADMIN · 1 관리자(`sup1`)로 로그인 → 관제 → **지도** → **금지구역 설정** → 지도에서 누른 채 끌었다 놓으면 그 사각형이 금지구역이 된다
-  (이름은 선택). 붉은 테두리 + 빗금 상자로 표시되고, 다른 계정의 관제 지도 · 대시보드 지도에도 3초 안에 보인다.
+  (이름은 선택). 붉은 테두리 + 빗금 상자로 표시되고(고른 구역은 자홍), 다른 계정의 관제 지도 · 대시보드 지도에도 3초 안에 보인다.
 - **삭제**: 금지구역 설정 모드에서 상자를 눌러 고른 뒤 **삭제**.
 - **주행**: 구역은 계획 맵(전역 비용 지도)과 제어 맵(지역 비용 지도)에 막힌 칸으로 들어간다. 달리는 도중에 가던 길 위에 설정하면
   1 ~ 2초 안에 다시 계획해 돌아간다. 길이 그 구역뿐이면 그 지점은 "진입 불가"로 끝난다.

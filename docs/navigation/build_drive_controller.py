@@ -4,6 +4,7 @@
   ros/sim/src/config/nav2_params.yaml(계획기 · 제어기 · 비용 지도), navigate_fixed_plan.xml(행동 트리),
   ros/robot/src/nav2_goal_bridge.py(STUCK_* · ESCAPE_* · SHADOW_* · MAX_RETRIES · NO_PROGRESS_SEC),
   ros/sim/src/worlds/world_spec.py(벽 · 설비 · 점검 지점 · 시험 장애물 — 평면도는 여기서 그대로 그린다),
+  금지구역(관리자가 그리는 구역)이 어느 층에서 동작하는지는 drive_layers.svg 3절에 있다.
   plan_probe.py --dump(계획 경로 좌표: PATHS), nav_soak.py(장애물별 결과 · 시간).
 돌아가는 길(DETOURS)은 지나는 통로만 맞춘 개략선이다(실제 좌표가 아니다).
 실행: python3 docs/navigation/build_drive_controller.py  →  docs/navigation/drive_controller.svg
@@ -131,7 +132,7 @@ def flow(y):
     cy = by + 132
     box(xs[3] - 60, cy, bw + 60, 86, '전역 비용 지도', ['저장 지도 + 라이다 + 가상 장애물', '팽창 0.45m (벽 여유 띠)'], 'client',
         mono='0.05m 칸 · 건물 전체')
-    box(xs[4] + 16, cy, bw + 20, 86, '지역 비용 지도', ['라이다만 (지금 보이는 것)', '팽창 0.6m'], 'py', mono='0.025m 칸 · 로봇 둘레 3×3m')
+    box(xs[4] + 16, cy, bw + 20, 86, '지역 비용 지도', ['금지구역 + 라이다(지금 보이는 것)', '팽창 0.6m'], 'py', mono='0.025m 칸 · 로봇 둘레 3×3m')
     box(xs[5] + 30, cy + 8, bw - 30, 70, '라이다 /scan', ['최대 8m · 360°'], 'dev')
     S.line([(xs[3] + bw / 2 - 30, cy - 3), (xs[3] + bw / 2 - 30, by + 95)], color=BLUE, sw=1.8)
     S.line([(xs[4] + bw / 2 + 16, cy - 3), (xs[4] + bw / 2 + 16, by + 95)], color=C['py'][0], sw=1.8)
@@ -139,9 +140,9 @@ def flow(y):
     S.line([(xs[5] + 60, cy + 81), (xs[5] + 60, cy + 104), (xs[3] + 60, cy + 104), (xs[3] + 60, cy + 89)], color=GRAY, sw=1.6)
     # 브리지 → 가상 장애물
     S.line([(xs[1] + bw / 2, by + 95), (xs[1] + bw / 2, cy + 43), (xs[3] - 64, cy + 43)], color=C['bridge'][0], sw=1.8)
-    label((xs[1] + bw / 2 + xs[3] - 64) / 2 + 30, cy + 35, '/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리)', C['bridge'][0], 10.5, 'middle', 600)
+    label((xs[1] + bw / 2 + xs[3] - 64) / 2 + 30, cy + 35, '/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리 · 금지구역)', C['bridge'][0], 10.5, 'middle', 600)
     S.line([(xs[5] + bw / 2, cy + 5), (xs[5] + bw / 2, by + 95)], color=GRAY, sw=1.6, start=True, end=False)
-    para(44, cy + 60, ['점선 = 결과가 되돌아오는 길', '사유 코드: BLOCKED_NO_PATH · NAV_FAILED', '· NO_PROGRESS · NAV_UNAVAILABLE'], 11, SUB, 16)
+    para(44, cy + 44, ['점선 = 결과가 되돌아오는 길', '사유 코드: BLOCKED_NO_PATH · NAV_FAILED', '· NO_PROGRESS · NAV_UNAVAILABLE', '금지구역이 들어가는 층은 drive_layers.svg 3절'], 11, SUB, 16)
 
 
 # ------------------------------------------------------------------ 2. 지도
@@ -422,6 +423,7 @@ def bottom(y):
         ('같은 자리 판정', '3번 · 0.4m 안', 'STUCK_*'),
         ('빠져나오기', '0.45m · 0.10 m/s · 10초 제한', 'ESCAPE_*'),
         ('다시 보내기', '최대 3번', 'MAX_RETRIES'),
+        ('금지구역', '계획 맵 + 제어 맵 · 한 변 0.2m 이상 · 로봇 둘레 0.35m 제외', 'KeepoutService'),
         ('전진 없음 제한', '90초', 'NO_PROGRESS_SEC'),
     ]
     for i, (a, b, c) in enumerate(rows):

@@ -25,6 +25,8 @@ SHX, SQ = -0.5, 0.5                             # 기울이기: 화면 x = x + S
 ROBOT = (2.75, 5.38)                             # 예시 위치: P3 → P1 로 가며 전기실 문 앞
 OBS = W.OBSTACLES['aisle60']                     # 예시 장애물: 문 바로 아래 골목을 반쯤 막은 상자
 WIN = 3.0                                        # 제어 맵 한 변(m)
+ZONE = (1.35, 6.25, 2.45, 6.85)                  # 예시 금지구역(x1, y1, x2, y2): 전기실 선반 위쪽. 실제로 있는 구역이 아니다
+ZRED = '#ff3b30'
 
 
 def lx(x):
@@ -67,6 +69,19 @@ def obstacle_box(fill, stroke, grow=0.0, opacity=None, dash=None):
            sw=1.4 if stroke != 'none' else 0, rx=grow * K, opacity=opacity, dash=dash)
 
 
+def zone_box(grow=0.0):
+    """예시 금지구역. grow > 0 이면 팽창 띠(그만큼 키운 둥근 상자)만 그린다."""
+    x1, y1, x2, y2 = ZONE
+    if grow:
+        return
+    S.rect(lx(x1), ly(y2), (x2 - x1) * K, (y2 - y1) * K, fill='url(#zh)', stroke=ZRED, sw=2.4, rx=0)
+
+
+def zone_band(grow, fill):
+    x1, y1, x2, y2 = ZONE
+    S.rect(lx(x1 - grow), ly(y2 + grow), (x2 - x1 + 2 * grow) * K, (y2 - y1 + 2 * grow) * K, fill=fill, stroke='none', sw=0, rx=grow * K)
+
+
 def pts(path):
     return [(lx(a), ly(b)) for a, b in path]
 
@@ -80,7 +95,9 @@ def draw_plan():
     for i, (x, y, sx, sy) in enumerate(W.rects()):           # 팽창 0.45m: 벽 · 설비 둘레의 여유 띠
         S.rect(lx(x - sx / 2 - 0.45), ly(y + sy / 2 + 0.45), (sx + 0.9) * K, (sy + 0.9) * K, fill='#cfe4ff', stroke='none', sw=0, rx=0.45 * K)
     obstacle_box('#cfe4ff', 'none', 0.45)
+    zone_band(0.45, '#cfe4ff')
     rects(L1)
+    zone_box()                                               # 금지구역: 계획 맵에서는 가상 장애물 층에 합쳐진다
     obstacle_box('url(#lh)', BLUE)                           # 가상 장애물 층: 몸통 채우기
     x, y, sx, sy = OBS
     D.poly([(lx(x - sx / 2), ly(y + sy / 2)), (lx(x + sx / 2), ly(y + sy / 2))], RED, 3, late=False)   # 라이다 층: 본 면
@@ -99,6 +116,8 @@ def draw_ctrl():
     for x, y, sx, sy in W.rects():                           # 팽창 0.6m
         S.rect(lx(x - sx / 2 - 0.6), ly(y + sy / 2 + 0.6), (sx + 1.2) * K, (sy + 1.2) * K, fill='#ffe0b8', stroke='none', sw=0, rx=0.6 * K)
     obstacle_box('#ffe0b8', 'none', 0.6)
+    zone_band(0.6, '#ffe0b8')
+    zone_box()                                               # 금지구역: 제어 맵에서는 keepout_layer
     for x, y, sx, sy in list(W.rects()) + [OBS]:             # 라이다가 본 면(벽 · 설비 · 새 장애물 모두 같은 층)
         S.rect(lx(x - sx / 2), ly(y + sy / 2), sx * K, sy * K, fill='#fbe3e0', stroke=RED, sw=2.6, rx=0)
     S.raw('</g>')
@@ -120,6 +139,8 @@ def stack(y):
            '아래에서 위로: 변하지 않는 기존 맵 → 건물 전체를 보는 계획 맵 → 로봇 둘레만 2배 촘촘하게 보는 제어 맵. 같은 순간(전기실 문 앞, 골목에 상자가 놓인 직후)의 세 겹이다.', 'client')
     S.raw(f'<pattern id="lh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
           f'<rect width="6" height="6" fill="#d6e8ff"/><line x1="0" y1="0" x2="0" y2="6" stroke="{BLUE}" stroke-width="2"/></pattern>')
+    S.raw(f'<pattern id="zh" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+          f'<rect width="7" height="7" fill="#ffe1df"/><line x1="0" y1="0" x2="0" y2="7" stroke="{ZRED}" stroke-width="2"/></pattern>')
     e = 60 - SHX * MH + 10
     f3, f2, f1 = y + 96, y + 372, y + 648
     # 제어 맵 창이 아래 겹의 어디인지 잇는 세로 점선
@@ -171,12 +192,12 @@ def stack(y):
         S.text(tx + 24, by + 58 + len(rows) * 23 + 14, note, 11.5, 400, SUB)
     # 겹 사이 관계
     for f, s in [(f3, '색이 든 네모 = 제어 맵 전체(3×3m). 바깥의 흐린 윤곽은 이 겹에 없는 정보다'),
-                 (f2, '점선 네모 = 지금 제어 맵이 보고 있는 자리'), (f1, '이 겹이 계획 맵의 바탕 층으로 그대로 올라간다')]:
+                 (f2, '점선 네모 = 지금 제어 맵이 보고 있는 자리'), (f1, '이 겹이 계획 맵의 바탕 층으로 그대로 올라간다. 금지구역은 이 겹에 없다')]:
         S.text(852, f + SQ * MH + 26, s, 11.5, 500, SUB, 'end')
     # 범례
     gy = y + 914
     items = [(L1, None, '벽 · 설비(기존 맵)'), ('#cfe4ff', None, '계획 맵 팽창 0.45m'), ('url(#lh)', BLUE, '가상 장애물(몸통 채우기)'),
-             ('#fbe3e0', RED, '라이다가 본 면'), ('#ffe0b8', None, '제어 맵 팽창 0.6m')]
+             ('#fbe3e0', RED, '라이다가 본 면'), ('#ffe0b8', None, '제어 맵 팽창 0.6m'), ('url(#zh)', ZRED, '금지구역(예시)')]
     gx = 44
     for fill, st, s in items:
         S.rect(gx, gy, 16, 14, fill=fill, stroke=st or '#8e8e93', sw=.8, rx=2)
@@ -239,9 +260,75 @@ def obstacles(y):
     ], 12.5, INK, 21)
 
 
-# ------------------------------------------------------------------ 3. 비교표
+# ------------------------------------------------------------------ 3. 금지구역
+def keepout(y):
+    D.card(y, 602, '3', '금지구역은 어디에서 동작하나',
+           '관리자가 지도에 그린 직사각형(공사 중인 구역 등). 실제 장애물이 없어 라이다로는 안 보이므로, 서버가 목록을 로봇에 보내고 브리지가 두 겹에 직접 넣는다.', 'data')
+    bw, bh, gap, x0, by = 204, 92, 40, 44, y + 96
+    chain = [
+        ('화면 · 관제 지도', 'Monitor.tsx · drawZone', ['끌어서 그림 · 눌러 고름 · 삭제', '붉은 빗금 상자로 표시'], 'client'),
+        ('gateway', 'application.yml', ['설정 · 삭제: ADMIN · 1 관리자', '조회: 모든 역할'], 'edge'),
+        ('robot-service', 'KeepoutService · keepout_zone', ['저장 · 검사 후 목록 전체를 보냄', '바뀔 때 + 5초마다'], 'spring'),
+        ('목표 브리지', 'nav2_goal_bridge.py', ['구역 → 지도와 같은 크기의', '격자 두 장으로 바꿈'], 'bridge'),
+    ]
+    xs = [x0 + i * (bw + gap) for i in range(len(chain))]
+    for x, (t, m, ls, kind) in zip(xs, chain):
+        D.box(x, by, bw, bh, t, ls, kind, mono=m)
+    for i, a in enumerate(['POST · DELETE', '/api/robots/{id}/zones', '/inspection/keepout']):
+        S.line([(xs[i] + bw + 3, by + bh / 2), (xs[i + 1] - 4, by + bh / 2)], color=INK, sw=1.8)
+        D.label(xs[i] + bw + gap / 2, by - 8, a, INK, 10, 'middle', 500)
+    # 브리지 → 두 겹
+    tx = xs[3] + bw + 214
+    tw = S.w - 40 - tx
+    S.rect(tx, by - 26, tw, 66, fill=C['client'][1], stroke=L2, sw=1.6, rx=10)
+    S.text(tx + 14, by - 4, '2겹 계획 맵 — 가상 장애물 층 (virtual_layer)', 13, 700, L2)
+    S.text(tx + 14, by + 14, '몸통 채우기 표시와 한 격자에 합쳐진다 → 팽창 0.45m', 11.5, 400, INK)
+    S.text(tx + 14, by + 30, '→ Theta* 가 구역을 피해 계획(달리는 중이면 다시 계획)', 11.5, 400, INK)
+    S.rect(tx, by + 52, tw, 66, fill=C['py'][1], stroke=L3, sw=1.6, rx=10)
+    S.text(tx + 14, by + 74, '3겹 제어 맵 — 금지구역 층 (keepout_layer)', 13, 700, L3)
+    S.text(tx + 14, by + 92, '라이다 층보다 앞에 놓인 전용 층 → 팽창 0.6m', 11.5, 400, INK)
+    S.text(tx + 14, by + 108, '→ MPPI 가 비켜 가다 구역 모서리를 넘지 않는다', 11.5, 400, INK)
+    bx = xs[3] + bw
+    S.line([(bx + 3, by + bh / 2 - 12), (bx + 60, by + bh / 2 - 12), (bx + 60, by + 6), (tx - 4, by + 6)], color=L2, sw=1.8)
+    S.line([(bx + 3, by + bh / 2 + 12), (bx + 60, by + bh / 2 + 12), (bx + 60, by + 86), (tx - 4, by + 86)], color=L3, sw=1.8)
+    D.label(bx + 68, by - 2, '/inspection/virtual_map', L2, 10, 'start', 600)
+    D.label(bx + 68, by + 102, '/inspection/keepout_map', L3, 10, 'start', 600)
+    # 기존 맵에는 없음
+    S.rect(tx, by + 130, tw, 34, fill='#f2f2f7', stroke=L1, sw=1.2, rx=10, dash='5 4')
+    S.text(tx + 14, by + 152, '1겹 기존 맵 — 들어가지 않는다 (위치 추정은 그대로)', 12, 600, L1)
+
+    # 어디에서 무엇을 하나
+    ty = by + 196
+    cols = [(0, '곳'), (230, '금지구역에 대해 하는 일'), (1060, '값 · 근거')]
+    S.rect(36, ty - 19, S.w - 72, 28, fill='#f2f2f7', stroke='none', sw=0, rx=6)
+    for cx, h in cols:
+        S.text(44 + cx, ty, h, 13, 700, SUB)
+    rows = [
+        (L1, '1겹 기존 맵 (저장 지도)', '동작하지 않는다. 구역을 그려도 저장 지도 · 위치 추정(AMCL) · 웹 지도 그림은 바뀌지 않는다', '—'),
+        (L2, '2겹 계획 맵 · 가상 장애물 층', '구역이 덮는 칸을 막힌 칸(100)으로 넣는다. 걸친 칸은 모두 넣는다. 목표와 상관없이 지울 때까지 남는다', '0.05m 칸 · 1초마다 다시 보냄'),
+        (L2, '2겹 계획 맵 · 팽창 층', '구역 둘레에 여유 띠를 두른다 → 경로가 구역에 붙지 않는다', '팽창 0.45m'),
+        (L2, '2겹 계획 맵 · 라이다 층 / 기존 맵 층', '동작하지 않는다(구역은 실제 장애물이 아니라 라이다에 안 보인다)', '—'),
+        (L3, '3겹 제어 맵 · 금지구역 층', '같은 구역을 제어 맵에도 막힌 칸으로 넣는다. 로봇 둘레 3×3m 창에 들어온 부분만 쓰인다', 'keepout_layer · 라이다 층보다 앞'),
+        (L3, '3겹 제어 맵 · 팽창 층', '구역 둘레에 여유 띠를 두른다 → 제어기 후보 궤적이 구역으로 들어가지 않는다', '팽창 0.6m'),
+        (C['bridge'][0], '목표 브리지', '서버 목록을 두 격자로 바꿔 보낸다. 구역이 없어도 빈 격자를 보낸다(층이 기다리지 않게)', '바뀔 때만 keepout_map 재전송'),
+        (C['spring'][0], 'robot-service', '한 변 0.2m 미만 거부(400) · 로봇이 구역 안이거나 둘레 0.35m 안이면 거부(409) · DB 에 보관', 'KeepoutService'),
+    ]
+    for i, (col, a, b, c) in enumerate(rows):
+        ry = ty + 30 + i * 27
+        S.raw(f'<circle cx="50" cy="{ry - 4}" r="5" fill="{col}"/>')
+        S.text(64, ry, a, 12.5, 700, col)
+        S.text(44 + cols[1][0], ry, b, 12.5, 400, INK)
+        S.text(44 + cols[2][0], ry, c, 12, 400, SUB)
+        S.raw(f'<line x1="36" y1="{ry + 9}" x2="{S.w - 36}" y2="{ry + 9}" stroke="#e5e5ea"/>')
+    D.para(44, ty + 30 + len(rows) * 27 + 14, [
+        '· 달리는 도중 가던 길 위에 설정: 계획 맵에 1 ~ 2초 안에 들어가고, 경로 검사가 "막힘"을 보고 다시 계획해 돌아간다(E2E Z-5).',
+        '· 구역이 목적지를 덮거나 길이 그 구역뿐이면 그 지점은 BLOCKED_NO_PATH(진입 불가)로 끝난다. 구역을 지우면 1 ~ 2초 안에 다시 지나간다(E2E Z-4).',
+    ], 12.5, INK, 21)
+
+
+# ------------------------------------------------------------------ 4. 비교표
 def compare(y):
-    D.card(y, 400, '3', '세 겹 비교', '같은 건물을 서로 다른 눈으로 본다. 계획은 멀리 · 성기게 · 가끔, 제어는 가까이 · 촘촘하게 · 자주.', 'py')
+    D.card(y, 400, '4', '세 겹 비교', '같은 건물을 서로 다른 눈으로 본다. 계획은 멀리 · 성기게 · 가끔, 제어는 가까이 · 촘촘하게 · 자주.', 'py')
     x0, hy = 44, y + 84
     cols = [(0, ''), (170, '1겹 기존 맵'), (560, '2겹 계획 맵'), (1010, '3겹 제어 맵')]
     cc = [INK, L1, L2, L3]
@@ -275,7 +362,7 @@ def build():
     S.text(24, 72, '로봇은 지도 한 장으로 달리지 않는다. 변하지 않는 기존 맵 위에 계획 맵과, 2배 촘촘한 제어 맵을 겹쳐 쓴다. 값은 nav2_params.yaml · site.yaml 기준이다.',
            13, 400, SUB)
     y = 92
-    for fn, h in ((stack, 950), (obstacles, 704), (compare, 400)):
+    for fn, h in ((stack, 950), (obstacles, 704), (keepout, 602), (compare, 400)):
         fn(y)
         y += h + 14
     S.h = y + 10

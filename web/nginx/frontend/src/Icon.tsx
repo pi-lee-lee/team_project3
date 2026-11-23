@@ -83,6 +83,7 @@ const SYMBOLS: Record<string, string> = {
   'viewfinder': 'center_focus_strong',
   'flask': 'science',
   'gauge.needle': 'speed',
+  'gamecontroller.fill': 'videogame_asset',
 };
 
 export function Icon({ name, size = 18, className = '', title }: { name: string; size?: number; className?: string; title?: string }) {
