@@ -72,6 +72,8 @@ export interface Point {
   y: number;
   yaw_deg: number;
   active: boolean;
+  /** 비상구 앞 구역 "[x1, y1, x2, y2]"(지도 좌표, m). 비상구 점검 지점만 있다 */
+  exit_zone?: string | null;
 }
 
 export type TaskStatus =
@@ -454,7 +456,7 @@ export interface Api {
   // 지점
   points(): Promise<Point[]>;
   adminPoints(): Promise<Point[]>;
-  savePoint(p: { point_id?: number; code?: string; name: string; description?: string | null; x: number; y: number; yawDeg: number; active?: boolean }): Promise<Point>;
+  savePoint(p: { point_id?: number; code?: string; name: string; description?: string | null; x: number; y: number; yawDeg: number; active?: boolean; exitZone?: number[] | null }): Promise<Point>;
   pointHistory(id: number): Promise<{ point: Point; observations: Observation[] }>;
   // 작업
   tasks(group?: string): Promise<TaskRow[]>;

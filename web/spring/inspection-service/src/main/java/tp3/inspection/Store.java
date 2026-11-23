@@ -24,7 +24,8 @@ public class Store {
     }
 
     // ------------------------------------------------------------- 지점
-    private static final String POINT = "SELECT point_id, code, name, description, x, y, yaw_deg, active FROM inspection_point";
+    private static final String POINT = "SELECT point_id, code, name, description, x, y, yaw_deg, active,"
+            + " exit_zone::text AS exit_zone FROM inspection_point";   // exit_zone: 비상구 앞 구역 "[x1, y1, x2, y2]" 또는 null
 
     public List<Map<String, Object>> points(boolean includeInactive) {
         return jdbc.sql(POINT + (includeInactive ? "" : " WHERE active") + " ORDER BY code").query().listOfRows();
@@ -46,6 +47,12 @@ public class Store {
                         UPDATE inspection_point SET name = ?, description = ?, x = ?, y = ?, yaw_deg = ?, active = ?,
                                updated_at = now() WHERE point_id = ?""")
                 .params(name, desc, x, y, yaw, active, id).update();
+    }
+
+    /** 비상구 앞 구역 [x1, y1, x2, y2](지도 좌표, m). null 이면 지운다(일반 지점). */
+    public void updateExitZone(long id, double[] zone) {
+        jdbc.sql("UPDATE inspection_point SET exit_zone = ?::jsonb, updated_at = now() WHERE point_id = ?")
+                .params(zone == null ? null : java.util.Arrays.toString(zone), id).update();
     }
 
     // ------------------------------------------------------------- 작업

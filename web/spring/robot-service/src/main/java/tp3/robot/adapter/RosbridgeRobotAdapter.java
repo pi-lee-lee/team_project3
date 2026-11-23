@@ -627,7 +627,18 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
 
     @Override
     public void sendGoal(String goalId, double x, double y, double yaw) {
+        sendGoal(goalId, x, y, yaw, null);
+    }
+
+    @Override
+    public void sendGoal(String goalId, double x, double y, double yaw, double[] exitZone) {
         ObjectNode data = om.createObjectNode().put("goalId", goalId).put("x", x).put("y", y).put("yaw", yaw);
+        if (exitZone != null && exitZone.length == 4) {
+            var z = data.putArray("exitZone");      // 목표 브리지: 이 구역 안에서 막히면 복구 없이 바로 진입 불가
+            for (double v : exitZone) {
+                z.add(v);
+            }
+        }
         publishString("goal", data.toString());
     }
 

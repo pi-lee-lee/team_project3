@@ -5,9 +5,17 @@ import { ActionBar, Empty, Field, Group, Page, Picker, Switch } from '../../ui';
 import { MapPicker } from '../../MapPicker';
 import './admin.css';
 
-type Form = { code: string; name: string; description: string; x: string; y: string; yawDeg: string; active: boolean };
+type Form = { code: string; name: string; description: string; x: string; y: string; yawDeg: string; active: boolean; exitZone: string };
 // 새 지점은 위치를 비워 둔다(지도를 누르거나 숫자를 넣어야 저장할 수 있다)
-const empty: Form = { code: '', name: '', description: '', x: '', y: '', yawDeg: '0', active: true };
+const empty: Form = { code: '', name: '', description: '', x: '', y: '', yawDeg: '0', active: true, exitZone: '' };
+
+/** 비상구 앞 구역 칸: "x1, y1, x2, y2" → 숫자 네 개. 비우면 null(일반 지점), 모양이 틀리면 undefined */
+function parseZone(text: string): number[] | null | undefined {
+  const t = text.replace(/[\[\]]/g, '').trim();
+  if (!t) return null;
+  const v = t.split(/[\s,]+/).map(Number);
+  return v.length === 4 && v.every((n) => !isNaN(n)) ? v : undefined;
+}
 
 /** A3 지점 추가 · A3-1 지점 수정 */
 export default function PointForm() {
@@ -35,6 +43,7 @@ export default function PointForm() {
     setForm({
       code: point.code, name: point.name, description: point.description ?? '',
       x: String(point.x), y: String(point.y), yawDeg: String(point.yaw_deg), active: point.active,
+      exitZone: (point.exit_zone ?? '').replace(/[\[\]]/g, ''),
     });
     setLoaded(true);
   }, [point, loaded]);
@@ -46,12 +55,13 @@ export default function PointForm() {
   const others = (points.data ?? []).filter((p) => p.point_id !== pointId);
   const title = pointId ? '지점 수정' : '지점 추가';
   const nums = [form.x, form.y, form.yawDeg];
-  const valid = !!form.code && !!form.name && nums.every((v) => v.trim() !== '' && !isNaN(Number(v)));
+  const zone = parseZone(form.exitZone);
+  const valid = !!form.code && !!form.name && nums.every((v) => v.trim() !== '' && !isNaN(Number(v))) && zone !== undefined;
 
   const save = () => act.run(async () => {
     await api.savePoint({
       point_id: pointId, code: form.code, name: form.name, description: form.description || null,
-      x: Number(form.x), y: Number(form.y), yawDeg: Number(form.yawDeg), active: form.active,
+      x: Number(form.x), y: Number(form.y), yawDeg: Number(form.yawDeg), active: form.active, exitZone: zone ?? null,
     });
     nav('/admin/points');
   });
@@ -97,6 +107,15 @@ export default function PointForm() {
         {pointId && (
           <Field label="사용"><Switch label="사용" checked={form.active} onChange={(v) => set({ active: v })} /></Field>
         )}
+      </Group>
+
+      <Group header="비상구 점검"
+        footer={<>비상구 앞 통로를 점검하는 지점이면 그 통로 구역을 지도 좌표로 넣습니다(왼쪽 아래 x1, y1 · 오른쪽 위 x2, y2, m).
+          이 지점으로 가는 로봇이 구역 안에서 막히면 돌아가지 않고 바로 '통로 막힘 · 진입 불가'로 끝내고 그 쪽 사진을 올립니다.
+          구역 밖에서 막히면 평소처럼 돌아갑니다. 비우면 일반 지점입니다.</>}>
+        <Field label="비상구 앞 구역"><input value={form.exitZone} placeholder="비움 = 일반 지점 · 예: 7.1, 3.6, 8.2, 7.2"
+          onChange={(e) => set({ exitZone: e.target.value })} /></Field>
+        {zone === undefined && <span className="cell muted">숫자 네 개(x1, y1, x2, y2)를 쉼표로 나눠 넣으세요</span>}
       </Group>
 
       <ErrorBox msg={act.error} />

@@ -73,6 +73,11 @@ public interface RobotAdapter extends AutoCloseable {
 
     void sendGoal(String goalId, double x, double y, double yaw);
 
+    /** exitZone(비상구 앞 구역 [x1, y1, x2, y2])을 함께 보낸다. 지원하지 않는 로봇은 구역 없이 보낸다(평소처럼 복구 · 우회). */
+    default void sendGoal(String goalId, double x, double y, double yaw, double[] exitZone) {
+        sendGoal(goalId, x, y, yaw);
+    }
+
     /** goalId 가 "*" 이면 모든 목표 취소. */
     void cancelGoal(String goalId);
 

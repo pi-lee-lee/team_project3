@@ -36,8 +36,12 @@ public class MissionService {
     private static final Logger log = LoggerFactory.getLogger(MissionService.class);
     private static final long GOAL_TIMEOUT_MS = 300_000;
 
-    /** action: CAPTURE(도착해 촬영, 기본) / HOLD(출동: 도착만 알리고 기다린다) */
-    public record Waypoint(long pointId, String code, double x, double y, double yaw, String action) {
+    /** action: CAPTURE(도착해 촬영, 기본) / HOLD(출동: 도착만 알리고 기다린다)
+     *  exitZone: 비상구 점검 지점의 비상구 앞 구역 [x1, y1, x2, y2](없으면 null). 로봇이 이 안에서 막히면 복구 없이 바로 진입 불가. */
+    public record Waypoint(long pointId, String code, double x, double y, double yaw, String action, double[] exitZone) {
+        public Waypoint(long pointId, String code, double x, double y, double yaw, String action) {
+            this(pointId, code, x, y, yaw, action, null);
+        }
     }
 
     private static final class Running {
@@ -222,7 +226,16 @@ public class MissionService {
                     event(id, blocked ? "ARRIVAL_BLOCKED" : "ARRIVAL_FAILED",
                             Map.of("pointId", wp.pointId(), "code", wp.code(), "reasonCode", code, "reason", why,
                                     "recoveries", result.recoveries()));
-                    observation(id, wp, i, "UNABLE", code, why, a.state().pose(), null);
+                    // 진입 불가(통로 막힘)는 로봇이 막힌 곳 가까이 가서 알게 되므로 그 자리 사진을 근거로 함께 올린다.
+                    // 복구 동작(후진 · 회전) 뒤라 로봇이 아무 쪽이나 보고 멈춰 있으므로, 제자리에서 목적지 쪽으로만 돌린 뒤 찍는다
+                    // (막은 물건은 로봇과 목적지 사이에 있다). 관제가 사진을 보고 판단한다.
+                    byte[] evidence = null;
+                    if (blocked) {
+                        faceToward(a, wp.x(), wp.y());
+                        Thread.sleep(1500);   // 정지 후 영상 안정화
+                        evidence = snapshotOrNull(a);
+                    }
+                    observation(id, wp, i, "UNABLE", code, why, a.state().pose(), evidence);
                     unable++;
                     continue;
                 }
@@ -456,7 +469,7 @@ public class MissionService {
         run.currentGoal = goalId;
         long start = System.currentTimeMillis();
         try {
-            a.sendGoal(goalId, wp.x(), wp.y(), wp.yaw());
+            a.sendGoal(goalId, wp.x(), wp.y(), wp.yaw(), wp.exitZone());
             // 목표 메시지가 유실될 수 있으므로 ACTIVE 응답이 올 때까지 같은 목표를 다시 보낸다.
             // 로봇 측은 같은 goalId 를 새 목표로 취급하지 않는다.
             while (true) {
@@ -468,7 +481,7 @@ public class MissionService {
                         return new RobotAdapter.GoalStatus(goalId, "ABORTED", "시간 초과", "TIMEOUT", false, 0);
                     }
                     if (!run.activeSeen.containsKey(goalId)) {
-                        a.sendGoal(goalId, wp.x(), wp.y(), wp.yaw());
+                        a.sendGoal(goalId, wp.x(), wp.y(), wp.yaw(), wp.exitZone());
                     }
                 }
             }
@@ -543,6 +556,90 @@ public class MissionService {
         repo.enqueue(missionId, "EVENT", p.toString(), null);
     }
 
+    /**
+     * 제자리에서 (tx, ty) 쪽을 보도록 돈다(전진 없음). 원격 조종과 같은 속도 명령(/cmd_vel_teleop)을 쓰고, 끝나면 반드시 정지 명령을 보낸다.
+     * 막힌 직후에는 Nav2 의 복구 동작(제자리 회전 등)이 취소와 엇갈려 몇 초 더 돌 수 있다 → 그 명령과 섞이지 않게
+     * 먼저 로봇이 멈출 때까지(방향이 STILL_MS 동안 그대로) 기다린 뒤 돌고, 돈 뒤 잠깐 기다려 방향이 맞는지 다시 본다(최대 3번).
+     * 위치를 모르거나 명령을 못 보내면 그대로 둔다(사진은 그 방향 그대로 찍힌다).
+     */
+    private static void faceToward(RobotAdapter a, double tx, double ty) throws InterruptedException {
+        final long STILL_MS = 800;
+        try {
+            for (int round = 0; round < 3; round++) {
+                waitStill(a, STILL_MS, 5000);
+                if (Math.abs(headingError(a, tx, ty)) < 0.1) {
+                    return;
+                }
+                long end = System.currentTimeMillis() + 8000;
+                while (System.currentTimeMillis() < end) {
+                    double err = headingError(a, tx, ty);
+                    if (Double.isNaN(err)) {
+                        return;
+                    }
+                    if (Math.abs(err) < 0.08) {
+                        break;
+                    }
+                    a.teleop(0, Math.copySign(Math.max(0.2, Math.min(0.6, Math.abs(err))), err));
+                    Thread.sleep(100);
+                }
+                a.teleop(0, 0);
+            }
+        } catch (InterruptedException e) {
+            throw e;
+        } catch (Exception e) {
+            log.warn("목적지 쪽으로 돌지 못함: {}", e.getMessage());
+        } finally {
+            try {
+                a.teleop(0, 0);
+            } catch (Exception ignored) {
+                // 연결이 끊긴 경우 로봇 측 워치독이 정지시킨다
+            }
+        }
+    }
+
+    /** (tx, ty) 쪽과 지금 방향의 차(rad, -π ~ π). 위치를 모르면 NaN. */
+    private static double headingError(RobotAdapter a, double tx, double ty) {
+        RobotAdapter.Pose p = a.state().pose();
+        if (p == null) {
+            return Double.NaN;
+        }
+        double err = Math.atan2(ty - p.y(), tx - p.x()) - p.yaw();
+        return Math.atan2(Math.sin(err), Math.cos(err));
+    }
+
+    /** 로봇 방향이 stillMs 동안 0.03rad 넘게 바뀌지 않을 때까지 기다린다(최대 maxMs). */
+    private static void waitStill(RobotAdapter a, long stillMs, long maxMs) throws InterruptedException {
+        long end = System.currentTimeMillis() + maxMs, since = System.currentTimeMillis();
+        RobotAdapter.Pose last = a.state().pose();
+        while (System.currentTimeMillis() < end) {
+            Thread.sleep(150);
+            RobotAdapter.Pose p = a.state().pose();
+            if (p == null || last == null) {
+                return;
+            }
+            double d = Math.atan2(Math.sin(p.yaw() - last.yaw()), Math.cos(p.yaw() - last.yaw()));
+            if (Math.abs(d) > 0.03 || Math.hypot(p.x() - last.x(), p.y() - last.y()) > 0.02) {
+                since = System.currentTimeMillis();
+                last = p;
+            } else if (System.currentTimeMillis() - since >= stillMs) {
+                return;
+            }
+        }
+    }
+
+    /** 카메라 한 장(세 번까지 다시 시도). 끝내 못 찍으면 null — 근거 사진이 없을 뿐 관측은 그대로 올린다. */
+    private static byte[] snapshotOrNull(RobotAdapter a) throws InterruptedException {
+        for (int k = 0; k < 3; k++) {
+            try {
+                return a.snapshot();
+            } catch (Exception e) {
+                log.warn("근거 사진 촬영 실패({}회): {}", k + 1, e.getMessage());
+                Thread.sleep(700);
+            }
+        }
+        return null;
+    }
+
     private void observation(long missionId, Waypoint wp, int seq, String status, String reasonCode, String reason,
                              RobotAdapter.Pose pose, byte[] image) {
         ObjectNode p = om.createObjectNode().put("pointId", wp.pointId()).put("seq", seq + 1).put("status", status)
@@ -561,9 +658,14 @@ public class MissionService {
 
     public static List<Waypoint> parseWaypoints(JsonNode arr) {
         List<Waypoint> list = new ArrayList<>();
-        arr.forEach(n -> list.add(new Waypoint(n.path("pointId").asLong(), n.path("code").asText(""),
-                n.path("x").asDouble(), n.path("y").asDouble(), n.path("yaw").asDouble(),
-                n.path("action").asText("CAPTURE"))));
+        arr.forEach(n -> {
+            JsonNode z = n.path("exitZone");
+            double[] zone = z.isArray() && z.size() == 4
+                    ? new double[]{z.get(0).asDouble(), z.get(1).asDouble(), z.get(2).asDouble(), z.get(3).asDouble()} : null;
+            list.add(new Waypoint(n.path("pointId").asLong(), n.path("code").asText(""),
+                    n.path("x").asDouble(), n.path("y").asDouble(), n.path("yaw").asDouble(),
+                    n.path("action").asText("CAPTURE"), zone));
+        });
         return list;
     }
 }

@@ -32,14 +32,17 @@ public class InternalController {
     private final TaskService tasks;
     private final RuleService rules;
     private final IncidentService incidents;
+    private final AlertService alerts;
     private final Path photoDir;
     private final ObjectMapper om = new ObjectMapper();
 
-    public InternalController(Store store, TaskService tasks, RuleService rules, IncidentService incidents, @Value("${app.photo-dir}") String photoDir) throws Exception {
+    public InternalController(Store store, TaskService tasks, RuleService rules, IncidentService incidents, AlertService alerts,
+                              @Value("${app.photo-dir}") String photoDir) throws Exception {
         this.store = store;
         this.tasks = tasks;
         this.rules = rules;
         this.incidents = incidents;
+        this.alerts = alerts;
         this.photoDir = Path.of(photoDir);
         Files.createDirectories(this.photoDir);
     }
@@ -78,8 +81,60 @@ public class InternalController {
                     Map.of("observationId", obsId.get(), "pointCode", String.valueOf(point.get("code")),
                             "reason", meta.path("reason").asText(""),
                             "reasonCode", meta.path("reasonCode").asText("")), capturedAt);
+            exitCheck(id, obsId.get(), point, status, meta);
         }
         return Map.of("ok", true, "duplicate", obsId.isEmpty());
+    }
+
+    /**
+     * 비상구 점검 지점(비상구 앞 구역이 있는 지점): 진입 불가(통로 막힘)는 소화기 없음과 같은 급의 점검 결과(경고)다.
+     * 같은 지점의 열린 경고는 하나로 두고(dedup "exit:지점"), 다음 점검에서 도착해 촬영하면(통로가 비어 있음) 스스로 푼다.
+     * 사람이 관측을 '정상'으로 판정해도 풀린다(AlertService.onReview). 다른 지점의 진입 불가는 주행 문제라 경고로 만들지 않는다.
+     */
+    private void exitCheck(long taskId, long obsId, Map<String, Object> point, String status, JsonNode meta) {
+        if (point.get("exit_zone") == null || point.get("point_id") == null) {
+            return;
+        }
+        long pointId = ((Number) point.get("point_id")).longValue();
+        String key = "exit:" + pointId;
+        Double x = num(meta, "poseX"), y = num(meta, "poseY");
+        // 로봇이 비상구 앞 구역 '안에서' 막혔을 때만 비상구 통로 막힘이다. 가는 길(구역 밖)에서 막힌 것은 주행 문제라
+        // 경고로 만들지 않는다(목표 브리지가 복구 없이 바로 끝내는 기준과 같다). 위치를 모르면 판단하지 않는다.
+        if ("UNABLE".equals(status) && "BLOCKED_NO_PATH".equals(meta.path("reasonCode").asText())
+                && insideZone(point.get("exit_zone"), x, y)) {
+            Map<String, Object> ev = new java.util.LinkedHashMap<>();
+            ev.put("observationId", obsId);
+            ev.put("reason", meta.path("reason").asText(""));
+            if (x != null && y != null) {
+                ev.put("robotX", x);
+                ev.put("robotY", y);
+            }
+            alerts.open(new AlertService.Draft("EXIT_BLOCKED", "WARNING", key,
+                    point.get("code") + " " + point.get("name") + " · 비상구 앞 통로 막힘",
+                    "로봇이 비상구 앞 구역에서 막혀 진입하지 못함" + (x != null && y != null
+                            ? String.format(" (멈춘 위치 %.2f, %.2f)", x, y) : "") + " · 근거 사진 확인",
+                    pointId, x, y, "observation", obsId, taskId, ev));
+        } else if ("CAPTURED".equals(status)) {
+            alerts.resolveByKey(key, "SYSTEM", "다음 점검에서 비상구 앞 통로 확인 (관측 #" + obsId + ")");
+        }
+    }
+
+    /** exit_zone 글자 "[x1, y1, x2, y2]" 안에 (x, y) 가 있는가. 구역 · 위치를 모르면 false. */
+    private boolean insideZone(Object zoneText, Double x, Double y) {
+        if (zoneText == null || x == null || y == null) {
+            return false;
+        }
+        try {
+            JsonNode z = om.readTree(zoneText.toString());
+            if (!z.isArray() || z.size() != 4) {
+                return false;
+            }
+            double x1 = Math.min(z.get(0).asDouble(), z.get(2).asDouble()), x2 = Math.max(z.get(0).asDouble(), z.get(2).asDouble());
+            double y1 = Math.min(z.get(1).asDouble(), z.get(3).asDouble()), y2 = Math.max(z.get(1).asDouble(), z.get(3).asDouble());
+            return x >= x1 && x <= x2 && y >= y1 && y <= y2;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

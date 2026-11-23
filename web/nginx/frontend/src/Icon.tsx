@@ -74,6 +74,7 @@ const SYMBOLS: Record<string, string> = {
   // 시나리오: 규칙 · 경고 · 사건 · 설정
   'gearshape': 'settings',
   'ruler': 'rule',
+  'door.left.hand.open': 'door_open',
   'target': 'adjust',
   'paperplane.fill': 'send',
   'checkmark.seal.fill': 'verified',

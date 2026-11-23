@@ -84,11 +84,31 @@ public class TaskService {
         return detail(taskId);
     }
 
+    /** 지점의 exit_zone 글자("[x1, y1, x2, y2]")를 JSON 배열로. 없거나 모양이 틀리면 null. */
+    private JsonNode exitZone(Object text) {
+        if (text == null) {
+            return null;
+        }
+        try {
+            JsonNode z = om.readTree(text.toString());
+            return z.isArray() && z.size() == 4 ? z : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void dispatch(long taskId, long robotId, List<Map<String, Object>> points) {
-        var wps = points.stream().map(p -> Map.of(
-                "pointId", p.get("point_id"), "code", p.get("code"),
-                "x", p.get("x"), "y", p.get("y"),
-                "yaw", Math.toRadians(((Number) p.get("yaw_deg")).doubleValue()))).toList();
+        var wps = points.stream().map(p -> {
+            Map<String, Object> w = new HashMap<>(Map.of(
+                    "pointId", p.get("point_id"), "code", p.get("code"),
+                    "x", p.get("x"), "y", p.get("y"),
+                    "yaw", Math.toRadians(((Number) p.get("yaw_deg")).doubleValue())));
+            JsonNode zone = exitZone(p.get("exit_zone"));
+            if (zone != null) {
+                w.put("exitZone", zone);   // 비상구 점검 지점: 로봇이 이 구역 안에서 막히면 복구 없이 바로 진입 불가로 보고한다
+            }
+            return w;
+        }).toList();
         try {
             robot.post().uri("/internal/missions").contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("missionId", taskId, "robotId", robotId, "waypoints", wps))

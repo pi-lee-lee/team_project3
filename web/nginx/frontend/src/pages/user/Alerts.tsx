@@ -9,7 +9,7 @@ import './user.css';
 type Filter = 'open' | 'resolved';
 const FILTERS: [Filter, string][] = [['open', '열린 경고'], ['resolved', '해제된 경고']];
 const TYPE: Record<string, [string, string]> = {
-  RULE_VIOLATION: ['규칙 위반', 'ruler'], FIRE_DETECTED: ['화재 감지', 'flame.fill'], HEAT_WARNING: ['열원 감지', 'flame.fill'],
+  RULE_VIOLATION: ['규칙 위반', 'ruler'], EXIT_BLOCKED: ['비상구 앞 통로 막힘', 'door.left.hand.open'], FIRE_DETECTED: ['화재 감지', 'flame.fill'], HEAT_WARNING: ['열원 감지', 'flame.fill'],
 };
 
 /** 경고가 가리키는 대상의 화면 주소. 없으면 null */

@@ -107,6 +107,7 @@ const ALERT_TEXT: Record<string, [string, string]> = {
   TASK_INTERRUPTED: ['exclamationmark.triangle.fill', '작업 중단(상태 불명)'],
   // 경고 표에서 오는 것(확인 · 해제를 남긴다)
   RULE_VIOLATION: ['ruler', '규칙 위반'],
+  EXIT_BLOCKED: ['door.left.hand.open', '비상구 앞 통로 막힘'],
   FIRE_DETECTED: ['flame.fill', '화재 감지'],
   HEAT_WARNING: ['flame.fill', '열원 감지'],
 };

@@ -69,6 +69,9 @@ public class ApiController {
         try {
             long id = store.insertPoint(code, name, b.path("description").asText(null), b.path("x").asDouble(),
                     b.path("y").asDouble(), b.path("yawDeg").asDouble());
+            if (b.has("exitZone")) {
+                store.updateExitZone(id, exitZone(b.path("exitZone")));
+            }
             return store.point(id).orElseThrow();
         } catch (DuplicateKeyException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 있는 코드입니다");
@@ -84,7 +87,27 @@ public class ApiController {
                 b.path("y").asDouble(((Number) cur.get("y")).doubleValue()),
                 b.path("yawDeg").asDouble(((Number) cur.get("yaw_deg")).doubleValue()),
                 b.path("active").asBoolean((Boolean) cur.get("active")));
+        if (b.has("exitZone")) {
+            store.updateExitZone(id, exitZone(b.path("exitZone")));
+        }
         return store.point(id).orElseThrow();
+    }
+
+    /** 비상구 앞 구역: [x1, y1, x2, y2](지도 좌표, m) → 정렬한 사각형. null · 빈 배열이면 지운다. 한 변이 0.3m 보다 작으면 거부. */
+    private static double[] exitZone(JsonNode z) {
+        if (z == null || z.isNull() || (z.isArray() && z.isEmpty())) {
+            return null;
+        }
+        if (!z.isArray() || z.size() != 4 || !z.get(0).isNumber() || !z.get(1).isNumber() || !z.get(2).isNumber()
+                || !z.get(3).isNumber()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비상구 앞 구역은 [x1, y1, x2, y2] 숫자 네 개입니다");
+        }
+        double x1 = Math.min(z.get(0).asDouble(), z.get(2).asDouble()), x2 = Math.max(z.get(0).asDouble(), z.get(2).asDouble());
+        double y1 = Math.min(z.get(1).asDouble(), z.get(3).asDouble()), y2 = Math.max(z.get(1).asDouble(), z.get(3).asDouble());
+        if (x2 - x1 < 0.3 || y2 - y1 < 0.3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비상구 앞 구역이 너무 작습니다(한 변 0.3m 이상)");
+        }
+        return new double[]{x1, y1, x2, y2};
     }
 
     // ------------------------------------------------------------- 작업
