@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Navigate, NavLink, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import type { Me, Role } from './api/types';
 import { AuthContext, ROLE_LABEL, useApi, useAuth } from './util';
 import { Icon } from './Icon';
@@ -37,6 +37,9 @@ import IncidentBanner from './pages/user/IncidentBanner';
 import { EmergencyDialog } from './EmergencyDialog';
 import Demo from './pages/admin/Demo';
 import { LaunchDialog } from './LaunchDialog';
+import { getTheme, ThemeToggle, useTheme } from './theme';
+import Duel from './pages/dashboard/Duel';
+import { playTransition } from './PixelFx';
 
 // 사용자 화면에 들어올 수 있는 역할. ADMIN 은 모든 화면에 들어갈 수 있다(사이드바의 "화면 이동" 링크)
 const USER_ROLES: Role[] = ['ADMIN', 'SUPERVISOR', 'MANAGER', 'USER'];
@@ -56,6 +59,17 @@ export default function App() {
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
 
+  // 픽셀 모드: 메뉴(주소 앞 두 마디)가 바뀌면 덮인 화면이 걷히는 전환 연출을 낸다. 목록 → 상세 같은 메뉴 안 이동에는 내지 않는다
+  const { pathname } = useLocation();
+  const menu = pathname.split('/').slice(1, 3).join('/');
+  const prevMenu = useRef(menu);
+  useLayoutEffect(() => {
+    if (prevMenu.current === menu) return;
+    prevMenu.current = menu;
+    if (getTheme() === 'pixel') playTransition({ reveal: true, speed: 1.8 });
+  }, [menu]);
+  const pixel = useTheme() === 'pixel';
+
   useEffect(() => {
     api.me().then(setMe, () => setMe(null)).finally(() => setChecked(true));
     const onExpired = () => {
@@ -74,7 +88,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         {/* 관제 대시보드: 메뉴 틀(Shell) 없이 화면 전체를 쓴다. 전용 계정(DASHBOARD)의 첫 화면이고, 다른 역할도 주소로 열 수 있다 */}
-        <Route path="/dashboard" element={me ? <Dashboard /> : <Navigate to="/login" replace />} />
+        {/* 픽셀 모드(이스터 에그)에서는 대시보드 자리에 포격전이 뜬다 */}
+        <Route path="/dashboard" element={me ? (pixel ? <Duel /> : <Dashboard />) : <Navigate to="/login" replace />} />
         <Route element={<Shell area="admin" roles={['ADMIN']} />}>
           {/* 일 단위 화면: 목록 → 상세 → 폼 */}
           <Route path="/admin/users" element={<Users />} />
@@ -140,6 +155,7 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
   const { me, setMe } = useAuth();
   const api = useApi();
   const navigate = useNavigate();
+  const pixel = useTheme() === 'pixel';
   if (!me) return <Navigate to="/login" replace />;
   if (!roles.includes(me.role)) return <Navigate to={homeOf(me.role)} replace />;
   const logout = async () => {
@@ -147,6 +163,8 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
     setMe(null);
     navigate('/login');
   };
+  // 화면 이동 링크: ADMIN 은 세 화면 모두, 픽셀 모드에서는 누구에게나 대시보드(포격전) 하나를 보인다
+  const areaLinks = AREA_LINKS.filter(([, , , a]) => a !== area && (me.role === 'ADMIN' || (pixel && a === 'dashboard')));
   return (
     <div className={`shell ${area}`}>
       {/* 사이드바(넓은 화면) */}
@@ -160,11 +178,11 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
             <NavLink key={to} to={to}><Icon name={icon} />{label}</NavLink>
           ))}
         </nav>
-        {me.role === 'ADMIN' && (
+        {areaLinks.length > 0 && (
           <div className="area-links">
             <span className="area-title">화면 이동</span>
-            {AREA_LINKS.filter(([, , , a]) => a !== area).map(([to, label, icon, a]) => (a === 'dashboard'
-              // 관제 대시보드는 상황실 모니터용 전체 화면이라 새 창으로 띄운다(하던 화면은 그대로 둔다)
+            {areaLinks.map(([to, label, icon, a]) => (a === 'dashboard' && !pixel
+              // 관제 대시보드는 상황실 모니터용 전체 화면이라 새 창으로 띄운다(하던 화면은 그대로 둔다). 픽셀 모드는 창마다 따로라 같은 창에서 연다
               ? <a key={to} href={to} target="_blank" rel="noopener"><Icon name={icon} size={18} />{label}<Icon name="arrow.up.right.square" size={14} /></a>
               : <NavLink key={to} to={to}><Icon name={icon} size={18} />{label}<Icon name="chevron.right" size={14} /></NavLink>
             ))}
@@ -174,6 +192,7 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
           <b>{me.name}</b>
           <span>{me.loginId} · {ROLE_LABEL[me.role]}</span>
           <ServerClock />
+          {pixel && <ThemeToggle />}
           <button className="link" onClick={logout}><Icon name="rectangle.portrait.and.arrow.right" size={16} />로그아웃</button>
         </div>
       </aside>
@@ -193,15 +212,16 @@ function Shell({ area, roles }: { area: 'admin' | 'user'; roles: Role[] }) {
         {/* 스마트폰: 사이드바가 없으므로 사용자 영역(이름·서버 시간)을 화면 맨 아래에 둔다 */}
         <div className="mobile-who">
           <div><b>{me.name}</b> <span className="muted small">{me.loginId} · {ROLE_LABEL[me.role]}</span></div>
-          {me.role === 'ADMIN' && (
+          {areaLinks.length > 0 && (
             <div className="area-links row wrap">
-              {AREA_LINKS.filter(([, , , a]) => a !== area).map(([to, label, icon, a]) => (a === 'dashboard'
+              {areaLinks.map(([to, label, icon, a]) => (a === 'dashboard' && !pixel
                 ? <a key={to} href={to} target="_blank" rel="noopener"><Icon name={icon} size={16} />{label}</a>
                 : <NavLink key={to} to={to}><Icon name={icon} size={16} />{label}</NavLink>
               ))}
             </div>
           )}
           <ServerClock />
+          {pixel && <ThemeToggle />}
         </div>
       </main>
       {/* 하단 탭 바(좁은 화면) */}

@@ -5,12 +5,12 @@
 | 폴더 | 답하는 질문 | 형식 |
 | --- | --- | --- |
 | [`guide/`](guide/) | 어떻게 띄우고 쓰는가 | Markdown |
-| [`architecture/`](architecture/) | 시스템이 어떻게 짜여 있는가 (컨테이너 · 서비스 · 요청 흐름) | SVG 도면 |
+| [`architecture/`](architecture/) | 시스템이 어떻게 짜여 있는가 (컨테이너 · 서비스 · 요청 흐름 · 기술 스택) | SVG 도면 · Markdown |
 | [`navigation/`](navigation/) | 로봇이 어떻게 달리는가 (지도 · 계획 · 제어 · 장애물) | SVG 설명서 |
 | [`design/`](design/) | 무엇을 만들고, 서로 무엇을 주고받는가 (시나리오 · 인터페이스) | Markdown |
 | [`plan/`](plan/) | 앞으로 무엇을 언제 하는가 (향후 계획 · 일정 · 주차별 진행 도면) | Markdown · SVG 도면 |
 | [`storyboard/`](storyboard/) | 화면이 어떻게 생겼고 어떻게 이어지는가 | SVG 도면 |
-| `_lib/` | (문서 아님) SVG 생성 스크립트가 함께 쓰는 그리기 도구 | Python |
+| `_lib/` | (문서 아님) SVG 생성 스크립트가 함께 쓰는 그리기 도구 · 기술 로고(`icons/`) | Python · SVG |
 
 빠른 실행 명령만 보려면 저장소 루트의 [도커_실행.md](../도커_실행.md) 를 본다.
 
@@ -30,6 +30,7 @@
 | [system_cycle.svg](architecture/system_cycle.svg) | 시스템 사이클: 화면 불러오기(CDN 캐시) · 인증 · 점검 미션 · 사진 분석 · 판정 · 재점검 · 관제 · 조종 · 예외 · 복구를 번호 순서로 |
 | [spa_cycle.svg](architecture/spa_cycle.svg) | React SPA 사이클: 브라우저가 화면을 조립하는 과정(첫 접속 · 데이터 채우기 · 화면 이동 · 실시간 화면 · 새 빌드 반영) |
 | [build_containers.svg](architecture/build_containers.svg) | 빌드용 컨테이너(`common-build` · `frontend-build`): compose 에 선언된 컨테이너 11개 가운데 빌드용 둘만 표시한 목록 · 왜 필요한가(빌드하는 세 방법 비교) · 시작 순서 · 무엇을 읽어 무엇을 만들고 누가 쓰는가 · 고친 뒤 다시 돌릴 것 · 이미지 빌드와의 차이 |
+| [tech_stack.svg](architecture/tech_stack.svg) · [TECH_STACK.md](architecture/TECH_STACK.md) | 기술 스택: 구성도의 영역(화면 · 엣지 · 게이트웨이 · 업무 서비스 · 분석 서비스 · 저장소 · 로봇 · 실행/빌드/시험 · 실제 로봇)마다 쓰는 기술과 버전. 그림은 기술 로고 · 이름 · 버전 · 하는 일, 글은 거기에 "왜 쓰는가" · 일부러 쓰지 않는 것 · 버전을 바꿀 때 |
 
 ## navigation — 주행
 
@@ -77,6 +78,7 @@ SVG 를 직접 고치지 않는다. 같은 폴더의 `build_*.py` 를 고친 뒤
 | `architecture/system_cycle.svg` | `python3 docs/architecture/build_cycle.py` |
 | `architecture/spa_cycle.svg` | `python3 docs/architecture/build_spa_cycle.py` |
 | `architecture/build_containers.svg` | `python3 docs/architecture/build_build_containers.py` |
+| `architecture/tech_stack.svg` · `TECH_STACK.md` | `python3 docs/architecture/build_tech_stack.py` (그림과 글을 한 번에) |
 | `navigation/drive_controller.svg` | `python3 docs/navigation/build_drive_controller.py` |
 | `navigation/drive_layers.svg` | `python3 docs/navigation/build_drive_layers.py` |
 | `navigation/theta_star.svg` | `python3 docs/navigation/build_theta_star.py` (numpy 필요) |
@@ -87,6 +89,8 @@ SVG 를 직접 고치지 않는다. 같은 폴더의 `build_*.py` 를 고친 뒤
 | `storyboard/web_service_scenario.svg` | `python3 docs/storyboard/build_service_scenario.py` |
 
 - `plan/weekly/` 는 파트별 요약을 `plan/SCHEDULE.md` 의 "주차별 한눈에 보기" 표에서 읽고, 노드별 할 일은 스크립트의 `NODES` 에 적는다. 계획서를 바꾸면 `NODES` 도 고친 뒤 다시 생성한다.
+- `architecture/TECH_STACK.md` 는 Markdown 이지만 `tech_stack.svg` 와 함께 스크립트의 `STACK` 에서 만든다(직접 고치지 않는다). 버전의 원본은 `package.json` · `pom.xml` · `requirements.txt` · `Dockerfile` · `compose.yaml` 이라, 그 파일을 바꾸면 `STACK` 도 고친 뒤 다시 생성한다.
+  기술 로고는 `_lib/icons/` 에 받아 둔 Simple Icons(CC0, 상표는 각 소유자의 것) SVG 를 읽어 넣고, 로고가 없는 기술은 스크립트의 `GLYPH`(직접 그린 선 아이콘)를 쓴다. 기술을 더하면 `ICON` 에 한 줄 더한다.
 - `architecture/` · `navigation/` 의 스크립트는 `_lib/svg.py`(색 · 글자 폭 · 도형)를 함께 쓴다.
 - `navigation/` 의 `theta_star` · `mppi` 는 숫자를 `ros/sim/src/config/nav2_params.yaml` 에서 읽고(`_lib/nav2cfg.py`), 그림 속 경로 · 후보 궤적은
   Nav2 의 식을 옮긴 작은 계산(`theta_sim.py` · `mppi_sim.py`)으로 그린다. 설정을 바꾸면 다시 생성한다(실행 기록이 아니라 계산이다 — 실측은 `drive_probe.py` · `plan_probe.py`).
