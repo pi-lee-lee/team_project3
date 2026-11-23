@@ -50,6 +50,72 @@ def draw_gauge(value, cx=320, cy=240, r=90, squash=1.0):
     return img
 
 
+def draw_dial(value, cx=320, cy=240, r=100, squash=1.0, wall=(235, 235, 230), labels=True):
+    """실물 압력계 인쇄물: 흰 판 + 굵은 검은 테두리 + 빨강·초록·빨강 구간 + 검은 눈금·숫자 + 검은 바늘·허브.
+    눈금은 225°(값 0)에서 시계 방향으로 -45°(값 1)까지. 초록 구간은 0.3~0.7."""
+    img, d = canvas(wall)
+    rx = r * squash
+
+    def pt(rho, deg):
+        a = math.radians(deg)
+        return cx + rho * rx * math.cos(a), cy - rho * r * math.sin(a)
+
+    def ang(val):
+        return 225 - val * 270
+
+    d.ellipse([cx - rx, cy - r, cx + rx, cy + r], fill=(0, 0, 0))
+    d.ellipse([cx - 0.92 * rx, cy - 0.92 * r, cx + 0.92 * rx, cy + 0.92 * r], fill=(255, 255, 255))
+    for lo, hi, col in ((0.0, 0.3, (220, 30, 30)), (0.3, 0.7, (30, 170, 60)), (0.7, 1.0, (220, 30, 30))):
+        steps = int((hi - lo) * 120) + 2
+        outer = [pt(0.9, ang(lo + (hi - lo) * i / (steps - 1))) for i in range(steps)]
+        inner = [pt(0.8, ang(hi - (hi - lo) * i / (steps - 1))) for i in range(steps)]
+        d.polygon(outer + inner, fill=col)
+    for i in range(11):
+        d.line([pt(0.68, ang(i / 10)), pt(0.78, ang(i / 10))], fill=(0, 0, 0), width=2 if i % 5 else 4)
+    if labels:
+        for i in (0, 5, 10):
+            x, y = pt(0.55, ang(i / 10))
+            d.text((x - 5, y - 6), str(i / 10 * 2)[:3], fill=(0, 0, 0))
+        d.text((cx - 12, cy + 0.35 * r), 'MPa', fill=(0, 0, 0))
+    a = ang(value)
+    w = max(3, r // 20)
+    d.line([pt(-0.15, a), pt(0.75, a)], fill=(10, 10, 10), width=w)
+    hub = 0.08
+    d.ellipse([cx - hub * rx, cy - hub * r, cx + hub * rx, cy + hub * r], fill=(10, 10, 10))
+    return img
+
+
+def test_gauge_dial():
+    rule = {'ruleId': 11, 'kind': 'GAUGE', 'params': {'style': 'dial', 'unit': 'MPa', 'maxValue': 2},
+            'grading': {'type': 'ranges', 'ranges': [{'min': 0.6, 'max': 1.4, 'grade': 'NORMAL'}], 'default': 'EMERGENCY'}}
+    cases = [('가운데·큼', dict(), None), ('작음', dict(cx=180, cy=150, r=55), None),
+             ('비스듬히(가로 0.7배)', dict(squash=0.7), None), ('어두운 음영(0.7배)', dict(), 'shade'),
+             ('영역 지정', dict(cx=470, cy=300, r=80), [0.5, 0.3, 1.0, 1.0])]
+    zones = {0.1: 'red', 0.5: 'green', 0.9: 'red'}
+    for name, kw, region in cases:
+        for v in (0.1, 0.5, 0.9):
+            img = draw_dial(v, **kw)
+            rl = dict(rule)
+            if region == 'shade':
+                img = shade(img, 0.7)
+            elif region:
+                rl['regions'] = {'INSPECTOR': region}
+            out = run_rule(frame(img), rl, 'INSPECTOR')
+            assert out['value'] is not None, (name, v, out)
+            assert abs(out['value'] - v * 2) <= 0.08, (name, v, out)
+            assert out['grade'] == ('NORMAL' if v == 0.5 else 'EMERGENCY'), (name, v, out)
+            assert out['evidence']['zoneColor'] == zones[v], (name, v, out)
+            print(f'dial {name}: 기대 {v * 2:.1f} → {out["value"]} (각도 {out["evidence"]["angleDeg"]}°, '
+                  f'구간 {out["evidence"]["zoneColor"]}, {out["grade"]})')
+    # 계기판이 없으면(빈 벽, 검은 막대 하나) 못 찾음
+    img, d = canvas((235, 235, 230))
+    d.line([100, 200, 400, 220], fill=(0, 0, 0), width=8)
+    for im in (canvas((235, 235, 230))[0], img):
+        out = run_rule(frame(im), rule)
+        assert out['grade'] == 'UNKNOWN' and 'located' not in out, out
+    print('dial 없음: ok')
+
+
 def draw_lamp(color, cx=320, cy=240, r=26):
     img, d = canvas()
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
@@ -182,12 +248,12 @@ def test_object():
     region = [0.30, 0.30, 0.70, 0.95]
     rule = {'ruleId': 4, 'kind': 'OBJECT', 'params': {'label': 'fire_extinguisher', 'expect': 'PRESENT'},
             'regions': {'INSPECTOR': region, 'PATROL': [0.0, 0.0, 0.2, 0.2]},
-            'grading': {'type': 'map', 'map': {'IN_REGION': 'NORMAL', 'OUT_OF_REGION': 'WARNING', 'MISSING': 'EMERGENCY'},
+            'grading': {'type': 'map', 'map': {'IN_REGION': 'NORMAL', 'OUT_OF_REGION': 'WARNING', 'MISSING': 'WARNING'},
                         'default': 'UNKNOWN'},
             'target': {'sizeM': 0.15}}
     cam = {'hfovDeg': 62.2}
     for name, x, value, g in (('영역 안', 300, 'IN_REGION', 'NORMAL'), ('영역 밖', 40, 'OUT_OF_REGION', 'WARNING'),
-                              ('없음', None, 'MISSING', 'EMERGENCY')):
+                              ('없음', None, 'MISSING', 'WARNING')):
         out = run_rule(frame(draw_object(x), camera=cam), rule, 'INSPECTOR')
         assert out['value'] == value and out['grade'] == g, (name, out)
         assert out['evidence']['expectedRegion'] == region and ('located' in out) == (x is not None), out
@@ -208,9 +274,11 @@ def test_object():
     assert run_rule(frame(draw_object(40)), absent, 'INSPECTOR')['value'] == 'ABSENT'
     out = run_rule(frame(draw_object(None)), absent, 'INSPECTOR')
     assert out['value'] == 'ABSENT' and out['grade'] == 'NORMAL', out
-    # 인식 모델 방식은 자리만
+    # 인식 모델 방식: 모델 이름이 없거나 파일이 없으면 그 규칙만 UNKNOWN(판독기 오류)
     out = run_rule(frame(draw_object(300)), dict(rule, params={'detector': 'model'}), 'INSPECTOR')
-    assert out['grade'] == 'UNKNOWN' and out['reason'] == '인식 모델이 설치되지 않음', out
+    assert out['grade'] == 'UNKNOWN' and '판독기 오류' in out['reason'], out
+    out = run_rule(frame(draw_object(300)), dict(rule, params={'detector': 'model', 'model': '../x'}), 'INSPECTOR')
+    assert out['grade'] == 'UNKNOWN' and '판독기 오류' in out['reason'], out
     print('object 방향·거리·ABSENT·model: ok')
 
 
@@ -236,6 +304,6 @@ def test_engine():
 
 
 if __name__ == '__main__':
-    for t in (test_grade, test_gauge, test_lamp, test_thermal, test_object, test_engine):
+    for t in (test_grade, test_gauge, test_gauge_dial, test_lamp, test_thermal, test_object, test_engine):
         t()
     print('ALL OK')

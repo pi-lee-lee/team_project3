@@ -1,7 +1,8 @@
 """OBJECT: 물체 유무·위치.
 
 detector 'color'(지금 구현): 지정한 색의 가장 큰 덩어리를 물체로 본다. 사진 전체에서 찾고 영역은 판정에만 쓴다.
-detector 'model'(자리만): 학습 모델이 아직 없어 UNKNOWN 을 낸다.
+detector 'model': 학습한 인식 모델(yolo.py, ONNX)로 찾는다. className 클래스 중 신뢰도가 가장 높은 상자 하나를 쓴다.
+  모델 파일이 없거나 onnxruntime 이 없으면 그 규칙만 '판독기 오류(UNKNOWN)'가 된다.
 못 찾음 자체가 값이다: expect PRESENT → IN_REGION / OUT_OF_REGION / MISSING, expect ABSENT → ABSENT / PRESENT.
 """
 from __future__ import annotations
@@ -11,7 +12,7 @@ from .base import RED, Frame, Located, Reading, blobs, color_mask, hsv_schema, r
 
 class ObjectChecker:
     kind = 'OBJECT'
-    version = 'object-1'
+    version = 'object-2'
     value_type = 'label'
     labels = ['IN_REGION', 'OUT_OF_REGION', 'MISSING', 'ABSENT', 'PRESENT']
     params_schema = {
@@ -20,21 +21,23 @@ class ObjectChecker:
             'label': {'type': 'string', 'title': '물체 이름표(기록용)', 'default': ''},
             'expect': {'type': 'string', 'title': '기대 상태(PRESENT: 있어야 함, ABSENT: 없어야 함)',
                        'enum': ['PRESENT', 'ABSENT'], 'default': 'PRESENT'},
-            'detector': {'type': 'string', 'title': '찾는 방식(color: 색 덩어리, model: 인식 모델 — 아직 없음)',
+            'detector': {'type': 'string', 'title': '찾는 방식(color: 색 덩어리, model: 학습한 인식 모델)',
                          'enum': ['color', 'model'], 'default': 'color'},
             'color': hsv_schema('물체 색 범위(color 방식)', RED),
             'minAreaRatio': {'type': 'number', 'title': '물체로 인정하는 최소 면적(사진 넓이 대비 비율)', 'default': 0.003,
                              'minimum': 0, 'maximum': 1},
             'minConfidence': {'type': 'number', 'title': '찾았다고 보는 최소 신뢰도(0~1)', 'default': 0.4,
                               'minimum': 0, 'maximum': 1},
-            'model': {'type': 'string', 'title': '인식 모델 이름(model 방식)', 'default': ''},
+            'model': {'type': 'string', 'title': '인식 모델 이름(model 방식, 예: fire_v1)', 'default': ''},
+            'className': {'type': 'string', 'title': '찾을 클래스 이름(model 방식, 예: fire_extinguisher. 비우면 모든 클래스)',
+                          'default': ''},
         },
     }
 
     def locate(self, frame: Frame, params: dict, region=None):
         data = {'region': list(region) if region is not None else None, 'areaRatio': 0.0}
         if params.get('detector', 'color') == 'model':
-            return Located(None, 0.0, dict(data, unsupported=True))
+            return self._locate_model(frame, params, data)
         if params.get('detector', 'color') != 'color':
             raise ValueError(f'알 수 없는 찾는 방식: {params.get("detector")}')
         h, s, v = hsv = to_hsv(frame.rgb)
@@ -50,10 +53,26 @@ class ObjectChecker:
             return Located(None, confidence, data)     # 너무 작거나 흐릿함: 못 찾은 것으로 본다
         return Located(ratio_box(frame, *b.bbox), confidence, data)
 
+    def _locate_model(self, frame: Frame, params: dict, data: dict) -> Located:
+        from .yolo import get_model
+        model = get_model(params.get('model') or '')
+        want = params.get('className') or None
+        min_conf = float(params.get('minConfidence', 0.4))
+        dets = [d for d in model.detect(frame.rgb, conf=min(0.1, min_conf)) if want is None or d[0] == want]
+        data['detections'] = [{'class': c, 'confidence': round(p, 3), 'bbox': ratio_box(frame, *b)} for c, p, b in dets[:5]]
+        if not dets:
+            return Located(None, 0.0, data)
+        cls, conf, (x0, y0, x1, y1) = dets[0]
+        area = (x1 - x0) * (y1 - y0) / float(frame.width * frame.height)
+        data.update(areaRatio=round(area, 5), modelClass=cls)
+        if conf < min_conf or area < float(params.get('minAreaRatio', 0.003)):
+            return Located(None, conf, data)          # 신뢰도가 낮거나 너무 작음: 못 찾은 것으로 본다
+        return Located(ratio_box(frame, x0, y0, x1, y1), conf, data)
+
     def read(self, frame: Frame, located: Located, params: dict) -> Reading:
         evidence = {'label': params.get('label') or None, 'areaRatio': located.data.get('areaRatio', 0.0)}
-        if located.data.get('unsupported'):
-            return Reading(None, None, 0.0, evidence, '인식 모델이 설치되지 않음')
+        if 'detections' in located.data:
+            evidence['detections'] = located.data['detections']
         region, box = located.data.get('region'), located.bbox
         inside = False
         if box is not None:
