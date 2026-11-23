@@ -3,12 +3,12 @@
   /sim/tools/target.sh gauge 0.35                    계기판 바늘 (0~1. 0 = 왼쪽 아래, 0.5 = 위, 1 = 오른쪽 아래)
   /sim/tools/target.sh lamp green|yellow|red|off     표시등 색
   /sim/tools/target.sh extinguisher remove|move|restore
-                                                     소화기(빨간 상자): 치움 / 벽을 따라 옆으로 옮김 / 원위치
+                                                     소화기 사진 판(P1): 받침만 있는 사진으로 바꿈 / 벽을 따라 옆으로 옮김 / 원위치
   /sim/tools/target.sh status                        현재 상태(JSON)
   /sim/tools/target.sh reset                         전부 기본값(계기판 0.8, 표시등 green, 소화기 원위치)
 
 모양·위치·색의 원본은 worlds/world_spec.py 다. 계기판·표시등은 충돌체가 없어 주행과 지도에 영향이 없다.
-옮긴 소화기는 원래처럼 충돌체가 있다(벽에 붙어 있어 통로를 막지 않는다). 상태는 컨테이너 안 파일에 적어 두며,
+소화기는 사진 판이라 충돌체가 없다(인식 모델이 사진 속 소화기를 찾는다). 상태는 컨테이너 안 파일에 적어 두며,
 sim 을 다시 띄우면 월드와 함께 기본값으로 돌아간다.
 """
 import json
@@ -20,7 +20,7 @@ import world_spec as W  # noqa: E402
 
 STATE_FILE = Path('/tmp/sim_target_state.json')
 DEFAULT = {'gauge': W.GAUGE['value'], 'lamp': W.LAMP['color'], 'extinguisher': 'restore'}
-EXTINGUISHER = 'target_red'
+EXTINGUISHER = 'photo_p1'
 
 
 def load():
@@ -32,7 +32,7 @@ def load():
 
 def describe(st):
     """상태에 위치 정보를 붙인다(시험 스크립트가 읽는다)."""
-    _, rx, ry, *_ = next(t for t in W.TARGETS if t[0] == EXTINGUISHER)
+    rx, ry, *_ = W.PHOTO_PANELS[EXTINGUISHER]
     ex = {'restore': (rx, ry), 'move': W.EXTINGUISHER_MOVED, 'remove': None}[st['extinguisher']]
     return {
         'gauge': {'value': st['gauge'], 'angleDeg': round(W.gauge_angle(st['gauge']), 1),
@@ -49,12 +49,12 @@ def apply(gz, key, value):
         gz.replace('target_gauge', lambda name: W.gauge_model(value, name))
     elif key == 'lamp':
         gz.replace('target_lamp', lambda name: W.lamp_model(value, name))
-    elif value == 'remove':
-        gz.remove(EXTINGUISHER)
+    elif value == 'remove':        # 같은 자리, 받침만 있는 사진
+        gz.replace(EXTINGUISHER, lambda name: W.photo_panel_model(EXTINGUISHER, name, W.PHOTO_MATERIAL['empty']))
     elif value == 'move':
-        gz.replace(EXTINGUISHER, lambda name: W.target_box_model(EXTINGUISHER, *W.EXTINGUISHER_MOVED, name=name))
+        gz.replace(EXTINGUISHER, lambda name: W.photo_panel_model(EXTINGUISHER, name, None, *W.EXTINGUISHER_MOVED))
     else:
-        gz.replace(EXTINGUISHER, lambda name: W.target_box_model(EXTINGUISHER, name=name))
+        gz.replace(EXTINGUISHER, lambda name: W.photo_panel_model(EXTINGUISHER, name))
 
 
 def main():

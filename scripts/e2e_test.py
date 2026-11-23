@@ -112,49 +112,49 @@ def drive_and_block(user, rid, point_id, note, name, reached, timeout=600):
 def obstacle_scenarios(user, rid, by):
     """시험 시설의 적재물 시나리오. 장애물은 로봇이 달리는 도중에, 그때의 계획 경로 위에 놓는다(9-3 만 출발 전에 막는다).
     장애물이 실제로 서기까지 2.5초쯤 걸리므로 0.5m 쯤 앞서 놓으라고 한다."""
-    print('9-1. 장애물: 경로 위 팔레트 (P1 → P2, 제어기가 비켜 지나감)')
+    print('9-1. 장애물: 경로 위 팔레트 (P1 → P3, 제어기가 비켜 지나감)')
     obstacle('clear')
     run_task(user, rid, [by['P1']], 'P1 로 이동')
-    d = drive_and_block(user, rid, by['P2'], '팔레트 비켜 가기', 'pallet', lambda p: p['x'] > 4.9 and p['y'] > 3.5)
-    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '팔레트를 비켜 P2 도착·촬영')
+    d = drive_and_block(user, rid, by['P3'], '팔레트 비켜 가기', 'pallet', lambda p: p['x'] > 4.9 and p['y'] > 3.5)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '팔레트를 비켜 P3 도착·촬영')
 
-    print('9-2. 장애물: 가던 문이 막힘 (P1 → P2, 생산동 → C2 문 막힘 → C1 · C2 로 돌아감)')
+    print('9-2. 장애물: 가던 문이 막힘 (P1 → P3, 생산동 → C2 문 막힘 → C1 · C2 로 돌아감)')
     obstacle('clear')
     run_task(user, rid, [by['P1']], 'P1 로 이동')
-    d = drive_and_block(user, rid, by['P2'], '문 막힘', 'door', lambda p: p['x'] > 5.6 and p['y'] > 3.5)
-    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 C1 · C2 로 돌아 P2 도착·촬영')
+    d = drive_and_block(user, rid, by['P3'], '문 막힘', 'door', lambda p: p['x'] > 5.6 and p['y'] > 3.5)
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 C1 · C2 로 돌아 P3 도착·촬영')
 
     print('9-3. 장애물: C2 위쪽 막힘 (진입 불가)')
     obstacle('clear')
-    d = run_task(user, rid, [by['P1']], '막기 전에 생산동으로 이동')     # 로봇이 막힘 위쪽(P2)에 갇히지 않게
+    d = run_task(user, rid, [by['P1']], '막기 전에 생산동으로 이동')     # 로봇이 막힘 위쪽(P3)에 갇히지 않게
     check(obstacle('place', 'block'), 'C2 위쪽 막기')
-    d = run_task(user, rid, [by['P2'], by['P3']], '진입 불가')
+    d = run_task(user, rid, [by['P3'], by['P4']], '진입 불가')
     print('     사건:', ' → '.join(e['type'] for e in d['events']))
-    o2 = next(o for o in d['observations'] if o['point_code'] == 'P2')
-    o3 = next(o for o in d['observations'] if o['point_code'] == 'P3')
+    o2 = next(o for o in d['observations'] if o['point_code'] == 'P3')
+    o3 = next(o for o in d['observations'] if o['point_code'] == 'P4')
     check(o2['status'] == 'UNABLE' and o2['reason_code'] == 'BLOCKED_NO_PATH',
-          f"P2 확인 불가 · 사유 코드 {o2['reason_code']} ({o2['reason']})")
+          f"P3 확인 불가 · 사유 코드 {o2['reason_code']} ({o2['reason']})")
     check('ARRIVAL_BLOCKED' in [e['type'] for e in d['events']], '사건 기록 ARRIVAL_BLOCKED')
-    check(o3['status'] == 'CAPTURED', '막힌 지점은 건너뛰고 다음 지점(P3)은 촬영')
+    check(o3['status'] == 'CAPTURED', '막힌 지점은 건너뛰고 다음 지점(P4)은 촬영')
 
-    print('9-4. 장애물: 가던 골목이 막힘 (P3 → P1, 전기실 문 바로 아래 막힘 → 랙 위로 돌아 나옴)')
-    obstacle('clear')                                                    # 로봇은 9-3 을 마치고 P3 에 있다
+    print('9-4. 장애물: 가던 골목이 막힘 (P4 → P1, 전기실 문 바로 아래 막힘 → 랙 위로 돌아 나옴)')
+    obstacle('clear')                                                    # 로봇은 9-3 을 마치고 P4 에 있다
     # 놓으라는 명령에서 실제로 서기까지 2.5~4초 → 문 0.7m 앞에서 명령한다(늦으면 블록이 로봇 위에 생긴다)
     d = drive_and_block(user, rid, by['P1'], '골목 막힘', 'aisle', lambda p: p['x'] > 2.3 and p['y'] > 4.9)
     check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 랙 위로 돌아 P1 도착·촬영')
 
-    print('9-5. 장애물: 같은 자리가 반쯤 막힘 (P3 → P1, 문을 지날 때 폭 0.6m 틈만 남음)')
+    print('9-5. 장애물: 같은 자리가 반쯤 막힘 (P4 → P1, 문을 지날 때 폭 0.6m 틈만 남음)')
     obstacle('clear')
-    run_task(user, rid, [by['P3']], 'P3 로 이동')                          # 9-4 를 마치고 P1 에 있다
-    d = drive_and_block(user, rid, by['P1'], '골목 반쯤 막힘(P3 → P1)', 'aisle60', lambda p: p['x'] > 2.6 and p['y'] > 5.0)
+    run_task(user, rid, [by['P4']], 'P4 로 이동')                          # 9-4 를 마치고 P1 에 있다
+    d = drive_and_block(user, rid, by['P1'], '골목 반쯤 막힘(P4 → P1)', 'aisle60', lambda p: p['x'] > 2.6 and p['y'] > 5.0)
     check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '틈으로 지나거나 랙 위로 돌아 P1 도착·촬영')
 
     # P1 은 그 자리에서 1.6m 뿐이라, 출발한 뒤에 놓으면 장애물이 로봇 코앞(0.3m)에 생긴다(실제로 서기까지 2.5초).
     # 그래서 되돌아가는 길은 9-5 의 장애물을 치우지 않고 그대로 둔다.
-    print('9-6. 장애물: 그 장애물을 둔 채 되돌아감 (P1 → P3, 같은 자리 폭 0.6m 틈)')
-    d = run_task(user, rid, [by['P3']], '반쯤 막힌 골목으로 되돌아감')
+    print('9-6. 장애물: 그 장애물을 둔 채 되돌아감 (P1 → P4, 같은 자리 폭 0.6m 틈)')
+    d = run_task(user, rid, [by['P4']], '반쯤 막힌 골목으로 되돌아감')
     print('     사건:', ' → '.join(e['type'] for e in d['events']))
-    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '틈으로 지나거나 랙 위로 돌아 P3 도착·촬영')
+    check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '틈으로 지나거나 랙 위로 돌아 P4 도착·촬영')
     obstacle('clear')
 
 
@@ -201,8 +201,8 @@ def zone_scenarios(admin, user, rid, by):
     check(user.get(f'/api/robots/{rid}/zones')[0] == 200, '조회는 누구나')
     check(sup.post(f'/api/robots/{rid}/zones', {'x1': 1, 'y1': 1, 'x2': 1.05, 'y2': 1.05})[0] == 400, '너무 작은 구역 거부(400)')
 
-    print('Z-2. 금지구역: 미리 설정 (P3 → P1, 문 아래 골목이 금지구역 → 랙 위로 돌아감)')
-    run_task(user, rid, [by['P3']], 'P3 로 이동')
+    print('Z-2. 금지구역: 미리 설정 (P4 → P1, 문 아래 골목이 금지구역 → 랙 위로 돌아감)')
+    run_task(user, rid, [by['P4']], 'P4 로 이동')
     s, zs = sup.post(f'/api/robots/{rid}/zones', ZONE)
     check(s == 200 and len(zs) == 1 and zs[0]['name'] == ZONE['name'], '1 관리자가 금지구역 설정')
     time.sleep(4)                                    # 로봇의 계획 맵 · 제어 맵에 들어갈 시간
@@ -216,14 +216,14 @@ def zone_scenarios(admin, user, rid, by):
     s, e = sup.post(f'/api/robots/{rid}/zones', {'x1': x - 0.3, 'y1': y - 0.3, 'x2': x + 0.3, 'y2': y + 0.3})
     check(s == 409, f"로봇 위 구역 거부(409: {e.get('message', '') if isinstance(e, dict) else ''})")
 
-    print('Z-4. 금지구역: 삭제하면 다시 지나감 (P1 → P3 직행)')
+    print('Z-4. 금지구역: 삭제하면 다시 지나감 (P1 → P4 직행)')
     check(sup.call('DELETE', f"/api/robots/{rid}/zones/{zs[0]['zoneId']}")[0] == 200, '금지구역 삭제')
     time.sleep(4)
-    d, poses = drive_watch(user, rid, by['P3'], '금지구역을 지우고 P3 로')
-    check(d['status'] == 'COMPLETED', 'P3 도착')
+    d, poses = drive_watch(user, rid, by['P4'], '금지구역을 지우고 P4 로')
+    check(d['status'] == 'COMPLETED', 'P4 도착')
     check(inside(poses) and max(y for _, y in poses) < 6.3, f"골목으로 직행(가장 위 y={max(y for _, y in poses):.2f})")
 
-    print('Z-5. 금지구역: 달리는 도중에 설정 (P3 → P1, 가던 골목이 금지구역이 됨 → 다시 계획해 돌아감)')
+    print('Z-5. 금지구역: 달리는 도중에 설정 (P4 → P1, 가던 골목이 금지구역이 됨 → 다시 계획해 돌아감)')
     state = {}
 
     def tick(v):
@@ -298,7 +298,7 @@ def main():
     print('5. 점검 요청 → 이동·촬영 (U2·U4)')
     s, pts = user.get('/api/points')
     by = {p['code']: p['point_id'] for p in pts}
-    s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P1'], by['P2']], 'note': 'e2e'})
+    s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P1'], by['P3']], 'note': 'e2e'})
     check(s == 201, f"작업 생성 #{t.get('task_id')}", str(t))
     tid = t['task_id']
 
@@ -339,7 +339,7 @@ def main():
     check(s == 201 and t2['recheck_of'] == o2['observation_id'], f"재점검 작업 #{t2['task_id']} 생성, 원래 관측과 연결")
     wait(lambda: user.get(f"/api/inspections/{t2['task_id']}")[1]['status'] == 'COMPLETED', 600, '재점검 작업 완료')
     check(user.post(f"/api/inspections/{t2['task_id']}/cancel")[0] == 409, '끝난 작업의 취소는 거부(409)')
-    s, t3 = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P3'], by['P1']], 'note': 'e2e 취소 시험'})
+    s, t3 = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P4'], by['P1']], 'note': 'e2e 취소 시험'})
     check(s == 201, f"먼 지점 작업 #{t3['task_id']} 생성")
     wait(lambda: user.get(f"/api/inspections/{t3['task_id']}")[1]['status'] == 'RUNNING', 60, '이동 시작')
     time.sleep(2)

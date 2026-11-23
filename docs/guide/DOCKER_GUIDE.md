@@ -179,7 +179,7 @@ Remove-Item Env:SIM_MODE; docker compose up -d sim
 ```bash
 docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 복도 팔레트 (돌아갈 수 있음)
 docker compose exec sim /sim/tools/obstacle.sh place reroute   # C2 아래쪽 막힘 (생산동으로 돌아감)
-docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘 (P2 진입 불가)
+docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘 (P3 진입 불가)
 docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우기
 ```
 

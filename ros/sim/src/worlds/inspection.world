@@ -197,15 +197,6 @@
           <material><ambient>0.6 0.5 0.3 1</ambient><diffuse>0.6 0.5 0.3 1</diffuse></material></visual>
       </link>
     </model>
-    <model name="target_red">
-      <static>true</static>
-      <pose>3.200 3.900 0.300 0 0 0</pose>
-      <link name="link">
-        <collision name="c"><geometry><box><size>0.300 0.500 0.600</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.300 0.500 0.600</size></box></geometry>
-          <material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material></visual>
-      </link>
-    </model>
     <model name="target_green">
       <static>true</static>
       <pose>7.650 7.000 0.100 0 0 0</pose>
@@ -239,6 +230,20 @@
       <pose>7.650 7.100 0.360 0 0 0.00000</pose>
       <link name="link">
         <visual name="bulb"><pose>0 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><sphere><radius>0.05</radius></sphere></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 1.0000 0.0000 1</emissive></material></visual>
+      </link>
+    </model>
+    <model name="photo_p1">
+      <static>true</static>
+      <pose>3.050 3.900 0.280 0 0 0.00000</pose>
+      <link name="link">
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><script><uri>file:///sim/models/photo_panels/materials/scripts</uri><uri>file:///sim/models/photo_panels/materials/textures</uri><name>PhotoPanel/Extinguisher</name></script></material></visual>
+      </link>
+    </model>
+    <model name="photo_p2">
+      <static>true</static>
+      <pose>4.300 4.400 0.280 0 0 -1.57080</pose>
+      <link name="link">
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><script><uri>file:///sim/models/photo_panels/materials/scripts</uri><uri>file:///sim/models/photo_panels/materials/textures</uri><name>PhotoPanel/Empty</name></script></material></visual>
       </link>
     </model>
   </world>

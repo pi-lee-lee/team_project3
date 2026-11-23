@@ -1,0 +1,32 @@
+// 벽에 거는 사진 판(소화기 모델 판독 시험용). 조명 없이 사진 색 그대로 보이게 한다.
+material PhotoPanel/Extinguisher
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      texture_unit
+      {
+        texture extinguisher.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material PhotoPanel/Empty
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      texture_unit
+      {
+        texture empty.jpg
+        filtering trilinear
+      }
+    }
+  }
+}

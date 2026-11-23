@@ -13,7 +13,7 @@ function gradingExample(c: CheckerInfo): Record<string, unknown> {
       ? { type: 'ranges', ranges: [{ max: 0.01, grade: 'NORMAL' }, { min: 0.01, max: 0.08, grade: 'WARNING' }], default: 'EMERGENCY' }
       : { type: 'ranges', ranges: [{ min: 0.7, max: 0.98, grade: 'NORMAL' }, { min: 0.5, max: 0.7, grade: 'WARNING' }], default: 'EMERGENCY' };
   }
-  if (c.kind === 'OBJECT') return { type: 'map', map: { IN_REGION: 'NORMAL', OUT_OF_REGION: 'WARNING', MISSING: 'EMERGENCY' }, default: 'UNKNOWN' };
+  if (c.kind === 'OBJECT') return { type: 'map', map: { IN_REGION: 'NORMAL', OUT_OF_REGION: 'WARNING', MISSING: 'WARNING' }, default: 'UNKNOWN' };
   if (c.kind === 'LAMP') return { type: 'map', map: { green: 'NORMAL', yellow: 'WARNING', red: 'EMERGENCY', off: 'WARNING' }, default: 'UNKNOWN' };
   return { type: 'map', map: Object.fromEntries(c.labels.map((l) => [l, 'NORMAL'])), default: 'UNKNOWN' };
 }

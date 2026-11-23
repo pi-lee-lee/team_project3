@@ -1,4 +1,4 @@
-"""주행 안정성 반복 시험: P3 ↔ P1 을 장애물 종류 · 놓는 시점을 바꿔 가며 되풀이하고, 회차마다 결과를 한 줄로 낸다.
+"""주행 안정성 반복 시험: P4 ↔ P1 을 장애물 종류 · 놓는 시점을 바꿔 가며 되풀이하고, 회차마다 결과를 한 줄로 낸다.
 docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py [--rounds 1] [--sets aisle,hall,hall_back] [--only aisle60,none]'
 
 목표는 서버와 같은 길(/inspection/goal → 목표 브리지 → Nav2)로 보낸다. 브리지의 재시도 · 물러나기까지 포함해 본다.
@@ -31,17 +31,17 @@ import world_spec as W  # noqa: E402
 sys.path.insert(0, '/sim/tools')
 from obstacle import sdf  # noqa: E402
 
-P1, P2, P3 = (4.3, 3.9, math.pi), (7.65, 6.1, math.pi / 2), (0.3, 4.6, math.pi)
+P1, P3, P4 = (3.95, 3.9, math.pi), (7.65, 6.1, math.pi / 2), (0.3, 4.6, math.pi)
 # 묶음: 이름 → (구간들, {장애물: (맞는 경로 이름, 주행 거리 범위 m)}).  '막힘' 은 길이 없어 BLOCKED_NO_PATH 로 끝나야 맞다.
 SETS = {
     # 전기실 문 바로 아래 골목: 직행 5.1~5.5m, 랙 1 위로 우회 8.2~10.6m
-    'aisle': ([('P3→P1', P3, P1), ('P1→P3', P1, P3)],
+    'aisle': ([('P4→P1', P4, P1), ('P1→P4', P1, P4)],
               {'none': ('직행', 0, 6.5), 'aisle70': ('직행', 0, 6.5), 'aisle60': ('직행', 0, 6.5),
                'aisle50': ('우회', 6.5, 11.5), 'aisle': ('우회', 6.5, 11.5)}),
     # 생산동: 직행 5.0m(팔레트는 옆으로 비켜 감), 문이 막히면 C1 · C2 로 돌아 14~19m, C2 위쪽이 막히면 길이 없다
-    'hall': ([('P1→P2', P1, P2)],
+    'hall': ([('P1→P3', P1, P3)],
              {'none': ('직행', 0, 6.5), 'pallet': ('직행', 0, 7.0), 'door': ('우회', 11.0, 21.0), 'block': ('막힘', 0, 99)}),
-    'hall_back': ([('P2→P1', P2, P1)], {'pallet': ('직행', 0, 7.0), 'door': ('우회', 11.0, 21.0)}),
+    'hall_back': ([('P3→P1', P3, P1)], {'pallet': ('직행', 0, 7.0), 'door': ('우회', 11.0, 21.0)}),
 }
 TIMEOUT = 300.0
 TRIGGER = {'far': 1.2, 'near': 0.6}          # 로봇 중심에서 장애물(상자)까지의 거리(m)

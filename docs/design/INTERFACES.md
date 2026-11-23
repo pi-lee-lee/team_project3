@@ -211,7 +211,7 @@
   "enabled": true,
   "params": { "label": "fire_extinguisher", "expect": "PRESENT", "minConfidence": 0.5 },
   "regions": { "INSPECTOR": [0.30, 0.35, 0.70, 0.95], "PATROL": [0.20, 0.30, 0.80, 0.95] },
-  "grading": { "type": "map", "map": { "IN_REGION": "NORMAL", "OUT_OF_REGION": "WARNING", "MISSING": "EMERGENCY" }, "default": "UNKNOWN" },
+  "grading": { "type": "map", "map": { "IN_REGION": "NORMAL", "OUT_OF_REGION": "WARNING", "MISSING": "WARNING" }, "default": "UNKNOWN" },
   "target": { "x": 2.2, "y": 0.0, "yaw": 3.14, "sizeM": 0.5, "useAsReference": false }
 }
 ```

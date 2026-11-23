@@ -9,9 +9,9 @@ SLAM 지도가 없을 때의 대체용이고, 스토리보드 그림에도 쓴�
    y
    7 ┌────────────────────┬──────────────────────┬────┐
      │ 전기실             │ 생산동               │ C2 │ ← 비상구(초록)
-     │ 분전반(노랑) P3    │  랙      랙          │폭  │
-     │            ┌─문    문─┐                    │1.1 │
-   3 ├──── 문 ────┤          │  설비     설비 P1←소화기  │
+     │ 분전반(노랑) P4    │  랙      랙          │폭  │  P3 = 비상구 표시등(C2 끝)
+     │            ┌─문    문─┐ P2(랙 앞 사진: 받침만) │1.1 │
+   3 ├──── 문 ────┤소화기 사진←P1  설비     설비      │
      │ 사무실     │          │                    문───┤
      │  책상섬    │          └─── 문 ─────────────┘    │
      │ ◎충전      문 ─ C1 복도 (폭 1.4) ─────────────── ┘ (꺾임)
@@ -87,7 +87,9 @@ FIXTURES = [
 ]
 # 점검 대상(색 상자): 이름, x, y, 크기 x, 크기 y, 색
 TARGETS = [
-    ('target_red', 3.2, 3.9, 0.3, 0.5, (0.8, 0.1, 0.1)),        # 소화기 (생산동 서쪽 벽)
+    # 소화기 (생산동 서쪽 벽). 지금은 월드에 세우지 않고 그 자리에 소화기 사진 판(P1)을 건다(PHOTO_PANELS).
+    # 저장된 SLAM 지도에는 이 상자가 남아 있어 지도(rects)에는 그대로 둔다 → 지도를 다시 만들 필요가 없다.
+    ('target_red', 3.2, 3.9, 0.3, 0.5, (0.8, 0.1, 0.1)),
     ('target_green', 7.65, 7.0, 0.5, 0.2, (0.1, 0.7, 0.2)),     # 비상구 표시 (C2 끝)
     ('target_yellow', -0.8, 4.6, 0.3, 0.6, (0.9, 0.8, 0.1)),    # 분전반 (전기실 서쪽 벽)
 ]
@@ -111,8 +113,8 @@ GAUGE_R, GAUGE_RIM_R, GAUGE_HUB_R, GAUGE_NEEDLE = 0.12, 0.13, 0.02, (0.10, 0.015
 # 표시등: C2 끝 북쪽 벽, 비상구 표시(초록 상자) 위. 구가 벽에 닿게 중심을 반지름만큼 띄운다
 LAMP_R = 0.05
 LAMP = {'x': 7.65, 'y': Y1 - T / 2 - LAMP_R, 'z': 0.36, 'color': 'green'}
-# 소화기(빨간 상자)를 "자리에서 벗어남"으로 만들 때 옮겨 놓는 곳: 같은 벽을 따라 남쪽으로 0.5m (P1 사진의 왼쪽 가장자리에 걸친다)
-EXTINGUISHER_MOVED = (3.2, 3.4)
+# 소화기 사진 판(P1)을 "자리에서 벗어남"으로 만들 때 옮겨 놓는 곳: 같은 벽을 따라 남쪽으로 0.5m
+EXTINGUISHER_MOVED = (XO + T / 2, 3.4)
 
 # 화재(열화상 인쇄물)를 세우는 자리: 벽면 위 판 중심의 지도 좌표 x, y 와 판이 바라보는 방향(도). sim/tools/fire.py 가 쓴다.
 # 로봇은 판 앞 FIRE_STAND_DIST 에 판을 바라보고 선다(fire_stand). 점검 지점과 다른 벽이고 그 앞이 비어 있는 곳만 골랐다.
@@ -124,28 +126,65 @@ FIRE_SPOTS = {
 FIRE_Z = 0.27            # 판 중심 높이: 1m 앞 카메라(높이 0.10m)에 판 전체(0.12~0.42m)가 들어온다
 FIRE_STAND_DIST = 1.0
 
-# 점검 지점: 로봇이 서서 대상을 촬영할 위치(지도 좌표)와 방향(도)
-POINTS = {'P1': (4.3, 3.9, 180), 'P2': (7.65, 6.1, 90), 'P3': (0.3, 4.6, 180)}
+# 소화기 사진 판(인식 모델 OBJECT detector='model' 이 읽는다): 실제 현장에서 로봇 카메라로 찍은 사진을 건다.
+# 이름: (판 중심 x, y, 판이 바라보는 방향(도), 재질 이름). 재질·사진은 /sim/models/photo_panels.
+# photo_p1 = 생산동 서쪽 벽, 소화기가 제자리에 있는 사진(→ 정상). target.py extinguisher remove 면 받침만 있는 사진으로 바뀐다.
+# photo_p2 = 랙 1 남쪽 면, 받침만 있는 사진(→ 소화기 없음, 경고). 늘 이 상태로 두는 비교용.
+PHOTO_MATERIAL = {'present': 'PhotoPanel/Extinguisher', 'empty': 'PhotoPanel/Empty'}
+PHOTO_PANELS = {
+    'photo_p1': (XO + T / 2, 3.9, 0, PHOTO_MATERIAL['present']),
+    'photo_p2': (4.3, 4.4, -90, PHOTO_MATERIAL['empty']),      # 랙 1(4.3, 5.4, 세로 2.0) 남쪽 면 y = 4.4
+}
+PHOTO_SIZE = (0.60, 0.45)        # 가로, 세로(m). 사진 비율 4:3
+PHOTO_Z = 0.28                   # 판 중심 높이: 0.9m 앞 카메라(높이 0.10m)에 판 전체(0.055~0.505m)가 들어온다
+PHOTO_STAND_DIST = 0.9
+PHOTO_MATERIALS = '/sim/models/photo_panels/materials'
+
+
+def _stand(panel):
+    """사진 판을 정면으로 보는 로봇 자세 (x, y, yaw 도): 판에서 PHOTO_STAND_DIST 앞."""
+    x, y, facing, _ = PHOTO_PANELS[panel]
+    a = math.radians(facing)
+    yaw = (facing + 180) % 360
+    return (round(x + PHOTO_STAND_DIST * math.cos(a), 3), round(y + PHOTO_STAND_DIST * math.sin(a), 3),
+            yaw - 360 if yaw > 180 else yaw)
+
+
+# 점검 지점: 로봇이 서서 대상을 촬영할 위치(지도 좌표)와 방향(도). DB(inspection_point)와 같은 값이다.
+# P1 · P2 = 소화기 사진 판 앞, P3 = 비상구 표시등(C2 끝), P4 = 분전반 계기판(전기실 서쪽 벽)
+POINTS = {'P1': _stand('photo_p1'), 'P2': _stand('photo_p2'), 'P3': (7.65, 6.1, 90), 'P4': (0.3, 4.6, 180)}
+# 비상구 점검 지점의 비상구 앞 구역 [x1, y1, x2, y2](DB inspection_point.exit_zone 과 같은 값). 로봇이 이 안에서 막히면
+# 복구 · 우회 없이 바로 진입 불가로 끝내고 목적지 쪽 사진을 올린다. P3 = 생산동 → C2 문(y 3.6) 위쪽부터 비상구 벽까지의 C2 복도.
+EXIT_ZONES = {'P3': (XH, 3.6, X1, Y1)}
 
 # 시험 때 놓고 치우는 적재물 (sim/tools/obstacle.py): x, y, 크기 x, 크기 y
 OBSTACLES = {
     # detour · reroute 는 C1 · C2 복도를 따라갈 때만 경로 위다(예: 충전 위치 → C1 동쪽 끝 7.0, -0.1).
-    # 충전 위치 → P2 는 이제 생산동을 가로지르므로 이 둘을 지나지 않는다 → 점검 지점 시험에는 아래 pallet · door 를 쓴다.
+    # 충전 위치 → P3 는 이제 생산동을 가로지르므로 이 둘을 지나지 않는다 → 점검 지점 시험에는 아래 pallet · door 를 쓴다.
     'detour': (5.6, -0.35, 0.5, 0.5),     # C1 복도 가운데 팔레트 → 옆으로 비켜 지나감 (우회 가능)
     'reroute': (7.65, 1.6, 1.1, 0.4),     # C2 아래쪽 막힘 → C2 로 올라가는 길이 생산동 문뿐
-    'block': (7.65, 5.2, 1.1, 0.4),       # C2 위쪽(생산동 문보다 위) 막힘 → P2 진입 불가
+    'block': (7.65, 5.2, 1.1, 0.4),       # C2 위쪽(생산동 문보다 위) 막힘 → P3 진입 불가
     # ---- 달리는 도중에 놓는 시험용(계획 경로 위에 놓인다. e2e_test.py 가 놓기 직전에 '경로 위'인지 확인한다) ----
-    'pallet': (6.2, 4.1, 0.4, 0.4),       # 생산동 가운데, P1 → P2 직선 경로 위의 팔레트 → 제어기가 옆으로 비켜 지나감
-    'door': (7.1, 4.1, 0.2, 1.0),         # 생산동 → C2 문이 막힘 → C1 · C2 아래쪽으로 크게 돌아 P2 로 (다른 경로)
-    'pallet2': (1.6, 4.85, 0.4, 0.4),     # 전기실 가운데, P1 → P3(문 → P3) 직선 경로 위의 팔레트 → 비켜 지나감
+    'pallet': (6.2, 4.1, 0.4, 0.4),       # 생산동 가운데, P1 → P3 직선 경로 위의 팔레트 → 제어기가 옆으로 비켜 지나감
+    'door': (7.1, 4.1, 0.2, 1.0),         # 생산동 → C2 문이 막힘 → C1 · C2 아래쪽으로 크게 돌아 P3 로 (다른 경로)
+    'pallet2': (1.6, 4.85, 0.4, 0.4),     # 전기실 가운데, P1 → P4(문 → P4) 직선 경로 위의 팔레트 → 비켜 지나감
     # 전기실 → 생산동 문 바로 아래에서 골목(서쪽 벽 ↔ 랙 1, 폭 0.95m)을 막음 → 랙 1 위(폭 0.75m)로 돌아 나와야 P1 에 닿는다.
-    # P3 → P1 로 가는 로봇이 문을 지날 때 놓으면 '가던 길이 막혀 다시 계획'하는 시험이 된다.
+    # P4 → P1 로 가는 로봇이 문을 지날 때 놓으면 '가던 길이 막혀 다시 계획'하는 시험이 된다.
     'aisle': (3.525, 5.1, 0.95, 0.2),
     # 같은 자리를 서쪽 벽에서부터 일부만 막아 랙 1 쪽에 틈을 남긴다(애매하게 막힌 경우): 남는 폭 0.7m / 0.6m / 0.5m
     'aisle70': (3.175, 5.1, 0.25, 0.3),
     'aisle60': (3.225, 5.1, 0.35, 0.3),
     'aisle50': (3.275, 5.1, 0.45, 0.3),
+    # 비상구 앞 적재물(피난 통로 막힘 시험): P3(7.65, 6.1) 바로 앞 C2 복도 안쪽에 낮은 상자(가로 0.7 · 깊이 0.2 · 높이 0.22m).
+    # 양옆 틈이 0.15m 라 로봇(폭 약 0.31m)은 못 지나가고, 라이다(높이 약 0.17m)보다 높아 장애물로 잡힌다.
+    # 생산동 → C2 문(y 3.6~4.6)에서는 벽에 가려 안 보이는 자리라 로봇이 C2 에 들어와서야 발견한다. 진입 불가가 나면
+    # 로봇은 목적지 쪽으로 돌아 사진을 찍으므로(robot-service MissionService) 낮은 상자 전체가 사진에 들어온다.
+    'exit': (7.65, 6.0, 0.7, 0.2),
+    # C1 → 생산동 문(y = YC, x 4.2~5.2)을 통째로 막음 → 생산동을 가로지르지 못하고 C1 복도 끝까지 가서 C2 로 꺾어 올라가야 한다.
+    # 비상구 앞 구역(P3, y 3.6 위) 밖에서 막히는 것이라 기존 복구 · 우회 로직으로 다시 계획하는지 보는 시험용.
+    'c1door': (4.7, YC, 1.2, 0.3),
 }
+OBSTACLE_H = {'exit': 0.22}   # 상자 높이(m). 없으면 0.6
 # 좁은 통로 시험(obstacle.sh place gap 폭): C1 복도 양쪽 벽에서 상자 둘을 내밀어 가운데에 폭 width 의 틈을 남긴다.
 # 틈은 x 방향으로 GAP_LEN 만큼 이어진다(문틀이 아니라 골목). C2 아래쪽을 reroute 로 함께 막으면 이 틈이 유일한 길이 된다.
 GAP_X, GAP_LEN = 5.6, 0.6
@@ -245,6 +284,19 @@ def thermal_model(spot, variant='emergency', name=None):
     return _visual_model(name or f'fire_{spot}', x, y, FIRE_Z, facing, v)
 
 
+def photo_panel_model(panel, name=None, material=None, x=None, y=None):
+    """사진 판: 얇은 상자 앞면에 사진 재질(조명 없음)을 입힌다. 충돌체가 없어 지도·주행에 영향이 없다.
+    material·x·y 를 주면 그 값으로 바꿔 만든다(target.py 가 소화기를 치우거나 옮길 때)."""
+    px, py, facing, base = PHOTO_PANELS[panel]
+    x, y, material = px if x is None else x, py if y is None else y, material or base
+    w, h = PHOTO_SIZE
+    v = (f'        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows>'
+         f'<geometry><box><size>0.004 {w} {h}</size></box></geometry>'
+         f'<material><script><uri>file://{PHOTO_MATERIALS}/scripts</uri><uri>file://{PHOTO_MATERIALS}/textures</uri>'
+         f'<name>{material}</name></script></material></visual>\n')
+    return _visual_model(name or panel, x, y, PHOTO_Z, facing, v)
+
+
 def fire_stand(spot):
     """그 자리의 판을 정면으로 보는 로봇 자세 (x, y, yaw 도)."""
     x, y, facing = FIRE_SPOTS[spot]
@@ -263,8 +315,9 @@ def target_box_model(target, x=None, y=None, name=None):
 def world():
     m = ''.join(box_model(n, x, y, sx, sy, WALL_H, (0.78, 0.78, 0.8)) for n, x, y, sx, sy in WALLS)
     m += ''.join(box_model(n, x, y, sx, sy, h, rgb) for n, x, y, sx, sy, h, rgb in FIXTURES)
-    m += ''.join(target_box_model(n) for n, *_ in TARGETS)
+    m += ''.join(target_box_model(n) for n, *_ in TARGETS if n != 'target_red')   # 소화기는 사진 판(P1)으로 대신한다
     m += gauge_model() + lamp_model()            # 처음 상태: 계기판 0.8, 표시등 초록 (열화상 인쇄물은 fire.py 로만 세운다)
+    m += ''.join(photo_panel_model(p) for p in PHOTO_PANELS)
     return f'''<?xml version="1.0"?>
 <!-- world_spec.py 로 생성. 직접 고치지 말고 world_spec.py 를 고친 뒤 다시 생성한다. -->
 <sdf version="1.6">

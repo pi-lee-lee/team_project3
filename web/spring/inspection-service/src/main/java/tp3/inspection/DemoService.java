@@ -53,28 +53,37 @@ public class DemoService {
         SCENARIOS.put("fire-preempt", new String[]{"점검 중 화재",
                 "점검을 시작한 뒤 화재를 낸다. 하던 점검을 멈추고 출동한다(사람 승인 모드, 승인은 화면에서).", "소화액 투척"});
         SCENARIOS.put("rules-abnormal", new String[]{"소방 관제 · 이상 발생",
-                "소화기를 치우고 표시등을 빨강, 계기판을 0.6 으로 바꾼 뒤 세 지점을 점검한다. 비상 2건 · 경고 1건이 뜬다.", "소방 관제"});
+                "소화기를 치우고 표시등을 빨강, 계기판을 0.6 으로 바꾼 뒤 세 지점을 점검한다. 비상 1건 · 경고 2건이 뜬다(소화기 없음은 경고 — 비상은 화재·위험 상황에만).", "소방 관제"});
         SCENARIOS.put("rules-restore", new String[]{"소방 관제 · 복구",
                 "대상을 원위치하고 다시 점검한다. 경고가 스스로 풀린다.", "소방 관제"});
         SCENARIOS.put("reset", new String[]{"초기화",
                 "열화상 인쇄물을 치우고 대상을 원위치하며, 열린 사건을 닫고 투척 모드를 사람 승인으로 되돌린다.", "정리"});
     }
 
-    /** 시연용 규칙(이름이 이 머리로 시작). 지점에 규칙이 하나도 없을 때만 만든다. 값은 scripts/e2e_scenarios.py 와 같다. */
+    /** 시연용 규칙(이름이 이 머리로 시작). 지점에 규칙이 하나도 없을 때만 만든다. 값은 scripts/e2e_scenarios.py 와 같다.
+     *  P1 · P2 = 소화기 사진 판(인식 모델 fire_v1). P2 는 늘 받침만 있는 비교용이라 시연 점검(DEMO_POINTS)에는 넣지 않는다. */
     private static final String RULE_TAG = "[시연]";
     private static final Map<String, String> DEMO_RULES = Map.of(
             "P1", """
                     {"name": "[시연] 소화기 비치", "kind": "OBJECT", "enabled": true,
-                     "params": {"label": "fire_extinguisher", "expect": "PRESENT", "detector": "color"},
-                     "regions": {"INSPECTOR": [0.0, 0.0, 1.0, 0.8]},
+                     "params": {"label": "fire_extinguisher", "expect": "PRESENT", "detector": "model",
+                                "model": "fire_v1", "className": "fire_extinguisher"},
+                     "regions": {},
                      "grading": {"type": "map", "default": "UNKNOWN",
-                                 "map": {"IN_REGION": "NORMAL", "OUT_OF_REGION": "WARNING", "MISSING": "EMERGENCY"}}}""",
+                                 "map": {"IN_REGION": "NORMAL", "OUT_OF_REGION": "WARNING", "MISSING": "WARNING"}}}""",
             "P2", """
+                    {"name": "[시연] 소화기 비치", "kind": "OBJECT", "enabled": true,
+                     "params": {"label": "fire_extinguisher", "expect": "PRESENT", "detector": "model",
+                                "model": "fire_v1", "className": "fire_extinguisher"},
+                     "regions": {},
+                     "grading": {"type": "map", "default": "UNKNOWN",
+                                 "map": {"IN_REGION": "NORMAL", "OUT_OF_REGION": "WARNING", "MISSING": "WARNING"}}}""",
+            "P3", """
                     {"name": "[시연] 상태 표시등", "kind": "LAMP", "enabled": true, "params": {},
                      "regions": {"INSPECTOR": [0.0, 0.0, 1.0, 0.33]},
                      "grading": {"type": "map", "default": "UNKNOWN",
                                  "map": {"green": "NORMAL", "yellow": "WARNING", "red": "EMERGENCY", "off": "WARNING"}}}""",
-            "P3", """
+            "P4", """
                     {"name": "[시연] 압력계", "kind": "GAUGE", "enabled": true,
                      "params": {"minAngle": 225, "maxAngle": -45, "minValue": 0, "maxValue": 1, "unit": "MPa"},
                      "regions": {"INSPECTOR": [0.0, 0.0, 1.0, 0.37]},
@@ -408,17 +417,20 @@ public class DemoService {
             "AWAITING_APPROVAL", "투척 승인 대기", "LAUNCHING", "투척 중", "MONITORING", "투척함 · 현장 감시",
             "LAUNCHED", "투척함 · 확인 필요", "RESOLVED", "해결", "DISMISSED", "오탐으로 닫음", "FAILED", "대응 실패");
 
-    /** P1~P3 점검을 시작한다(실행한 관리자 이름으로). */
+    /** 시연 점검 지점: 소화기(P1) · 표시등(P3) · 계기판(P4). */
+    private static final List<String> DEMO_POINTS = List.of("P1", "P3", "P4");
+
+    /** 시연 지점 점검을 시작한다(실행한 관리자 이름으로). */
     private long inspect(Run r, long robotId, CurrentUser u, String note) {
         check(r);
         List<Long> ids = new ArrayList<>();
         for (var p : store.points(false)) {
-            if (List.of("P1", "P2", "P3").contains(String.valueOf(p.get("code")))) {
+            if (DEMO_POINTS.contains(String.valueOf(p.get("code")))) {
                 ids.add(((Number) p.get("point_id")).longValue());
             }
         }
         if (ids.isEmpty()) {
-            throw new Abort("점검 지점 P1~P3 가 없습니다");
+            throw new Abort("점검 지점 " + DEMO_POINTS + " 가 없습니다");
         }
         var d = tasks.create(u, robotId, ids, note, null);
         long id = ((Number) d.get("task_id")).longValue();

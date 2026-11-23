@@ -29,21 +29,24 @@ TERMINAL = ('COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED')
 # 로봇의 도착 방향 허용 오차(0.15rad)만큼 대상이 사진에서 좌우로 ±15% 쯤 움직이므로, 영역은 가로 전체로 두고
 # 세로로만 나눈다(표시등·계기판은 상자 위쪽에 있다). 그래서 소화기는 '있다/없다'만 가린다 — '옆으로 옮겨짐'은
 # 이 영역으로는 가릴 수 없다.
+# 지점: P1 = 소화기 사진 판(인식 모델 fire_v1), P3 = 비상구 표시등, P4 = 분전반 계기판.
+# P2(받침만 있는 사진 판, 늘 '없음')는 비교용이라 이 시나리오에 넣지 않는다.
 RULES = {
     'P1': [{
         'name': f'{TAG} 소화기 비치', 'kind': 'OBJECT',
-        'params': {'label': 'fire_extinguisher', 'expect': 'PRESENT', 'detector': 'color'},
-        'regions': {'INSPECTOR': [0.0, 0.0, 1.0, 0.80]},
+        'params': {'label': 'fire_extinguisher', 'expect': 'PRESENT', 'detector': 'model',
+                   'model': 'fire_v1', 'className': 'fire_extinguisher'},
+        'regions': {},
         'grading': {'type': 'map', 'default': 'UNKNOWN',
-                    'map': {'IN_REGION': 'NORMAL', 'OUT_OF_REGION': 'WARNING', 'MISSING': 'EMERGENCY'}},
+                    'map': {'IN_REGION': 'NORMAL', 'OUT_OF_REGION': 'WARNING', 'MISSING': 'WARNING'}},
     }],
-    'P2': [{
+    'P3': [{
         'name': f'{TAG} 상태 표시등', 'kind': 'LAMP', 'params': {},
         'regions': {'INSPECTOR': [0.0, 0.0, 1.0, 0.33]},
         'grading': {'type': 'map', 'default': 'UNKNOWN',
                     'map': {'green': 'NORMAL', 'yellow': 'WARNING', 'red': 'EMERGENCY', 'off': 'WARNING'}},
     }],
-    'P3': [{
+    'P4': [{
         'name': f'{TAG} 압력계', 'kind': 'GAUGE',
         'params': {'minAngle': 225, 'maxAngle': -45, 'minValue': 0, 'maxValue': 1, 'unit': 'MPa'},
         'regions': {'INSPECTOR': [0.0, 0.0, 1.0, 0.37]},
@@ -119,7 +122,7 @@ def scenario_rules(admin, user, rid, by):
     s, _ = user.post(f"/api/admin/points/{by['P1']}/rules", RULES['P1'][0])
     check(s == 403, '규칙 만들기는 관리자만')
     need = {code: len(rs) for code, rs in RULES.items()}
-    pts = [by['P1'], by['P2'], by['P3']]
+    pts = [by['P1'], by['P3'], by['P4']]
 
     print('[소방 관제] 2. 모두 정상인 상태로 점검')
     check(tool('target', 'reset')[0], '대상 원위치(계기판 0.8 · 표시등 초록 · 소화기 제자리)')
@@ -136,14 +139,14 @@ def scenario_rules(admin, user, rid, by):
     d = run_task(user, rid, pts, '소방 관제: 이상')
     g = grades(results_of(user, d, need))
     print('     등급:', g)
-    check(g['P1'][0][1] == 'EMERGENCY' and g['P1'][0][2] == 'MISSING', '소화기 없음 → 비상')
-    check(g['P2'][0][1] == 'EMERGENCY' and g['P2'][0][2] == 'red', '표시등 빨강 → 비상')
-    check(g['P3'][0][1] == 'WARNING' and abs(g['P3'][0][2] - 0.6) < 0.08, f"계기판 0.6 → 경고 (읽은 값 {g['P3'][0][2]})")
+    check(g['P1'][0][1] == 'WARNING' and g['P1'][0][2] == 'MISSING', '소화기 없음 → 경고')
+    check(g['P3'][0][1] == 'EMERGENCY' and g['P3'][0][2] == 'red', '표시등 빨강 → 비상')
+    check(g['P4'][0][1] == 'WARNING' and abs(g['P4'][0][2] - 0.6) < 0.08, f"계기판 0.6 → 경고 (읽은 값 {g['P4'][0][2]})")
     alerts = wait(lambda: (lambda a: a if len(a) == 3 else None)(open_rule_alerts(user, rule_ids)), 30, '규칙 경고 3건 열림')
-    check(sorted(a['grade'] for a in alerts) == ['EMERGENCY', 'EMERGENCY', 'WARNING'], '경고 등급: 비상 2 · 경고 1')
+    check(sorted(a['grade'] for a in alerts) == ['EMERGENCY', 'WARNING', 'WARNING'], '경고 등급: 비상 1 · 경고 2')
     s, ov = user.get('/api/dashboard/overview')
     rank = {p['code']: p.get('grade_rank') for p in ov['points']}
-    check(rank.get('P1') == 3 and rank.get('P2') == 3 and rank.get('P3') == 2, f'대시보드 지점 등급 {rank}')
+    check(rank.get('P1') == 2 and rank.get('P3') == 3 and rank.get('P4') == 2, f'대시보드 지점 등급 {rank}')
     check(any(a.get('alert_id') == alerts[0]['alert_id'] for a in ov['alerts']), '대시보드 경고 목록에 표시')
     warn = next(a for a in alerts if a['grade'] == 'WARNING')
     s, a = user.post(f"/api/alerts/{warn['alert_id']}/ack", {'comment': 'e2e 확인'})
@@ -285,7 +288,7 @@ def scenario_fire(sup, user, dash, rid, by, skip_preempt):
     if not skip_preempt:
         print('[소화액 투척] 4. 점검 중 가로채기')
         set_mode(sup, 'APPROVAL')
-        s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P1'], by['P2'], by['P3']], 'note': '가로채기 대상 점검'})
+        s, t = user.post('/api/inspections', {'robotId': rid, 'pointIds': [by['P1'], by['P3'], by['P4']], 'note': '가로채기 대상 점검'})
         check(s == 201, f"점검 작업 #{t['task_id']} 시작")
         wait(lambda: (lambda s, x: x['status'] == 'RUNNING')(*user.get(f"/api/inspections/{t['task_id']}")), 120, '점검 진행 중')
         base = last_incident_id(user)
@@ -345,7 +348,7 @@ def main():
     rid = robot['robotId']
     s, pts = wait(lambda: (lambda s, p: (s, p) if s == 200 else None)(*user.get('/api/points')), 60, '점검 지점 조회')
     by = {p['code']: p['point_id'] for p in pts}
-    check({'P1', 'P2', 'P3'} <= set(by), f"로봇 {robot['code']} 연결, 점검 지점 P1~P3")
+    check({'P1', 'P2', 'P3', 'P4'} <= set(by), f"로봇 {robot['code']} 연결, 점검 지점 P1~P4")
     try:
         if a.only in (None, 'rules'):
             scenario_rules(admin, user, rid, by)

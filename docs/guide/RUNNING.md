@@ -83,9 +83,10 @@ scripts/                   E2E 시험
 
 | 지점 | 위치 | 가는 길 |
 | --- | --- | --- |
-| P1 소화기 앞 | 생산동 서쪽 벽 | 사무실 → C1 → 생산동 문 |
-| P2 비상구 앞 | C2 복도 끝 | C1 → 꺾임 → 좁은 C2 (또는 생산동 동쪽 문으로 C2 중간 진입) |
-| P3 분전반 앞 | 전기실 서쪽 벽 | 사무실 북쪽 문(폭 1.0m) |
+| P1 소화기 앞 | 생산동 서쪽 벽(소화기 사진 판) | 사무실 → C1 → 생산동 문 |
+| P2 소화기 빈 자리 | 랙 1 남쪽 면(받침만 있는 사진 판, 비교용) | P1 바로 옆 |
+| P3 비상구 앞 | C2 복도 끝 | C1 → 꺾임 → 좁은 C2 (또는 생산동 동쪽 문으로 C2 중간 진입) |
+| P4 분전반 앞 | 전기실 서쪽 벽 | 사무실 북쪽 문(폭 1.0m) |
 
 실제 현장과 같은 순서로 지도를 만든다 (SLAM → 저장 → AMCL 위치 추정 + Nav2):
 
@@ -124,8 +125,8 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
 | 시험 | Regulated Pure Pursuit(이전) | MPPI |
 | --- | --- | --- |
 | 직선 3m | 60~77% / 16~20초 | 84~90% / 15~17초 |
-| 굽은 길 8m (C1 ↔ P2) | 50~52% / 48~49초 | 89~93% / 38~39초 |
-| 점검 지점 순회 (P1 → P3 → P2 → P1 → 충전 위치) | 재지 않음 | 69~95%, 모두 도착 (P3 가는 0.9m 문에서 69%) |
+| 굽은 길 8m (C1 ↔ P3) | 50~52% / 48~49초 | 89~93% / 38~39초 |
+| 점검 지점 순회 (P1 → P4 → P3 → P1 → 충전 위치) | 재지 않음 | 69~95%, 모두 도착 (P4 가는 0.9m 문에서 69%) |
 | 폭 0.7m 틈 | 36~41% / 20초 | 80~90% / 16~17초 |
 | 폭 0.6m 틈 | 36~38% / 21초 | **멈칫(51초) 또는 실패** |
 | 달리는 중 1.6m 앞에 놓인 팔레트(남는 폭 0.65m) | 28% / 23초 | 46% / 30초 |
@@ -149,9 +150,9 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
 - **한 번만 계획**: 행동 트리 `config/navigate_fixed_plan.xml`. 다시 계획하는 때는 목표가 바뀌었을 때, 경로가 막혔을 때,
   제어기 실패 · 복구 동작 뒤뿐이다(기본 트리는 1초마다 다시 계획해 주행 중 경로가 흔들렸다).
 - **계획 경로 측정**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/plan_probe.py'`
-  — 로봇을 움직이지 않고 충전 위치 · P1~P3 사이 경로의 길이 · 꺾임 · 벽 여유를 낸다.
+  — 로봇을 움직이지 않고 충전 위치 · P1~P4 사이 경로의 길이 · 꺾임 · 벽 여유를 낸다.
 - **지역 비용 지도 0.025m**: 폭 0.6m 틈(문 바로 아래 골목을 반쯤 막은 `aisle60`)에서 0.05m 일 때는 15~31초 멈칫하거나 실패했고,
-  0.025m 에서는 막지 않았을 때와 같은 시간에 지났다(P3 → P1 30~32초, P1 → P3 25~26초. 최근 12회 모두 틈으로 통과).
+  0.025m 에서는 막지 않았을 때와 같은 시간에 지났다(P4 → P1 30~32초, P1 → P4 25~26초. 최근 12회 모두 틈으로 통과).
 - **로봇 측 목표 브리지가 계획을 돕는 세 가지**(`ros/robot/src/nav2_goal_bridge.py`, 전역 비용 지도의 `virtual_layer`):
   - 장애물의 몸통 채우기 — 라이다는 새 장애물의 앞면만 선으로 본다. 보인 면 뒤 0.3m 를 막힌 것으로 찍는다(옆의 틈은 그대로).
   - 물러나 자세 잡기 — 같은 자리에서 제어기가 3번 실패하거나, 목표가 실패했는데 장애물이 0.4m 안에 있으면
@@ -162,7 +163,7 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
 - 한계: 로봇을 반지름 0.22m 원으로 본다. 틈이 0.5m 이하면 계획이 막힌 것으로 보고 돌아간다.
   두 번 막힌 자리 막기는 아직 작동한 적이 없다.
 - **반복 시험**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py --rounds 3'`
-  — 골목(P3 ↔ P1: 없음 · 폭 0.7 · 0.6 · 0.5m 틈 · 완전 막힘)과 생산동(P1 ↔ P2: 팔레트 · 문 막힘 · 진입 불가)을 장애물이
+  — 골목(P4 ↔ P1: 없음 · 폭 0.7 · 0.6 · 0.5m 틈 · 완전 막힘)과 생산동(P1 ↔ P3: 팔레트 · 문 막힘 · 진입 불가)을 장애물이
   서는 시점(출발 전 · 1.2m 앞 · 0.6m 앞)별로 달려, 맞는 결과(직행 · 우회 · 길 없음)인지와 정지 시간을 낸다(`--sets`, `--only`).
   한 회 42번 주행에 한 시간 남짓. 최근 연속 3회(126번)에서 틀린 결과 0, 물러나기는 뒤 2회(84번)에서 6번 작동했다.
 
@@ -182,16 +183,16 @@ Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값�
 - **주행**: 구역은 계획 맵(전역 비용 지도)과 제어 맵(지역 비용 지도)에 막힌 칸으로 들어간다. 달리는 도중에 가던 길 위에 설정하면
   1 ~ 2초 안에 다시 계획해 돌아간다. 길이 그 구역뿐이면 그 지점은 "진입 불가"로 끝난다.
 - **제한**: 한 변이 0.2m 이상이어야 하고, 로봇이 서 있는 자리(둘레 0.35m 포함)는 덮을 수 없다(덮으면 그 자리에서 계획이 거부돼 갇힌다).
-- **시험**: `python3 scripts/e2e_test.py --only-zones` — 권한(2 매니저는 403) · 미리 설정(P3 → P1 이 랙 위로 돌아감) · 로봇 위 설정 거부 ·
+- **시험**: `python3 scripts/e2e_test.py --only-zones` — 권한(2 매니저는 403) · 미리 설정(P4 → P1 이 랙 위로 돌아감) · 로봇 위 설정 거부 ·
   삭제 뒤 직행 · 달리는 도중 설정. 주행 내내 로봇 위치가 구역 안에 든 적이 없는지도 본다(34개 확인).
 
 ### 장애물 시험
 
 ```bash
-docker compose exec sim /sim/tools/obstacle.sh place pallet    # 생산동 가운데 팔레트(P1 → P2 경로 위): 옆으로 비켜 지나감
+docker compose exec sim /sim/tools/obstacle.sh place pallet    # 생산동 가운데 팔레트(P1 → P3 경로 위): 옆으로 비켜 지나감
 docker compose exec sim /sim/tools/obstacle.sh place door      # 생산동 → C2 문 막힘: C1 · C2 로 돌아감
-docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘: P2 진입 불가
-docker compose exec sim /sim/tools/obstacle.sh place aisle     # 전기실 문 바로 아래 골목 막힘(P3 ↔ P1 경로 위): 랙 1 위로 돌아 나옴
+docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘: P3 진입 불가
+docker compose exec sim /sim/tools/obstacle.sh place aisle     # 전기실 문 바로 아래 골목 막힘(P4 ↔ P1 경로 위): 랙 1 위로 돌아 나옴
 docker compose exec sim /sim/tools/obstacle.sh place aisle60   # 같은 자리를 반쯤 막아 폭 0.6m 틈만 남김(aisle50 은 0.5m)
 docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 복도 팔레트 / reroute: C2 아래쪽 막힘 (C1 · C2 를 따라갈 때만 경로 위)
 docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우기
@@ -202,12 +203,12 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 | | 구간 | 장애물 | 기대 |
 | --- | --- | --- | --- |
-| 9-1 | P1 → P2 | `pallet` | 제어기가 비켜 지나감 |
-| 9-2 | P1 → P2 | `door` | 다시 계획해 C1 · C2 로 돌아감 |
-| 9-3 | → P2, P3 | `block`(출발 전) | P2 진입 불가(`BLOCKED_NO_PATH`), P3 은 촬영 |
-| 9-4 | P3 → P1 | `aisle` | 다시 계획해 랙 위로 돌아 나옴 |
-| 9-5 | P3 → P1 | `aisle60` | 틈으로 지남 |
-| 9-6 | P1 → P3 | 9-5 의 장애물을 그대로 둠 | 틈으로 지남 |
+| 9-1 | P1 → P3 | `pallet` | 제어기가 비켜 지나감 |
+| 9-2 | P1 → P3 | `door` | 다시 계획해 C1 · C2 로 돌아감 |
+| 9-3 | → P3, P4 | `block`(출발 전) | P3 진입 불가(`BLOCKED_NO_PATH`), P4 은 촬영 |
+| 9-4 | P4 → P1 | `aisle` | 다시 계획해 랙 위로 돌아 나옴 |
+| 9-5 | P4 → P1 | `aisle60` | 틈으로 지남 |
+| 9-6 | P1 → P4 | 9-5 의 장애물을 그대로 둠 | 틈으로 지남 |
 
 
 장애물 처리는 로봇 측 Nav2 가 한다(일시 장애물 대기, 우회 경로 재계획, 복구 동작). Nav2 가 실패하면 목표 브리지(`ros/robot/src/nav2_goal_bridge.py`)가 현재 위치에서 경로를 다시 계산해 원인을 나눈다.
@@ -332,7 +333,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 | `fire-auto` 화재 · 자동 투척 | 자동 모드로 화재 → 도착 → 재판독 → 자동 투척 → 현장 감시 → 30초 뒤 열원을 없애 스스로 종료 |
 | `fire-false` 화재 · 오탐 | 열원이 없는 곳에 비상 감지 보고 → 가서 보고 쏘지 않고 닫음 |
 | `fire-preempt` 점검 중 화재 | 점검을 시작한 뒤 화재 → 점검을 멈추고 출동(승인은 화면에서) |
-| `rules-abnormal` 소방 관제 · 이상 | 소화기 치움 · 표시등 빨강 · 계기판 0.6 → 세 지점 점검 → 비상 2 · 경고 1 |
+| `rules-abnormal` 소방 관제 · 이상 | 소화기 치움 · 표시등 빨강 · 계기판 0.6 → 세 지점 점검 → 비상 1 · 경고 2 |
 | `rules-restore` 소방 관제 · 복구 | 대상 원위치 → 다시 점검 → 경고 자동 해제 |
 | `reset` 초기화 | 인쇄물 치움 · 대상 원위치 · 열린 사건 닫기 · 투척 모드를 사람 승인으로 |
 
@@ -348,9 +349,10 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
    | 지점 | 대상 | 판독기 | 기대 영역(사진 비율) | 등급 기준 예 |
    | --- | --- | --- | --- | --- |
-   | P1 | 소화기(빨간 상자) | OBJECT | 0, 0, 1, 0.8 | IN_REGION 정상 · MISSING 비상 |
-   | P2 | 표시등(초록 상자 위) | LAMP | 0, 0, 1, 0.33 | green 정상 · yellow 경고 · red 비상 |
-   | P3 | 계기판(노랑 상자 위) | GAUGE | 0, 0, 1, 0.37 | 0.7~0.98 정상 · 0.5~0.7 경고 · 그 밖 비상 |
+   | P1 | 소화기 사진 판(인식 모델 `fire_v1`) | OBJECT `detector: model` | 사진 전체 | IN_REGION 정상 · MISSING 경고 |
+   | P2 | 받침만 있는 사진 판(비교용) | OBJECT `detector: model` | 사진 전체 | 늘 MISSING → 경고 |
+   | P3 | 표시등(초록 상자 위) | LAMP | 0, 0, 1, 0.33 | green 정상 · yellow 경고 · red 비상 |
+   | P4 | 계기판(노랑 상자 위) | GAUGE | 0, 0, 1, 0.37 | 0.7~0.98 정상 · 0.5~0.7 경고 · 그 밖 비상 |
 
 2. 대상을 바꾼다: `docker compose exec sim /sim/tools/target.sh gauge 0.6` · `lamp red` · `extinguisher remove` (되돌리기 `reset`).
 3. user1 로 점검을 실행한다. 사진이 분석되면 관측 상세에 규칙별 등급이 나오고, 경고·비상이면 "경고" 메뉴와 대시보드에 뜬다.
