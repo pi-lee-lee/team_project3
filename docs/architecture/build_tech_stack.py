@@ -3,6 +3,7 @@
 읽는 법
 - 어두운 머리 영역: 구성도의 요청 경로(브라우저 → cdn → web → gateway → 서비스 → db)와 로봇 쪽 연결을 기술 이름으로 다시 적은 것.
 - 그 아래 흰 판 하나 = 구성도의 한 영역(색도 구성도와 같다). 왼쪽 = 영역 이름과 컨테이너, 오른쪽 카드 = 기술 하나(아이콘 · 이름 · 버전 · 하는 일).
+- 붉은 둥근 상자 = 핵심 스택(CORE): 구성도의 구조를 이루는 상위 기술. 나머지는 그 아래의 라이브러리 · 기능.
 - 아이콘: 공식 로고는 docs/_lib/icons/ 의 Simple Icons(CC0) SVG, 로고가 없는 것은 이 파일의 GLYPH(직접 그린 선 아이콘). 기술을 더하면 ICON 에도 한 줄 더한다.
 이 파일의 STACK 하나가 SVG 와 Markdown 두 문서의 원본이다. 버전의 원본은 각 항목에 적힌 파일(package.json · pom.xml ·
 requirements.txt · Dockerfile · compose.yaml)이므로, 그 파일을 바꾸면 STACK 도 고친 뒤 다시 생성한다.
@@ -119,6 +120,12 @@ STACK = [
         ('투척기 시리얼 브리지', 'rclpy', 'launcher_bridge.py (만들어만 둠)', '시뮬레이션에서는 `mock_launcher.py` 가 투척 계약에 답한다.'),
      ]),
 ]
+
+# 핵심 스택: 시스템 구성도의 구조를 이루는 상위 기술(컨테이너 · 서비스의 뼈대). 도면에서 붉은 둥근 상자로 두른다.
+# 라이브러리 · 기능 같은 하위 기술(Pillow · psycopg · Docker 볼륨 등)은 넣지 않는다.
+CORE = {'React', 'TypeScript', 'Vite', 'nginx', 'Spring Cloud Gateway', 'Java', 'Spring Boot', 'Python', 'FastAPI',
+        'PostgreSQL', 'ROS 2', 'Gazebo Classic', 'Nav2', 'rosbridge_server', 'Docker Compose'}
+RED = '#ff3b30'
 
 # 구성도의 요청 경로를 기술 이름으로: (컨테이너, 기술, 아이콘)
 PATH_WEB = [('브라우저', 'React 18 · TypeScript', 'react'), ('cdn', 'nginx 캐시', 'nginx'), ('web', 'nginx 원본', 'nginx'),
@@ -247,12 +254,15 @@ def hero(n):
     S.raw(f'<rect x="{PAD}" y="28" width="{W - 2 * PAD}" height="{h}" rx="24" fill="url(#hero)"/>')
     S.raw(f'<text x="{PAD + 32}" y="70" font-size="12" font-weight="700" fill="#a5a3ff" letter-spacing="2.4">TECH STACK</text>')
     S.text(PAD + 32, 108, '화재 점검 로봇 서비스 — 기술 스택', 30, 700, '#ffffff')
-    S.text(PAD + 32, 136, '시스템 구성도의 영역마다 무슨 기술을 쓰는가 · 영역의 순서와 색은 구성도(system_architecture.svg)와 같다', 13.5, 400, '#c7c7cc')
+    S.text(PAD + 32, 136, '시스템 구성도의 영역마다 무슨 기술을 쓰는가 · 붉은 상자 = 구성도의 구조를 이루는 핵심 스택 · 나머지 = 그 아래의 라이브러리 · 기능', 13.5, 400, '#c7c7cc')
     x = W - PAD - 32
-    for num, unit in reversed([(str(n), '기술'), (str(len(STACK)), '영역'), ('11', '컨테이너'), ('4', '네트워크')]):
+    for num, unit in reversed([(str(len(CORE)), '핵심 스택'), (str(n), '기술'), (str(len(STACK)), '영역'), ('11', '컨테이너'), ('4', '네트워크')]):
         w = 104
-        S.raw(f'<rect x="{x - w}" y="54" width="{w}" height="78" rx="14" fill="#ffffff" fill-opacity="0.07" '
-              f'stroke="#ffffff" stroke-opacity="0.16"/>')
+        if unit == '핵심 스택':
+            S.raw(f'<rect x="{x - w}" y="54" width="{w}" height="78" rx="14" fill="{RED}" fill-opacity="0.16" stroke="{RED}" stroke-width="2.4"/>')
+        else:
+            S.raw(f'<rect x="{x - w}" y="54" width="{w}" height="78" rx="14" fill="#ffffff" fill-opacity="0.07" '
+                  f'stroke="#ffffff" stroke-opacity="0.16"/>')
         S.text(x - w / 2, 98, num, 30, 700, '#ffffff', 'middle')
         S.text(x - w / 2, 120, unit, 11.5, 500, '#aeaeb2', 'middle')
         x -= w + 10
@@ -302,7 +312,10 @@ def band(y, no, title, kind, containers, notes, items):
                 print(f'  너무 김({what}): {label} — {used:.0f} > {TEXT_W:.0f}')
         key = ICON[name]
         col = LOGO.get(key, ink)
-        S.rect(x, cy, CARD_W, CARD_H, fill='#fbfbfd', stroke='#e5e5ea', sw=1, rx=13, dash='4 3' if planned else None)
+        if name in CORE:                 # 핵심 스택 = 붉은 둥근 상자
+            S.rect(x, cy, CARD_W, CARD_H, fill='#fff7f6', stroke=RED, sw=2.8, rx=13)
+        else:
+            S.rect(x, cy, CARD_W, CARD_H, fill='#fbfbfd', stroke='#e5e5ea', sw=1, rx=13, dash='4 3' if planned else None)
         S.raw(f'<rect x="{x + 11:.1f}" y="{cy + 11}" width="44" height="44" rx="11" fill="{col}" fill-opacity="0.12"/>')
         icon(x + 21, cy + 21, 24, key, col)
         S.text(x + 66, cy + 28, name, 13.5, 700, '#1c1c1e')
@@ -318,6 +331,11 @@ def build_svg():
     y = hero(n) + 20
     for no, (title, kind, containers, notes, _, _, items) in enumerate(STACK, 1):
         y = band(y, no, title, kind, containers, notes, items) + 16
+    S.rect(PAD + 4, y, 30, 20, fill='#fff7f6', stroke=RED, sw=2.4, rx=6)
+    S.text(PAD + 42, y + 14.5, '핵심 스택 — 구성도의 구조를 이루는 상위 기술', 12, 700, '#1c1c1e')
+    S.rect(PAD + 330, y, 30, 20, fill='#fbfbfd', stroke='#d1d1d6', sw=1, rx=6)
+    S.text(PAD + 368, y + 14.5, '하위 스택 — 라이브러리 · 기능', 12, 500, '#636366')
+    y += 30
     S.text(PAD + 4, y + 14, '버전의 원본: package.json(화면) · pom.xml(Spring) · requirements.txt(Python) · Dockerfile · compose.yaml(이미지)   |   '
                             '글 설명과 "왜 쓰는가": TECH_STACK.md   |   로고: Simple Icons(CC0), 상표는 각 소유자의 것 · 선 아이콘은 직접 그림', 11.5, 500, '#8e8e93')
     S.body.insert(defs_idx, defs())
@@ -334,19 +352,20 @@ def build_md():
            '> (`python3 docs/architecture/build_tech_stack.py`). 그림은 [tech_stack.svg](tech_stack.svg).', '',
            '[시스템 구성도](system_architecture.svg)의 영역마다 **무슨 기술을, 어디에, 왜** 쓰는지 적는다.',
            '영역 순서는 구성도에서 요청이 지나는 순서와 같다.', '',
+           f'**핵심 스택**(그림의 붉은 상자, 표의 🟥)은 구성도의 구조를 이루는 상위 기술 {len(CORE)}개다. 나머지는 그 아래에서 쓰는 라이브러리 · 기능이다.', '',
            '![기술 스택](tech_stack.svg)', '',
            '## 한눈에', '',
            '요청이 지나는 길: ' + ' → '.join(f'`{n}`({t})' for n, t, _ in PATH_WEB), '',
            '로봇 쪽 연결: ' + ' ⇄ '.join(f'`{n}`({t})' for n, t, _ in PATH_ROBOT), '',
-           '| 영역 | 컨테이너 | 핵심 기술 |', '| --- | --- | --- |']
+           '| 영역 | 컨테이너 | 핵심 스택 |', '| --- | --- | --- |']
     for title, _, containers, _, _, _, items in STACK:
-        core = ' · '.join(f'{name} {ver}' if ver[0].isdigit() else name for name, ver, _, _ in items[:4])
+        core = ' · '.join(f'**{name}** {ver}' if ver[0].isdigit() else f'**{name}**' for name, ver, _, _ in items if name in CORE) or '—'
         out.append(f'| [{title}](#{title.replace(" · ", "--").replace(" ", "-")}) | {containers} | {core} |')
     for title, _, containers, _, source, intro, items in STACK:
         out += ['', f'## {title}', '', intro, '',
                 f'- 컨테이너: {containers}', f'- 버전의 원본: `{source}`', '',
                 '| 기술 | 버전 | 하는 일 | 왜 쓰는가 |', '| --- | --- | --- | --- |']
-        out += [f'| **{name}** | {ver} | {cell(role)} | {cell(why)} |' for name, ver, role, why in items]
+        out += [f'| {"🟥 " if name in CORE else ""}**{name}** | {ver} | {cell(role)} | {cell(why)} |' for name, ver, role, why in items]
     out += ['', '## 일부러 쓰지 않는 것', '',
             '| 쓰지 않는 것 | 대신 | 이유 |', '| --- | --- | --- |',
             '| JPA · ORM | Spring JDBC(`JdbcClient`) + Flyway | 표가 단순하고 SQL 을 그대로 써야 하는 곳(작업 큐)이 있다 |',
