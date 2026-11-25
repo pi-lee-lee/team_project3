@@ -7,8 +7,8 @@
 - 3절: docker compose up 뒤의 시작 순서. 가로가 시간이다. 빌드용 컨테이너가 '성공해서 끝난 뒤에만' 뒤 컨테이너가 시작한다.
 - 4절: 두 컨테이너가 각각 무엇을 읽어 무엇을 만들고, 그 결과를 누가 쓰는가(위에서 아래로).
 - 5절: 코드를 고친 뒤 무엇을 다시 돌리는가. 6절: 이미지 빌드와의 차이.
-글 설명은 docs/guide/BUILD_CONTAINERS.md, 값의 원본은 compose.yaml 이다. compose 를 바꾸면 이 스크립트도 고친 뒤 다시 생성한다.
-실행: python3 docs/architecture/build_build_containers.py  →  docs/architecture/build_containers.svg
+글 설명은 docs/guide/guide_03_BUILD_CONTAINERS.md, 값의 원본은 compose.yaml 이다. compose 를 바꾸면 이 스크립트도 고친 뒤 다시 생성한다.
+실행: python3 docs/guide/build_build_containers.py  →  docs/guide/guide_04_build_containers.svg
 """
 import sys
 from pathlib import Path
@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
-OUT = Path(__file__).resolve().parent / 'build_containers.svg'
+OUT = Path(__file__).resolve().parent / 'guide_04_build_containers.svg'
 W = 1640
 S = Svg(W, 1800)
 GREEN, VIOLET, ORANGE, RED, GRAY = C['spring'][0], C['edge'][0], C['py'][0], '#d70015', '#636366'
@@ -300,7 +300,7 @@ def confuse(y):
                            '공유 라이브러리나 화면 코드를 고칠 때마다 다시 한다.'], gap=23)
     y += 148
     S.text(40, y + 6, '실제 배포에서는 CI 가 jar · dist 를 미리 만들어 이미지에 넣는다(방법 B). 그때는 이 두 컨테이너의 일이 CI 단계로 옮겨 간다. '
-                      '글 설명과 문제 해결은 docs/guide/BUILD_CONTAINERS.md', 12.5, 500, GRAY)
+                      '글 설명과 문제 해결은 docs/guide/guide_03_BUILD_CONTAINERS.md', 12.5, 500, GRAY)
     return y + 24
 
 

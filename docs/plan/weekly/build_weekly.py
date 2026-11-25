@@ -1,13 +1,13 @@
 """주차별 진행 도면: 시스템 구성도와 같은 노드 그래프 위에 '이번 주에 하는 일'과 '다음 주에 할 일'을 표시한다.
 
 읽는 법
-- 노드 하나 = 구성 요소 하나(컨테이너 · 서비스 · 로봇 노드 · 장치). 배치는 architecture/system_architecture.svg 와 같다:
+- 노드 하나 = 구성 요소 하나(컨테이너 · 서비스 · 로봇 노드 · 장치). 배치는 architecture/arch_01_system_architecture.svg 와 같다:
   가운데 세로 = 요청이 지나는 길(화면 → nginx → gateway → 서비스), 오른쪽 = 로봇 시스템(터틀봇 · 젯봇).
 - 노드 색 = 맡은 파트(A 웹 · B 카메라 · C 터틀봇 · D 젯봇 · E 투척기 · 시험).
 - 색을 채운 굵은 테두리 = 이번 주에 손대는 노드. 점선 테두리 = 이번 주는 쉬고 다음 주에 시작(재개)하는 노드.
   회색 = 끝났거나 아직 차례가 아닌 노드.
-- 아래 표는 파트별 이번 주 · 다음 주 한 줄 요약이다. docs/plan/SCHEDULE.md 의 '주차별 한눈에 보기' 표를 그대로 읽어 온다.
-노드별 할 일(NODES)은 SCHEDULE.md 4장을 구성 요소별로 나눠 적은 것이다. 계획서를 바꾸면 NODES 도 고친 뒤 다시 생성한다.
+- 아래 표는 파트별 이번 주 · 다음 주 한 줄 요약이다. docs/plan/plan_02_SCHEDULE.md 의 '주차별 한눈에 보기' 표를 그대로 읽어 온다.
+노드별 할 일(NODES)은 plan_02_SCHEDULE.md 4장을 구성 요소별로 나눠 적은 것이다. 계획서를 바꾸면 NODES 도 고친 뒤 다시 생성한다.
 실행: python3 docs/plan/weekly/build_weekly.py  →  docs/plan/weekly/week_1.svg ~ week_9.svg
 """
 import re
@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / '_lib'))   # 공용
 from svg import C, Svg, text_width
 
 HERE = Path(__file__).resolve().parent
-SCHEDULE = HERE.parent / 'SCHEDULE.md'
+SCHEDULE = HERE.parent / 'plan_02_SCHEDULE.md'
 W = 1820
 NW, NH = 320, 92               # 노드 크기
 
@@ -29,7 +29,7 @@ PART = {   # 파트: (이름, 색 종류)
 WEEKS = ['11-23 ~ 11-27', '11-30 ~ 12-04', '12-07 ~ 12-11', '12-14 ~ 12-18', '12-21 ~ 12-24',
          '12-28 ~ 12-31', '01-04 ~ 01-08', '01-11 ~ 01-15', '01-18 ~ 01-22']
 GOALS = {2: '뼈대 · 계약 확정', 4: '기본 점검(시뮬)', 6: '두 시나리오(시뮬)', 8: '실물 연결', 9: '통합 테스트'}
-GOAL_TEXT = {   # 단계 목표(SCHEDULE.md 3장)
+GOAL_TEXT = {   # 단계 목표(plan_02_SCHEDULE.md 3장)
     2: '스택이 한 번에 뜨고, 로그인이 되고, 시뮬레이션 로봇이 웹 명령으로 한 지점에 간다. 토픽 계약 · API 확정',
     4: '점검 요청 → 이동 → 촬영 → 품질 분석 → 판정이 시뮬레이션에서 끝까지 된다',
     6: '소방 관제 · 소화액 투척 두 시나리오가 시뮬레이션에서 된다. 대시보드와 팝업',
@@ -114,13 +114,13 @@ EDGES = [('ui', 'nginx', ''), ('nginx', 'gateway', ''), ('gateway', 'insp', ''),
 
 
 def overview():
-    """SCHEDULE.md '주차별 한눈에 보기' 표 → {주차: [A, B, C, D, E 칸]}"""
+    """plan_02_SCHEDULE.md '주차별 한눈에 보기' 표 → {주차: [A, B, C, D, E 칸]}"""
     out = {}
     for ln in SCHEDULE.read_text(encoding='utf-8').splitlines():
         cells = [c.strip().replace('**', '') for c in ln.strip().strip('|').split('|')]
         if len(cells) == 7 and cells[0].isdigit():
             out[int(cells[0])] = cells[2:]
-    assert sorted(out) == list(range(1, 10)), 'SCHEDULE.md 의 주차별 표를 읽지 못했다'
+    assert sorted(out) == list(range(1, 10)), 'plan_02_SCHEDULE.md 의 주차별 표를 읽지 못했다'
     return out
 
 
@@ -256,7 +256,7 @@ def group(S, x, y, w, h, title, sub):
 def table(S, y, wk, ov):
     S.text(40, y, f'파트별 요약 — {wk}주차(금주)와 {wk + 1}주차(차주)' if wk < 9 else '파트별 요약 — 9주차(금주, 마지막 주)',
            17, 700)
-    S.text(40, y + 22, 'docs/plan/SCHEDULE.md 의 "주차별 한눈에 보기" 표에서 읽어 온 한 줄 요약이다.', 12, 400, '#636366')
+    S.text(40, y + 22, 'docs/plan/plan_02_SCHEDULE.md 의 "주차별 한눈에 보기" 표에서 읽어 온 한 줄 요약이다.', 12, 400, '#636366')
     y += 38
     lw, cw = 190, (W - 80 - 190) / 2
     S.rect(40, y, W - 80, 34, fill='#1c1c1e', stroke='#1c1c1e', rx=10)

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 사건(화재 대응)의 흐름을 끌고 간다. 상태 흐름은 docs/design/INTERFACES.md 7장 F1.
+ * 사건(화재 대응)의 흐름을 끌고 간다. 상태 흐름은 docs/design/design_02_INTERFACES.md 7장 F1.
  *
  *   DETECTED → DISPATCHED → ARRIVED → (재판독) → AWAITING_APPROVAL → LAUNCHING → (투척 후 판독) → RESOLVED
  *                                                                                └ 열원이 남음 → MONITORING(현장 감시) ┘

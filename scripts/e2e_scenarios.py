@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """시나리오 전 구간 시험: 소방 관제(규칙 → 등급 → 경고)와 소화액 투척(감지 → 출동 → 재판독 → 투척)을
-compose 로 띄운 실제 스택과 시뮬레이션에 대고 확인한다. 설계는 docs/design/SCENARIOS.md · INTERFACES.md.
+compose 로 띄운 실제 스택과 시뮬레이션에 대고 확인한다. 설계는 docs/design/design_01_SCENARIOS.md · design_02_INTERFACES.md.
 
 실행(저장소 루트, 스택이 떠 있고 Nav2 가 준비된 상태에서):
     python3 scripts/e2e_scenarios.py              # 전부 (로봇이 실제로 주행하므로 20~40분)

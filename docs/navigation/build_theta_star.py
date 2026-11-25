@@ -3,7 +3,7 @@
 값은 ros/sim/src/config/nav2_params.yaml(planner_server · global_costmap)에서 읽어 쓴다.
 경로 그림은 theta_sim.py 가 Nav2 의 식 그대로 계산한 것이다(Nav2 실행 기록이 아니다). 건물 그림은 world_spec.py 의 설계도에서
 계산했고, 그 위의 점은 실제 Nav2 가 낸 경로다(plan_probe.py --dump → build_drive_controller.PATHS).
-실행: python3 docs/navigation/build_theta_star.py  →  docs/navigation/theta_star.svg
+실행: python3 docs/navigation/build_theta_star.py  →  docs/navigation/nav_03_theta_star.svg
 """
 import math
 from pathlib import Path
@@ -15,7 +15,7 @@ from build_drive_controller import BLUE, GRAY, INK, ORANGE, PURPLE, RED, SUB, W
 from nav2cfg import num
 from svg import C, Svg
 
-OUT = Path(__file__).resolve().parent / 'theta_star.svg'
+OUT = Path(__file__).resolve().parent / 'nav_03_theta_star.svg'
 S = Svg(1640, 4000)
 D.S = S
 
@@ -534,11 +534,11 @@ def settings(y):
         '· 로봇이 어느 쪽을 보는지, 얼마나 빨리 도는지는 모른다. 경로는 꺾은선이고',
         '  모퉁이는 각이 져 있다 → 제어기(MPPI)가 그 둘레를 둥글게 돌아 준다.',
         '· 로봇을 원으로만 본다. 폭 0.5m 이하 틈은 막힌 것으로, 0.6m 틈은 지날 수',
-        '  있는 것으로 본다(실제로 지나는지는 제어기 몫 — mppi.svg 5번).',
+        '  있는 것으로 본다(실제로 지나는지는 제어기 몫 — nav_04_mppi.svg 5번).',
         '· 라이다가 못 본 것은 모른다. 새 장애물의 뒤쪽은 목표 브리지가 가상',
-        '  장애물로 채워 준다(drive_controller.svg 3번).',
+        '  장애물로 채워 준다(nav_02_drive_controller.svg 3번).',
         '· 꺾이는 점이 칸 중심이라 수학적 최단과 몇 cm 다를 수 있다.',
-        '이어서 볼 그림: mppi.svg(이 경로를 어떻게 따라가나) · drive_layers.svg(계획이 보는 지도).',
+        '이어서 볼 그림: nav_04_mppi.svg(경로를 따라가는 법) · nav_01_drive_layers.svg(계획이 보는 지도).',
     ], 12, INK, 19.5)
 
 

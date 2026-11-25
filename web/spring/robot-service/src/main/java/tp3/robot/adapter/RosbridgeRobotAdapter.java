@@ -113,7 +113,7 @@ public class RosbridgeRobotAdapter implements RobotAdapter, WebSocket.Listener {
         defaults.put("map", "/inspection/map");       // 로봇 측 브리지가 /map 을 주기적으로 다시 발행
         defaults.put("plan", "/plan");
         defaults.put("mapPose", "/inspection/map_pose");
-        defaults.put("actuator", "/inspection/actuator");             // 투척 명령(INTERFACES.md 2.2)
+        defaults.put("actuator", "/inspection/actuator");             // 투척 명령(design_02_INTERFACES.md 2.2)
         defaults.put("actuatorStatus", "/inspection/actuator_status");
         defaults.put("actuatorState", "/inspection/actuator_state");
         defaults.put("keepout", "/inspection/keepout");               // 금지구역 목록(목표 브리지가 비용 지도에 넣는다)

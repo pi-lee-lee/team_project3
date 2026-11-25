@@ -269,7 +269,7 @@ export interface SystemStatus {
   robots: { code: string; enabled: boolean; connected: boolean; ageMs: Record<string, number | null>; outboxPending: number }[];
 }
 
-// ------------------------------------------------------------------ 시나리오: 규칙 · 경고 · 사건 · 설정 (docs/design/INTERFACES.md)
+// ------------------------------------------------------------------ 시나리오: 규칙 · 경고 · 사건 · 설정 (docs/design/design_02_INTERFACES.md)
 export type Grade = 'NORMAL' | 'WARNING' | 'EMERGENCY' | 'UNKNOWN';
 export type LaunchMode = 'APPROVAL' | 'AUTO';
 

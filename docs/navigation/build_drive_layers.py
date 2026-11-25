@@ -5,7 +5,7 @@
 
 값은 ros/sim/src/config/nav2_params.yaml(global_costmap · local_costmap), ros/maps/site.yaml(0.05m, 183×160칸),
 ros/robot/src/nav2_goal_bridge.py(가상 장애물)에서 가져왔다. 평면도는 world_spec.py 그대로다.
-실행: python3 docs/navigation/build_drive_layers.py  →  docs/navigation/drive_layers.svg
+실행: python3 docs/navigation/build_drive_layers.py  →  docs/navigation/nav_01_drive_layers.svg
 """
 from pathlib import Path
 
@@ -13,7 +13,7 @@ import build_drive_controller as D        # docs/_lib 를 경로에 넣는다
 from svg import C, Svg   # noqa: E402
 from build_drive_controller import BLUE, GRAY, INK, ORANGE, PURPLE, RED, SUB, W
 
-OUT = Path(__file__).resolve().parent / 'drive_layers.svg'
+OUT = Path(__file__).resolve().parent / 'nav_01_drive_layers.svg'
 S = Svg(1640, 2000)
 D.S = S                      # 공용 그리기 함수(card · para · poly · robot · world_map)가 이 도면에 그리게 한다
 
@@ -353,7 +353,7 @@ def compare(y):
             S.text(x0 + cx, ry, s, 12.5, 700 if cx == 0 else 400, INK)
         S.raw(f'<line x1="{x0 - 8}" y1="{ry + 9}" x2="{S.w - 36}" y2="{ry + 9}" stroke="#e5e5ea"/>')
     S.text(x0, hy + 30 + len(rows) * 27 + 12,
-           '웹 화면의 지도(MapRenderer)는 1겹을 보기 좋게 다시 그린 그림이다. 주행에 쓰는 세 겹에는 영향이 없다. 제어기 동작 · 막혔을 때의 순서는 drive_controller.svg 를 본다.',
+           '웹 화면의 지도(MapRenderer)는 1겹을 보기 좋게 다시 그린 그림이다. 주행에 쓰는 세 겹에는 영향이 없다. 제어기 동작 · 막혔을 때의 순서는 nav_02_drive_controller.svg 를 본다.',
            12, 400, SUB)
 
 

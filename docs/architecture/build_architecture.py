@@ -8,7 +8,7 @@
 - 오른쪽: sim 컨테이너(로봇 시스템). robot-service 의 RosbridgeRobotAdapter 가
   WebSocket 으로 rosbridge(:9090)에, HttpClient 로 web_video_server(:8080)에 옆으로 붙는다.
 - 컨테이너 이름 옆 색 표시는 Docker 네트워크(front · edge · backend · robot)다.
-실행: python3 docs/architecture/build_architecture.py  →  docs/architecture/system_architecture.svg
+실행: python3 docs/architecture/build_architecture.py  →  docs/architecture/arch_01_system_architecture.svg
 """
 import sys
 from pathlib import Path
@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, NET, Svg, text_width
 
-OUT = Path(__file__).resolve().parent / 'system_architecture.svg'
+OUT = Path(__file__).resolve().parent / 'arch_01_system_architecture.svg'
 S = Svg(1820, 1600)            # 높이는 마지막에 내용에 맞춘다
 
 CX0, CX1 = 400, 1220           # 가운데 컨테이너 상자 x 범위

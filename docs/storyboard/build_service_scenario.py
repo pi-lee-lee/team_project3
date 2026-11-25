@@ -4,7 +4,7 @@
   관리자가 확인할 지점을 요청 → 로봇이 방문해 사진과 기록을 가져옴 → 담당자가 확인 결과·추가 점검 필요를 남김
   → 모의 이상 신고가 들어오면 해당 지점을 다시 확인.
 배경(장소)은 아직 정하지 않았으므로 '가상 시설'의 예시이고, 지점·좌표는 시뮬레이션 월드와 같다.
-실행: python3 build_service_scenario.py  →  docs/storyboard/web_service_scenario.svg
+실행: python3 build_service_scenario.py  →  docs/storyboard/story_01_web_service_scenario.svg
 """
 from pathlib import Path
 
@@ -16,7 +16,7 @@ import build_storyboard as sb
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'ros' / 'sim' / 'src' / 'worlds'))
 import world_spec as W_  # noqa: E402
 
-OUT = Path(__file__).resolve().parent / 'web_service_scenario.svg'
+OUT = Path(__file__).resolve().parent / 'story_01_web_service_scenario.svg'
 W = 1840
 CARD_W, CARD_H = 580, 372
 VIS_SCALE = 0.5

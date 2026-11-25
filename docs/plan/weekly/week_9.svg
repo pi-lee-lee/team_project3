@@ -310,7 +310,7 @@
 <text x="124.0" y="1160.0" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="start">이번 주 금요일</text>
 <text x="220.0" y="1160.0" font-size="12" font-weight="500" fill="#ffffff" text-anchor="start">두 시나리오가 실물로 처음부터 끝까지 연속 3회 끝난다</text>
 <text x="40.0" y="1244.0" font-size="17" font-weight="700" fill="#1c1c1e" text-anchor="start">파트별 요약 — 9주차(금주, 마지막 주)</text>
-<text x="40.0" y="1266.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">docs/plan/SCHEDULE.md 의 "주차별 한눈에 보기" 표에서 읽어 온 한 줄 요약이다.</text>
+<text x="40.0" y="1266.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">docs/plan/plan_02_SCHEDULE.md 의 "주차별 한눈에 보기" 표에서 읽어 온 한 줄 요약이다.</text>
 <rect x="40.0" y="1282.0" width="1740.0" height="34.0" rx="10" fill="#1c1c1e" stroke="#1c1c1e" stroke-width="1.0"/>
 <text x="56.0" y="1304.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">파트</text>
 <text x="246.0" y="1304.0" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start">금주 · 9주차 (01-18 ~ 01-22)</text>

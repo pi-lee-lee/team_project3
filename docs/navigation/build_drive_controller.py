@@ -4,10 +4,10 @@
   ros/sim/src/config/nav2_params.yaml(계획기 · 제어기 · 비용 지도), navigate_fixed_plan.xml(행동 트리),
   ros/robot/src/nav2_goal_bridge.py(STUCK_* · ESCAPE_* · SHADOW_* · MAX_RETRIES · NO_PROGRESS_SEC),
   ros/sim/src/worlds/world_spec.py(벽 · 설비 · 점검 지점 · 시험 장애물 — 평면도는 여기서 그대로 그린다),
-  금지구역(관리자가 그리는 구역)이 어느 층에서 동작하는지는 drive_layers.svg 3절에 있다.
+  금지구역(관리자가 그리는 구역)이 어느 층에서 동작하는지는 nav_01_drive_layers.svg 3절에 있다.
   plan_probe.py --dump(계획 경로 좌표: PATHS), nav_soak.py(장애물별 결과 · 시간).
 돌아가는 길(DETOURS)은 지나는 통로만 맞춘 개략선이다(실제 좌표가 아니다).
-실행: python3 docs/navigation/build_drive_controller.py  →  docs/navigation/drive_controller.svg
+실행: python3 docs/navigation/build_drive_controller.py  →  docs/navigation/nav_02_drive_controller.svg
 """
 import sys
 from pathlib import Path
@@ -19,7 +19,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / 'ros/sim/src/worlds'))
 import world_spec as W   # noqa: E402
 
-OUT = HERE / 'drive_controller.svg'
+OUT = HERE / 'nav_02_drive_controller.svg'
 S = Svg(1640, 2590)
 
 BLUE, ORANGE, RED, PURPLE, GRAY, INK, SUB = '#007aff', '#ff9500', '#e5352b', '#8944ab', '#8e8e93', '#1c1c1e', '#636366'
@@ -142,7 +142,7 @@ def flow(y):
     S.line([(xs[1] + bw / 2, by + 95), (xs[1] + bw / 2, cy + 43), (xs[3] - 64, cy + 43)], color=C['bridge'][0], sw=1.8)
     label((xs[1] + bw / 2 + xs[3] - 64) / 2 + 30, cy + 35, '/inspection/virtual_map  (가상 장애물: 몸통 채우기 · 막힌 자리 · 금지구역)', C['bridge'][0], 10.5, 'middle', 600)
     S.line([(xs[5] + bw / 2, cy + 5), (xs[5] + bw / 2, by + 95)], color=GRAY, sw=1.6, start=True, end=False)
-    para(44, cy + 44, ['점선 = 결과가 되돌아오는 길', '사유 코드: BLOCKED_NO_PATH · NAV_FAILED', '· NO_PROGRESS · NAV_UNAVAILABLE', '금지구역이 들어가는 층은 drive_layers.svg 3절'], 11, SUB, 16)
+    para(44, cy + 44, ['점선 = 결과가 되돌아오는 길', '사유 코드: BLOCKED_NO_PATH · NAV_FAILED', '· NO_PROGRESS · NAV_UNAVAILABLE', '금지구역이 들어가는 층은 nav_01_drive_layers.svg 3절'], 11, SUB, 16)
 
 
 # ------------------------------------------------------------------ 2. 지도

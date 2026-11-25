@@ -1,9 +1,11 @@
 # Docker 구동 가이드
 
+> **읽는 순서 — 실행 안내:** **01 설치 · 실행 · 문제 해결** → [02 구성 · 사용법 · 시나리오](guide_02_RUNNING.md) → [03 빌드용 컨테이너](guide_03_BUILD_CONTAINERS.md) → [04 빌드용 컨테이너 그림](guide_04_build_containers.svg)
+
 화재 점검 로봇 서비스(웹·백엔드·DB·TurtleBot3 시뮬레이션)를 Docker Compose 로 띄우는 방법이다.
 명령은 **macOS·Linux(터미널)** 와 **Windows(PowerShell)** 를 함께 적었다. 둘이 같으면 한 번만 적었다.
 
-- 구성·코드 구조·시나리오 설명: [RUNNING.md](RUNNING.md)
+- 구성·코드 구조·시나리오 설명: [guide_02_RUNNING.md](guide_02_RUNNING.md)
 - 접속 주소: http://localhost:8080
 
 ---

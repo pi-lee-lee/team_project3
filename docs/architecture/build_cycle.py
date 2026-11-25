@@ -4,7 +4,7 @@
   SessionChecker 10초 캐시 · OutboxSender 1초 · AnalysisTrigger 5초(60초 재요청) · TeleopHandler 100ms/0.5초 ·
   cmd_vel_watchdog 0.5초 · 제어권 2분 · 출발 전 검사(odom 2초 · 카메라 5초 · Nav2 · 위치 추정) · 도착 후 1.5초 촬영(3회) ·
   bridge map 5초 · map_pose 5Hz · 지도 화면 0.2초 · cdn 보관 기간(web/nginx/web/default.conf 의 Cache-Control, cdn/default.conf).
-실행: python3 docs/architecture/build_cycle.py  →  docs/architecture/system_cycle.svg
+실행: python3 docs/architecture/build_cycle.py  →  docs/architecture/arch_04_system_cycle.svg
 """
 import sys
 from pathlib import Path
@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
-OUT = Path(__file__).resolve().parent / 'system_cycle.svg'
+OUT = Path(__file__).resolve().parent / 'arch_04_system_cycle.svg'
 
 LANES = [  # 키, 이름, 설명, 색
     ('b', '브라우저', 'React SPA', 'client'),

@@ -7,7 +7,7 @@
   pages/user/Monitor.tsx(상태 1초 · mapview 0.2초 · 지도 정보 10초 · 조종 100ms)
   web/nginx/web/default.conf(try_files · Cache-Control) · cdn/default.conf(보관·통과 경로)
 파일 크기는 dist/assets 의 현재 빌드 기준(해시와 크기는 빌드마다 달라진다).
-실행: python3 docs/architecture/build_spa_cycle.py  →  docs/architecture/spa_cycle.svg
+실행: python3 docs/architecture/build_spa_cycle.py  →  docs/architecture/arch_05_spa_cycle.svg
 """
 import sys
 from pathlib import Path
@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용 그리기 도구 docs/_lib/svg.py
 from svg import C, Svg, text_width
 
-OUT = Path(__file__).resolve().parent / 'spa_cycle.svg'
+OUT = Path(__file__).resolve().parent / 'arch_05_spa_cycle.svg'
 
 LANES = [  # 키, 이름, 설명, 색
     ('u', '사용자', '주소 입력 · 클릭 · 키 입력', 'dev'),

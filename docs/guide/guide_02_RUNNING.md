@@ -1,8 +1,10 @@
 # 실행 안내 — 화재 점검 로봇 서비스 (시뮬레이션)
 
+> **읽는 순서 — 실행 안내:** [01 설치 · 실행 · 문제 해결](guide_01_DOCKER_GUIDE.md) → **02 구성 · 사용법 · 시나리오** → [03 빌드용 컨테이너](guide_03_BUILD_CONTAINERS.md) → [04 빌드용 컨테이너 그림](guide_04_build_containers.svg)
+
 웹(로그인·관리자·사용자 화면) + MSA 백엔드 + ROS 2 TurtleBot3 시뮬레이션(SLAM·Nav2)을 Docker Compose 로 한 번에 띄운다.
 
-> 설치부터 실행·초기화·문제 해결까지 단계별 안내(macOS·Linux·Windows PowerShell)는 [DOCKER_GUIDE.md](DOCKER_GUIDE.md) 를 본다.
+> 설치부터 실행·초기화·문제 해결까지 단계별 안내(macOS·Linux·Windows PowerShell)는 [guide_01_DOCKER_GUIDE.md](guide_01_DOCKER_GUIDE.md) 를 본다.
 
 ## 실행
 
@@ -12,7 +14,7 @@ docker compose up -d --build
 ```
 
 - 접속: http://localhost:8080 — 기본 계정 admin / `Admin1234!`, 시험 계정 sup1·mgr1·user1 / `User1234!` (`.env` 로 바꿀 수 있다).
-- 시나리오(브랜치 `feat/scenarios-sim`): 소방 관제(지점별 점검 규칙 → 정상·경고·비상 → 경고)와 소화액 투척(화재 감지 → 터틀봇 출동 → 재판독 → 승인/자동 투척)이 시뮬레이션에서 돈다. 설계는 [plan/SCENARIOS.md](../design/SCENARIOS.md)·[plan/INTERFACES.md](../design/INTERFACES.md), 해 보는 방법은 아래 "시나리오 해 보기".
+- 시나리오(브랜치 `feat/scenarios-sim`): 소방 관제(지점별 점검 규칙 → 정상·경고·비상 → 경고)와 소화액 투척(화재 감지 → 터틀봇 출동 → 재판독 → 승인/자동 투척)이 시뮬레이션에서 돈다. 설계는 [plan/design_01_SCENARIOS.md](../design/design_01_SCENARIOS.md)·[plan/design_02_INTERFACES.md](../design/design_02_INTERFACES.md), 해 보는 방법은 아래 "시나리오 해 보기".
 - 관제 대시보드: 전용 계정 dash1(역할 4 대시보드, 비밀번호는 시험 계정과 같음)로 로그인하면 바로 열린다(`/dashboard`). 조회만 할 수 있는 계정이고, 16:9 모니터 전체 화면용(1920×1080 고정, 반응형 아님)이다. 구성은 `web/nginx/frontend/src/pages/dashboard/` — `data.ts`(불러오기·경고) → `panels.tsx`(패널) + `layout.ts`(배치표) → `details.tsx`(누르면 뜨는 상세).
 - 첫 실행은 각 Spring 서비스가 시작할 때 Maven 빌드를 하고, 시뮬레이터가 Nav2 를 올리므로 3~5분 걸린다.
 - 종단 간 시험: `python3 scripts/e2e_test.py` (장애물 시나리오 제외: `--skip-obstacles`)
@@ -33,8 +35,8 @@ docs/                      문서 (목록: docs/README.md)
   guide/                   실행 안내(이 파일) · Docker 구동 가이드
   architecture/            시스템 구조: 구성도 · 시스템 사이클 · SPA 사이클 SVG + 생성 스크립트
   navigation/              주행: 지도 3겹 · 주행 제어기 설명서 SVG + 생성 스크립트
-  design/                  설계: 시나리오(SCENARIOS.md) · 인터페이스(INTERFACES.md)
-  plan/                    계획: 향후 계획(ROADMAP.md) · 주간 일정(SCHEDULE.md)
+  design/                  설계: 시나리오(design_01_SCENARIOS.md) · 인터페이스(design_02_INTERFACES.md)
+  plan/                    계획: 향후 계획(plan_01_ROADMAP.md) · 주간 일정(plan_02_SCHEDULE.md)
   storyboard/              화면 스토리보드 SVG + 생성 스크립트
   _lib/                    SVG 생성 스크립트 공용 그리기 도구
 scripts/                   E2E 시험
@@ -72,7 +74,7 @@ scripts/                   E2E 시험
 | 화면 | `docker compose run --rm frontend-build` |
 | 분석 서비스 · ROS | `docker compose restart analysis-service` / `sim` |
 
-`common-build` · `frontend-build` 는 빌드하고 끝나는 컨테이너다. 자세한 설명은 [BUILD_CONTAINERS.md](BUILD_CONTAINERS.md) 를 본다.
+`common-build` · `frontend-build` 는 빌드하고 끝나는 컨테이너다. 자세한 설명은 [guide_03_BUILD_CONTAINERS.md](guide_03_BUILD_CONTAINERS.md) 를 본다.
 
 네트워크: `front`(cdn ↔ web, 외부 포트 8080 하나) · `edge`(web ↔ gateway) · `backend`(gateway ↔ 서비스 ↔ db) · `robot`(robot-service ↔ sim). rosbridge 는 robot-service 만 접근한다.
 
@@ -141,8 +143,8 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
 
 #### 계획 방식과 좁은 틈
 
-그림으로 보는 설명서: [주행 제어기](../navigation/drive_controller.svg)(목표 → 경로 → 속도 명령, 막혔을 때의 순서, 장애물별 결과) · [주행 지도 3겹](../navigation/drive_layers.svg)(기존 맵 · 계획 맵 · 2배 촘촘한 제어 맵, 새 장애물이 생기는 층).
-계획기 · 제어기를 처음 본다면: [Theta\* 계획기](../navigation/theta_star.svg)(A\* 와 무엇이 다른가, 이 건물의 경로) · [MPPI 제어기](../navigation/mppi.svg)(한 주기에 하는 일, 평가 항목, 지금 설정값에서의 동작).
+그림으로 보는 설명서: [주행 제어기](../navigation/nav_02_drive_controller.svg)(목표 → 경로 → 속도 명령, 막혔을 때의 순서, 장애물별 결과) · [주행 지도 3겹](../navigation/nav_01_drive_layers.svg)(기존 맵 · 계획 맵 · 2배 촘촘한 제어 맵, 새 장애물이 생기는 층).
+계획기 · 제어기를 처음 본다면: [Theta\* 계획기](../navigation/nav_03_theta_star.svg)(A\* 와 무엇이 다른가, 이 건물의 경로) · [MPPI 제어기](../navigation/nav_04_mppi.svg)(한 주기에 하는 일, 평가 항목, 지금 설정값에서의 동작).
 
 "처음에 출렁임 없는 최단 경로를 한 번 세우고, 그 경로를 제어기가 따라간다."
 
@@ -298,7 +300,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 ## 화면 문서
 
-- `docs/storyboard/web_storyboard.svg` 화면 구조도·흐름도·화면 설계 / `docs/storyboard/web_screen_tree.svg` 화면 트리 / `docs/storyboard/web_service_scenario.svg` 가상 서비스 흐름
+- `docs/storyboard/story_03_web_storyboard.svg` 화면 구조도·흐름도·화면 설계 / `docs/storyboard/story_02_web_screen_tree.svg` 화면 트리 / `docs/storyboard/story_01_web_service_scenario.svg` 가상 서비스 흐름
 - 생성 스크립트: `docs/storyboard/*.py`
 
 ## 초안 기능 후보 반영
@@ -310,7 +312,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 ## 알려진 한계
 
-- 분석 서비스는 사진 품질(밝기·선명도)만 본다. 소화기 비치 여부 같은 내용 판독은 사람이 한다 — AI 판독 계획은 `docs/plan/ROADMAP.md`.
+- 분석 서비스는 사진 품질(밝기·선명도)만 본다. 소화기 비치 여부 같은 내용 판독은 사람이 한다 — AI 판독 계획은 `docs/plan/plan_01_ROADMAP.md`.
 
 - 시뮬레이션은 Apple Silicon 에서 에뮬레이션으로 돌아 실제보다 느리다. 점검 작업 한 건에 수 분이 걸릴 수 있다.
 - HTTPS 는 적용하지 않았다(로컬 시험용). 배포 시 nginx 에 인증서를 넣고 `COOKIE_SECURE=true` 로 바꾼다.
@@ -376,7 +378,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 ### 지금 구현에 없는 것
 
-- 젯봇: 위치 추정(대기 구역 마커 정렬 · 대상 기준 보정), 순찰, 실시간 감지, 두 로봇의 조정(INTERFACES.md 7장 F3 · F4)
+- 젯봇: 위치 추정(대기 구역 마커 정렬 · 대상 기준 보정), 순찰, 실시간 감지, 두 로봇의 조정(design_02_INTERFACES.md 7장 F3 · F4)
 - 실물 투척 기구 연결(`ros/robot/src/launcher_bridge.py` 는 실물로 돌려 보지 않았다)
 - 소화기 인식 모델(OBJECT 판독기는 색으로 찾는다), 마커(MARKER) 판독기와 기준 좌표 재기(A5)
 - 도착 후 제자리에서 돌며 찾기(같은 자리에서 여러 번 다시 본다)

@@ -1,5 +1,7 @@
 # 빌드용 컨테이너
 
+> **읽는 순서 — 실행 안내:** [01 설치 · 실행 · 문제 해결](guide_01_DOCKER_GUIDE.md) → [02 구성 · 사용법 · 시나리오](guide_02_RUNNING.md) → **03 빌드용 컨테이너** → [04 빌드용 컨테이너 그림](guide_04_build_containers.svg)
+
 `docker compose up` 을 하면 컨테이너 11개가 뜨는데, 그중 2개는 **일을 하고 바로 끝나는 빌드용 컨테이너**다.
 `docker compose ps -a` 에서 `Exited (0)` 으로 보이는 것이 정상이다 — 죽은 것이 아니라 할 일을 마친 것이다.
 
@@ -10,7 +12,7 @@
 
 나머지 9개(cdn · web · gateway · 서비스 4개 · db · sim)는 계속 떠 있는 실행 컨테이너다.
 
-그림으로 보려면 [build_containers.svg](../architecture/build_containers.svg) 를 본다(시작 순서 · 두 컨테이너의 입력과 결과).
+그림으로 보려면 [guide_04_build_containers.svg](guide_04_build_containers.svg) 를 본다(시작 순서 · 두 컨테이너의 입력과 결과).
 
 ## 0. 전체 컨테이너 가운데 빌드용은 둘뿐이다
 
@@ -143,4 +145,4 @@ docker compose up -d --build
 - **analysis-service(Python)와 sim(ROS)은 빌드할 것이 없다.** 코드를 그대로 읽어 실행하므로 재시작만 하면 된다.
 - **실제 배포에서는 방식이 달라진다.** 지금은 개발 편의를 위해 실행할 때 빌드한다. 배포할 때는 CI 가 jar · dist 를 미리 만들어 이미지에 넣는 것이 보통이고, 그때는 이 두 컨테이너의 일이 CI 단계로 옮겨 간다.
 
-관련 문서: 전체 구성은 [RUNNING.md](RUNNING.md), 단계별 실행은 [DOCKER_GUIDE.md](DOCKER_GUIDE.md), 구성도에서의 위치는 [system_architecture.svg](../architecture/system_architecture.svg), 새 빌드가 브라우저에 닿는 과정은 [spa_cycle.svg](../architecture/spa_cycle.svg) 를 본다.
+관련 문서: 전체 구성은 [guide_02_RUNNING.md](guide_02_RUNNING.md), 단계별 실행은 [guide_01_DOCKER_GUIDE.md](guide_01_DOCKER_GUIDE.md), 구성도에서의 위치는 [arch_01_system_architecture.svg](../architecture/arch_01_system_architecture.svg), 새 빌드가 브라우저에 닿는 과정은 [arch_05_spa_cycle.svg](../architecture/arch_05_spa_cycle.svg) 를 본다.

@@ -2293,11 +2293,11 @@
 <text x="956.0" y="3810.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 로봇이 어느 쪽을 보는지, 얼마나 빨리 도는지는 모른다. 경로는 꺾은선이고</text>
 <text x="956.0" y="3829.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  모퉁이는 각이 져 있다 → 제어기(MPPI)가 그 둘레를 둥글게 돌아 준다.</text>
 <text x="956.0" y="3849.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 로봇을 원으로만 본다. 폭 0.5m 이하 틈은 막힌 것으로, 0.6m 틈은 지날 수</text>
-<text x="956.0" y="3868.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  있는 것으로 본다(실제로 지나는지는 제어기 몫 — mppi.svg 5번).</text>
+<text x="956.0" y="3868.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  있는 것으로 본다(실제로 지나는지는 제어기 몫 — nav_04_mppi.svg 5번).</text>
 <text x="956.0" y="3888.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 라이다가 못 본 것은 모른다. 새 장애물의 뒤쪽은 목표 브리지가 가상</text>
-<text x="956.0" y="3907.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  장애물로 채워 준다(drive_controller.svg 3번).</text>
+<text x="956.0" y="3907.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">  장애물로 채워 준다(nav_02_drive_controller.svg 3번).</text>
 <text x="956.0" y="3927.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">· 꺾이는 점이 칸 중심이라 수학적 최단과 몇 cm 다를 수 있다.</text>
-<text x="956.0" y="3946.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">이어서 볼 그림: mppi.svg(이 경로를 어떻게 따라가나) · drive_layers.svg(계획이 보는 지도).</text>
+<text x="956.0" y="3946.5" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="start">이어서 볼 그림: nav_04_mppi.svg(경로를 따라가는 법) · nav_01_drive_layers.svg(계획이 보는 지도).</text>
 <path d="M1006.0 234.0 L1025.0 234.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
 <path d="M1198.0 234.0 L1217.0 234.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>
 <path d="M1390.0 234.0 L1409.0 234.0" fill="none" stroke="#1c1c1e" stroke-width="1.8" marker-end="url(#a1c1c1e)"/>

@@ -1,14 +1,16 @@
 # 기술 스택
 
-> 이 파일은 `build_tech_stack.py` 가 만든다. 직접 고치지 말고 스크립트의 `STACK` 을 고친 뒤 다시 생성한다
-> (`python3 docs/architecture/build_tech_stack.py`). 그림은 [tech_stack.svg](tech_stack.svg).
+> **읽는 순서 — 시스템 구조:** [01 구성도](arch_01_system_architecture.svg) → [02 기술 스택 그림](arch_02_tech_stack.svg) → **03 기술 스택 설명** → [04 시스템 사이클](arch_04_system_cycle.svg) → [05 React SPA 사이클](arch_05_spa_cycle.svg)
 
-[시스템 구성도](system_architecture.svg)의 영역마다 **무슨 기술을, 어디에, 왜** 쓰는지 적는다.
+> 이 파일은 `build_tech_stack.py` 가 만든다. 직접 고치지 말고 스크립트의 `STACK` 을 고친 뒤 다시 생성한다
+> (`python3 docs/architecture/build_tech_stack.py`). 그림은 [arch_02_tech_stack.svg](arch_02_tech_stack.svg).
+
+[시스템 구성도](arch_01_system_architecture.svg)의 영역마다 **무슨 기술을, 어디에, 왜** 쓰는지 적는다.
 영역 순서는 구성도에서 요청이 지나는 순서와 같다.
 
 **핵심 스택**(그림의 붉은 상자, 표의 🟥)은 구성도의 구조를 이루는 상위 기술 15개다. 나머지는 그 아래에서 쓰는 라이브러리 · 기능이다.
 
-![기술 스택](tech_stack.svg)
+![기술 스택](arch_02_tech_stack.svg)
 
 ## 한눈에
 
@@ -160,13 +162,13 @@ ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도
 | 기술 | 버전 | 하는 일 | 왜 쓰는가 |
 | --- | --- | --- | --- |
 | 🟥 **Docker Compose** | v2 | 컨테이너 11개 · 네트워크 4개 | 실행 9 + 빌드용 2. 네트워크(front · edge · backend · robot)로 서로 닿는 범위를 나눈다. |
-| **빌드용 컨테이너** | maven:3.9 · node:20 | common-build · frontend-build | 호스트에 JDK · Node 를 설치하지 않아도 된다(`docs/guide/BUILD_CONTAINERS.md`). |
+| **빌드용 컨테이너** | maven:3.9 · node:20 | common-build · frontend-build | 호스트에 JDK · Node 를 설치하지 않아도 된다(`docs/guide/guide_03_BUILD_CONTAINERS.md`). |
 | **E2E 시험** | Python 3 표준 라이브러리 | 실제 스택에 대고 전체 흐름 확인 | 단위 테스트 대신 떠 있는 스택에 요청을 보내 본다(`scripts/e2e_test.py` · `e2e_scenarios.py`). |
 | **문서 도면** | Python → SVG | build_*.py 로 SVG 생성 | 도면을 손으로 고치지 않고 스크립트에서 다시 만든다. |
 
 ## 실제 로봇
 
-보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/SCHEDULE.md` 의 일정대로 한다.
+보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/plan_02_SCHEDULE.md` 의 일정대로 한다.
 
 - 컨테이너: 보유 장비
 - 버전의 원본: `README.md 9절`
@@ -188,7 +190,7 @@ ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도
 | Spring Security 전체 | 게이트웨이 필터 + jjwt + BCrypt | 인증 · 권한을 게이트웨이 한 곳에서만 한다 |
 | 상태 관리 · UI 라이브러리(Redux · MUI 등) | React 훅 + 공통 부품 `src/ui.tsx` | 화면 수가 많지 않고 Apple HIG 모양을 직접 맞춘다 |
 | 지도 라이브러리 | Canvas 2D 직접 그리기 | 점유 격자 지도 한 장과 로봇 · 경로만 그리면 된다 |
-| OpenCV · 학습 모델 | numpy + Pillow | 지금 판독기는 색 · 밝기 계산으로 된다(소화기 AI 판독은 `docs/plan/ROADMAP.md`) |
+| OpenCV · 학습 모델 | numpy + Pillow | 지금 판독기는 색 · 밝기 계산으로 된다(소화기 AI 판독은 `docs/plan/plan_01_ROADMAP.md`) |
 
 ## 버전을 바꿀 때
 

@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 로봇이 스스로 감지해 보낸 것(/patrol/detection)을 inspection-service 로 넘긴다(INTERFACES.md 2.3 · 4.2).
+ * 로봇이 스스로 감지해 보낸 것(/patrol/detection)을 inspection-service 로 넘긴다(design_02_INTERFACES.md 2.3 · 4.2).
  * 로봇은 같은 것을 보는 동안 같은 detId 로 계속 보낸다. 매번 넘기지는 않되, 등급이 바뀌었거나 마지막으로 넘긴 지
  * RESEND_MS 가 지났으면 다시 넘긴다 — 사람이 사건을 닫았는데 감지가 계속되면 inspection-service 가 사건을 다시 열어야 하기 때문이다.
  * 넘기지 못하면 다음 보고 때 다시 시도한다(로봇이 계속 보내 준다).

@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * 경고(alert 표). 같은 대상 · 같은 종류(dedup_key)의 열린 경고는 하나만 둔다:
  * 다시 생기면 그 줄의 등급 · 근거를 고치고, 비상으로 올라가면 확인(ACKED)했던 것도 다시 연다.
- * 흐름은 docs/design/INTERFACES.md 7장 F2.
+ * 흐름은 docs/design/design_02_INTERFACES.md 7장 F2.
  */
 @Service
 public class AlertService {

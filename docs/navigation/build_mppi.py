@@ -2,8 +2,8 @@
 
 값은 ros/sim/src/config/nav2_params.yaml 에서 읽어 쓴다(설정을 바꾸고 다시 생성하면 그림 · 숫자가 따라 바뀐다).
 후보 궤적 그림은 mppi_sim.py 가 같은 순서 · 같은 설정값으로 계산한 것이다(Nav2 실행 기록이 아니다 — 간단히 한 점은 그 파일 머리).
-실측값(최대속도 유지 등)은 drive_probe.py 로 잰 것으로 docs/guide/RUNNING.md 와 nav2_params.yaml 머리 5) · 9) 에서 가져왔다.
-실행: python3 docs/navigation/build_mppi.py  →  docs/navigation/mppi.svg
+실측값(최대속도 유지 등)은 drive_probe.py 로 잰 것으로 docs/guide/guide_02_RUNNING.md 와 nav2_params.yaml 머리 5) · 9) 에서 가져왔다.
+실행: python3 docs/navigation/build_mppi.py  →  docs/navigation/nav_04_mppi.svg
 """
 import math
 from pathlib import Path
@@ -16,7 +16,7 @@ from build_drive_controller import BLUE, GRAY, INK, ORANGE, PURPLE, RED, SUB
 from nav2cfg import num
 from svg import C, Svg
 
-OUT = Path(__file__).resolve().parent / 'mppi.svg'
+OUT = Path(__file__).resolve().parent / 'nav_04_mppi.svg'
 S = Svg(1640, 4000)
 D.S = S                                   # 공용 그리기 함수(card · para · poly · robot · label)가 이 도면에 그리게 한다
 
@@ -644,7 +644,7 @@ def settings(y):
         '· 후보가 무작위라 띠가 아주 좁으면 살아남는 후보가 없다. 같은 자리에서 3번 실패하면 목표 브리지가 물러나 자세를 다시 잡는다(폭 0.5m 이하 틈은 계획이 막힌 것으로 본다).',
         f'· {num(M.CS["progress_checker"]["movement_time_allowance"])}초 동안 {num(M.CS["progress_checker"]["required_movement_radius"])}m 를 못 가면 "전진 없음"으로 실패 처리된다(progress checker) — 서서 버티는 것을 끊는 장치다.',
         '· 로봇을 원(반지름 0.22m)으로 본다. 실제 외곽 사각형으로 바꾸면 0.55m 틈도 지났지만 0.9m 문에서 벽에 끼어 버렸다(계획과 제어는 같은 모양을 써야 한다).',
-        '이어서 볼 그림: theta_star.svg(경로는 어떻게 만드나) · drive_controller.svg(막혔을 때의 순서) · drive_layers.svg(MPPI 가 보는 지도).',
+        '이어서 볼 그림: nav_03_theta_star.svg(경로는 어떻게 만드나) · nav_02_drive_controller.svg(막혔을 때의 순서) · nav_01_drive_layers.svg(MPPI 가 보는 지도).',
     ], 12, INK, 20)
 
 

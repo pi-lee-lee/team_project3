@@ -285,7 +285,7 @@
 <text x="850.0" y="2324.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">공개 이미지를 그대로 띄워 우리 코드를 빌드한다(Dockerfile 없음).</text>
 <text x="850.0" y="2347.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">결과물 = jar · dist. 볼륨과 폴더에 남고, 컨테이너는 Exited (0) 으로 끝난다.</text>
 <text x="850.0" y="2370.0" font-size="12.5" font-weight="400" fill="#3a3a3c" text-anchor="start">공유 라이브러리나 화면 코드를 고칠 때마다 다시 한다.</text>
-<text x="40.0" y="2424.0" font-size="12.5" font-weight="500" fill="#636366" text-anchor="start">실제 배포에서는 CI 가 jar · dist 를 미리 만들어 이미지에 넣는다(방법 B). 그때는 이 두 컨테이너의 일이 CI 단계로 옮겨 간다. 글 설명과 문제 해결은 docs/guide/BUILD_CONTAINERS.md</text>
+<text x="40.0" y="2424.0" font-size="12.5" font-weight="500" fill="#636366" text-anchor="start">실제 배포에서는 CI 가 jar · dist 를 미리 만들어 이미지에 넣는다(방법 B). 그때는 이 두 컨테이너의 일이 CI 단계로 옮겨 간다. 글 설명과 문제 해결은 docs/guide/guide_03_BUILD_CONTAINERS.md</text>
 <path d="M649.0 956.0 L649.0 1020.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>
 <path d="M462.8 1002.0 L462.8 1020.0" fill="none" stroke="#c93400" stroke-width="1.6" marker-end="url(#ac93400)"/>
 <path d="M782.0 1094.0 L782.0 1112.0" fill="none" stroke="#b25000" stroke-width="2" marker-end="url(#ab25000)"/>

@@ -39,7 +39,7 @@ docker compose logs -f sim
 - 처음 실행은 이미지 빌드 때문에 오래 걸립니다.
 - 시뮬레이션은 준비까지 몇 분 걸립니다. 로그에 `lifecycle_manager_navigation ... Managed nodes are active` 가 보이면 로봇이 움직일 수 있습니다.
 - 끄기: `docker compose down`
-- 설치부터 문제 해결까지는 [docs/guide/DOCKER_GUIDE.md](docs/guide/DOCKER_GUIDE.md) 를 봅니다.
+- 설치부터 문제 해결까지는 [docs/guide/guide_01_DOCKER_GUIDE.md](docs/guide/guide_01_DOCKER_GUIDE.md) 를 봅니다.
 
 ## 3. 시연 안내
 
@@ -85,7 +85,7 @@ python3 scripts/demo.py all
 ```
 
 인자 없이 실행하면 시나리오 목록이 나옵니다. `all` 은 초기화 → 소방 관제(이상 → 복구) → 화재(오탐 → 자동 투척)를 이어서 돌리고, `stop` 은 중지합니다.
-손으로 하나씩 해 보는 방법은 [docs/guide/RUNNING.md](docs/guide/RUNNING.md) 의 "시나리오 해 보기"에 있습니다.
+손으로 하나씩 해 보는 방법은 [docs/guide/guide_02_RUNNING.md](docs/guide/guide_02_RUNNING.md) 의 "시나리오 해 보기"에 있습니다.
 
 ---
 
@@ -160,13 +160,13 @@ python3 scripts/demo.py all
 
 | 문서 | 내용 |
 | --- | --- |
-| [docs/guide/RUNNING.md](docs/guide/RUNNING.md) | 구성 · 시험 시설과 지도 · 주행 설정 · 화면 · 시나리오 해 보기 |
-| [docs/guide/DOCKER_GUIDE.md](docs/guide/DOCKER_GUIDE.md) | 설치부터 실행 · 초기화 · 문제 해결 |
-| [docs/navigation/drive_layers.svg](docs/navigation/drive_layers.svg) | 주행 지도 3겹(기존 맵 · 계획 맵 · 제어 맵)과 새 장애물이 생기는 층 |
-| [docs/navigation/drive_controller.svg](docs/navigation/drive_controller.svg) | 주행 제어기: 목표 → 경로 → 속도 명령, 막혔을 때의 순서 |
-| [docs/design/SCENARIOS.md](docs/design/SCENARIOS.md) | 두 시나리오의 설계(무엇을 왜) |
-| [docs/design/INTERFACES.md](docs/design/INTERFACES.md) | 상세 설계: 토픽 계약 · API · DB 표 · 상태 흐름 · 설정 |
-| [docs/plan/ROADMAP.md](docs/plan/ROADMAP.md) | 향후 계획: 소화기 인식 모델, 주행 제어기 개선 |
+| [docs/guide/guide_02_RUNNING.md](docs/guide/guide_02_RUNNING.md) | 구성 · 시험 시설과 지도 · 주행 설정 · 화면 · 시나리오 해 보기 |
+| [docs/guide/guide_01_DOCKER_GUIDE.md](docs/guide/guide_01_DOCKER_GUIDE.md) | 설치부터 실행 · 초기화 · 문제 해결 |
+| [docs/navigation/nav_01_drive_layers.svg](docs/navigation/nav_01_drive_layers.svg) | 주행 지도 3겹(기존 맵 · 계획 맵 · 제어 맵)과 새 장애물이 생기는 층 |
+| [docs/navigation/nav_02_drive_controller.svg](docs/navigation/nav_02_drive_controller.svg) | 주행 제어기: 목표 → 경로 → 속도 명령, 막혔을 때의 순서 |
+| [docs/design/design_01_SCENARIOS.md](docs/design/design_01_SCENARIOS.md) | 두 시나리오의 설계(무엇을 왜) |
+| [docs/design/design_02_INTERFACES.md](docs/design/design_02_INTERFACES.md) | 상세 설계: 토픽 계약 · API · DB 표 · 상태 흐름 · 설정 |
+| [docs/plan/plan_01_ROADMAP.md](docs/plan/plan_01_ROADMAP.md) | 향후 계획: 소화기 인식 모델, 주행 제어기 개선 |
 | [docs/README.md](docs/README.md) | 문서 전체 목록과 분류 기준(시스템 구조 도면 · 스토리보드 포함) |
 
 ## 8. 지금 구현 범위

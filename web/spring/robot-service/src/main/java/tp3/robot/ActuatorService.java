@@ -16,7 +16,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 투척 명령(INTERFACES.md 2.2 · 4.1). 쏠지 말지는 inspection-service 가 정하고, 여기서는 명령을 한 번만 전달한다.
+ * 투척 명령(design_02_INTERFACES.md 2.2 · 4.1). 쏠지 말지는 inspection-service 가 정하고, 여기서는 명령을 한 번만 전달한다.
  * - 같은 commandId 가 다시 오면 보내지 않고 지난 상태를 돌려준다(actuator_command 표).
  * - 로봇이 받았다고 답할 때까지 2초마다 다시 보낸다(로봇 쪽도 같은 ID 는 한 번만 실행한다). 20초 안에 끝나지 않으면 TIMEOUT.
  * - 결과는 그 로봇이 하고 있는 미션의 사건 기록(ACTUATED / ACTUATE_FAILED)으로 보고한다.

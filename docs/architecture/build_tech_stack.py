@@ -1,4 +1,4 @@
-"""기술 스택 도면 + 설명서: 시스템 구성도(system_architecture.svg)의 계층마다 무슨 기술을 쓰는가.
+"""기술 스택 도면 + 설명서: 시스템 구성도(arch_01_system_architecture.svg)의 계층마다 무슨 기술을 쓰는가.
 
 읽는 법
 - 어두운 머리 영역: 구성도의 요청 경로(브라우저 → cdn → web → gateway → 서비스 → db)와 로봇 쪽 연결을 기술 이름으로 다시 적은 것.
@@ -7,7 +7,7 @@
 - 아이콘: 공식 로고는 docs/_lib/icons/ 의 Simple Icons(CC0) SVG, 로고가 없는 것은 이 파일의 GLYPH(직접 그린 선 아이콘). 기술을 더하면 ICON 에도 한 줄 더한다.
 이 파일의 STACK 하나가 SVG 와 Markdown 두 문서의 원본이다. 버전의 원본은 각 항목에 적힌 파일(package.json · pom.xml ·
 requirements.txt · Dockerfile · compose.yaml)이므로, 그 파일을 바꾸면 STACK 도 고친 뒤 다시 생성한다.
-실행: python3 docs/architecture/build_tech_stack.py  →  docs/architecture/tech_stack.svg · TECH_STACK.md
+실행: python3 docs/architecture/build_tech_stack.py  →  docs/architecture/arch_02_tech_stack.svg · arch_03_TECH_STACK.md
 """
 import re
 import sys
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / '_lib'))   # 공용
 from svg import C, MONO, Svg, text_width
 
 HERE = Path(__file__).resolve().parent
-OUT_SVG, OUT_MD = HERE / 'tech_stack.svg', HERE / 'TECH_STACK.md'
+OUT_SVG, OUT_MD = HERE / 'arch_02_tech_stack.svg', HERE / 'arch_03_TECH_STACK.md'
 W = 1680
 S = Svg(W, 2000)               # 높이는 마지막에 내용에 맞춘다
 
@@ -107,13 +107,13 @@ STACK = [
      'compose.yaml · scripts/ · docs/',
      '전체를 한 번에 띄우고 확인하는 도구.', [
         ('Docker Compose', 'v2', '컨테이너 11개 · 네트워크 4개', '실행 9 + 빌드용 2. 네트워크(front · edge · backend · robot)로 서로 닿는 범위를 나눈다.'),
-        ('빌드용 컨테이너', 'maven:3.9 · node:20', 'common-build · frontend-build', '호스트에 JDK · Node 를 설치하지 않아도 된다(`docs/guide/BUILD_CONTAINERS.md`).'),
+        ('빌드용 컨테이너', 'maven:3.9 · node:20', 'common-build · frontend-build', '호스트에 JDK · Node 를 설치하지 않아도 된다(`docs/guide/guide_03_BUILD_CONTAINERS.md`).'),
         ('E2E 시험', 'Python 3 표준 라이브러리', '실제 스택에 대고 전체 흐름 확인', '단위 테스트 대신 떠 있는 스택에 요청을 보내 본다(`scripts/e2e_test.py` · `e2e_scenarios.py`).'),
         ('문서 도면', 'Python → SVG', 'build_*.py 로 SVG 생성', '도면을 손으로 고치지 않고 스크립트에서 다시 만든다.'),
      ]),
     ('실제 로봇', 'gray', '보유 장비', ['아직 코드가 붙지 않은 하드웨어', '제원은 README 9절'],
      'README.md 9절',
-     '보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/SCHEDULE.md` 의 일정대로 한다.', [
+     '보유한 하드웨어. 지금은 시뮬레이션으로만 돌고, 실물 연동은 `docs/plan/plan_02_SCHEDULE.md` 의 일정대로 한다.', [
         ('TurtleBot3 Waffle Pi', '실물', 'Raspberry Pi + OpenCR 보드', 'sim 컨테이너 자리를 대신한다(같은 노드 · 토픽, 목표 브리지도 같은 코드).'),
         ('LDS 라이다 · IMX219', 'TurtleBot3', '360° 거리 측정 · 점검 사진', '주행(Nav2)과 관측 사진의 입력.'),
         ('Jetson Nano 4GB', 'JetBot Mini', '순찰 · 화재 감지(예정)', '지금은 `fire.sh` 가 감지 보고(`/patrol/detection`)를 대신 보낸다.'),
@@ -337,7 +337,7 @@ def build_svg():
     S.text(PAD + 368, y + 14.5, '하위 스택 — 라이브러리 · 기능', 12, 500, '#636366')
     y += 30
     S.text(PAD + 4, y + 14, '버전의 원본: package.json(화면) · pom.xml(Spring) · requirements.txt(Python) · Dockerfile · compose.yaml(이미지)   |   '
-                            '글 설명과 "왜 쓰는가": TECH_STACK.md   |   로고: Simple Icons(CC0), 상표는 각 소유자의 것 · 선 아이콘은 직접 그림', 11.5, 500, '#8e8e93')
+                            '글 설명과 "왜 쓰는가": arch_03_TECH_STACK.md   |   로고: Simple Icons(CC0), 상표는 각 소유자의 것 · 선 아이콘은 직접 그림', 11.5, 500, '#8e8e93')
     S.body.insert(defs_idx, defs())
     S.h = y + 36
     S.render(OUT_SVG)
@@ -348,12 +348,14 @@ def build_md():
         return s.replace('|', '\\|')
 
     out = ['# 기술 스택', '',
+           '> **읽는 순서 — 시스템 구조:** [01 구성도](arch_01_system_architecture.svg) → [02 기술 스택 그림](arch_02_tech_stack.svg) → '
+           '**03 기술 스택 설명** → [04 시스템 사이클](arch_04_system_cycle.svg) → [05 React SPA 사이클](arch_05_spa_cycle.svg)', '',
            '> 이 파일은 `build_tech_stack.py` 가 만든다. 직접 고치지 말고 스크립트의 `STACK` 을 고친 뒤 다시 생성한다',
-           '> (`python3 docs/architecture/build_tech_stack.py`). 그림은 [tech_stack.svg](tech_stack.svg).', '',
-           '[시스템 구성도](system_architecture.svg)의 영역마다 **무슨 기술을, 어디에, 왜** 쓰는지 적는다.',
+           '> (`python3 docs/architecture/build_tech_stack.py`). 그림은 [arch_02_tech_stack.svg](arch_02_tech_stack.svg).', '',
+           '[시스템 구성도](arch_01_system_architecture.svg)의 영역마다 **무슨 기술을, 어디에, 왜** 쓰는지 적는다.',
            '영역 순서는 구성도에서 요청이 지나는 순서와 같다.', '',
            f'**핵심 스택**(그림의 붉은 상자, 표의 🟥)은 구성도의 구조를 이루는 상위 기술 {len(CORE)}개다. 나머지는 그 아래에서 쓰는 라이브러리 · 기능이다.', '',
-           '![기술 스택](tech_stack.svg)', '',
+           '![기술 스택](arch_02_tech_stack.svg)', '',
            '## 한눈에', '',
            '요청이 지나는 길: ' + ' → '.join(f'`{n}`({t})' for n, t, _ in PATH_WEB), '',
            '로봇 쪽 연결: ' + ' ⇄ '.join(f'`{n}`({t})' for n, t, _ in PATH_ROBOT), '',
@@ -374,7 +376,7 @@ def build_md():
             '| Spring Security 전체 | 게이트웨이 필터 + jjwt + BCrypt | 인증 · 권한을 게이트웨이 한 곳에서만 한다 |',
             '| 상태 관리 · UI 라이브러리(Redux · MUI 등) | React 훅 + 공통 부품 `src/ui.tsx` | 화면 수가 많지 않고 Apple HIG 모양을 직접 맞춘다 |',
             '| 지도 라이브러리 | Canvas 2D 직접 그리기 | 점유 격자 지도 한 장과 로봇 · 경로만 그리면 된다 |',
-            '| OpenCV · 학습 모델 | numpy + Pillow | 지금 판독기는 색 · 밝기 계산으로 된다(소화기 AI 판독은 `docs/plan/ROADMAP.md`) |',
+            '| OpenCV · 학습 모델 | numpy + Pillow | 지금 판독기는 색 · 밝기 계산으로 된다(소화기 AI 판독은 `docs/plan/plan_01_ROADMAP.md`) |',
             '', '## 버전을 바꿀 때', '',
             '1. 원본 파일을 고친다: `package.json`(화면) · `pom.xml`(Spring) · `requirements.txt`(Python) · `Dockerfile` · `compose.yaml`(이미지).',
             '2. `build_tech_stack.py` 의 `STACK` 에서 같은 항목의 버전을 고친다.',

@@ -2,13 +2,13 @@
 
 모바일웹 스토리보드처럼 '화면 하나 = 노드 하나'로, 화면 썸네일을 트리로 연결한다.
 선 위 라벨은 그 화면으로 들어가는 조작이다. 와이어프레임 데이터는 build_storyboard.py 의 SCREENS 를 쓴다.
-실행: python3 build_screen_tree.py  →  docs/storyboard/web_screen_tree.svg
+실행: python3 build_screen_tree.py  →  docs/storyboard/story_02_web_screen_tree.svg
 """
 from pathlib import Path
 
 import build_storyboard as sb
 
-OUT = Path(__file__).resolve().parent / 'web_screen_tree.svg'
+OUT = Path(__file__).resolve().parent / 'story_02_web_screen_tree.svg'
 BY_ID = {s['id']: s for s in sb.SCREENS}
 
 # 스토리보드 본문에는 없고 트리에만 있는 하위 화면(모달·편집)

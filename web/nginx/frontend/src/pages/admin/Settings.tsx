@@ -6,7 +6,7 @@ import './admin.css';
 
 /**
  * 설정 키의 이름과 설명. 값이 정해지지 않은 항목(사거리 · 열원 기준 등)을 코드가 아니라 여기서 받는다
- * (docs/design/INTERFACES.md 8장). 서버의 기본값 목록(SettingsService)에 있는 키만 저장된다.
+ * (docs/design/design_02_INTERFACES.md 8장). 서버의 기본값 목록(SettingsService)에 있는 키만 저장된다.
  */
 type Kind = 'mode' | 'number' | 'json' | 'robot' | 'bool';
 const GROUPS: { header: string; footer?: string; items: [key: string, label: string, kind: Kind, hint: string][] }[] = [
