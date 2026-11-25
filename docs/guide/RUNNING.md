@@ -262,6 +262,36 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
    카메라 영상은 **압축 토픽**(`/camera/image_raw/compressed`, JPEG)으로 받는다. 로봇에 `ros-jazzy-compressed-image-transport`(실제 터틀봇은 Jazzy) 를 설치하면 카메라 노드가 압축 토픽을 함께 발행한다(`imageTransport: "raw"` 로 바꾸면 원본 토픽).
 3. 시뮬레이터 없이 실행: `docker compose up -d --scale sim=0`
 
+### 실제 터틀봇에서 주행 시험 (Raspberry Pi 4 · Ubuntu 24.04 · Jazzy)
+
+Nav2 설정은 시뮬레이션과 같은 파일 하나에서 만든다(튜닝값 · 행동 트리 · 충돌 감시가 같다). 실물에서 달라지는 것(실제 시간,
+AMCL 오도메트리 오차 계수, 지도 · 행동 트리 경로)만 `ros/robot/tools/make_real_params.py` 가 바꾼다.
+절차는 실물 단독 주행 시험(2026-11-24, nav2_test 자료)을 따랐다. 그 시험은 목표 브리지 없이 금지구역 · 가상 장애물 층을 끄고
+돌렸으므로, 여기서는 브리지까지 함께 띄운다.
+
+```bash
+# (한 번) 설정 만들기 — 저장소를 받은 곳에서
+python3 ros/robot/tools/make_real_params.py --map ~/maps/site.yaml --bt ~/nav2/navigate_fixed_plan.xml -o ~/nav2/nav2_params_real.yaml
+cp ros/sim/src/config/navigate_fixed_plan.xml ~/nav2/
+
+# Pi 터미널 1: 터틀봇 하드웨어
+export ROS_DOMAIN_ID=<팀 번호>; export TURTLEBOT3_MODEL=waffle_pi
+ros2 launch turtlebot3_bringup robot.launch.py
+
+# Pi 터미널 2: Nav2 (한 프로세스로 묶어 띄우는 기본값 use_composition=True 그대로)
+ros2 launch nav2_bringup bringup_launch.py map:=$HOME/maps/site.yaml params_file:=$HOME/nav2/nav2_params_real.yaml use_sim_time:=False
+
+# Pi 터미널 3: 목표 브리지 · 워치독(금지구역 · 가상 장애물 층을 채우고 웹의 목표를 Nav2 로 넘긴다)
+python3 ros/robot/src/nav2_goal_bridge.py & python3 ros/robot/src/cmd_vel_watchdog.py
+
+# 원격 PC: 확인용 RViz (초기 위치는 2D Pose Estimate, 목표는 Nav2 Goal 또는 웹)
+ros2 launch nav2_bringup rviz_launch.py
+```
+
+- AMCL 오차 계수는 `--alpha`(기본 0.15)로 바꾼다. 실물에서 제자리 회전 뒤 위치가 밀리면 올리고, 멈춰 있는데 추정이 흔들리면 내린다.
+- 충돌 감시(`collision_monitor`)는 몸 바로 바깥 3cm 에서 정지, 13cm 안에서 절반 속도, 1.2초 안에 닿을 것 같으면 감속한다
+  (nav2_params.yaml 13). 목표 브리지의 빠져나오기 · 수동 조종은 이 감시를 거치지 않는다.
+
 ## 화면
 
 - 디자인 컨셉: Apple Human Interface Guidelines — 시스템 글꼴, iOS 시스템 색(라이트·다크 모드), 큰 제목, 그룹형 목록(inset grouped),
