@@ -46,9 +46,10 @@ Nav2 가 결국 실패하면 비용 지도의 오래된 표시를 지우고 현�
 채우기를 끄고 실제로 본 것만으로 다시 계획하게 한다.
 성공했더라도 처음 계획 경로보다 크게 돌아갔거나 복구 동작이 있었으면 detoured=true 로 알린다.
 비상구 앞 구역(목표에 "exitZone": [x1, y1, x2, y2] 이 붙은 것 — 비상구 점검 지점으로 가는 목표에만 붙는다):
-로봇이 그 구역 안에 들어온 뒤 막히면(계획 실패 · 제어기 실패 · 목표 실패 · EXIT_STALL_SEC 동안 가까워지지 못함)
-위의 복구 · 우회 · 재시도를 하지 않고 바로 BLOCKED_NO_PATH 로 끝낸다. 비상구 앞 통로는 비어 있어야 하므로 그 안의 장애물은
-돌아갈 대상이 아니라 알릴 대상이다(서버가 목적지 쪽 사진을 찍어 올린다). 구역 밖에서 막히면 지금까지와 똑같다.
+로봇이 그 구역에서 EXIT_NEAR_DIST 안에 있고 구역 안에 저장 지도에 없는 장애물(벽 쪽 EXIT_ZONE_MARGIN 은 빼고 EXIT_MIN_HITS 점 이상)이
+보이는 채로 막히면(계획 실패 · 제어기 실패 · 목표 실패 · EXIT_STALL_SEC 동안 가까워지지 못함) 위의 복구 · 우회 · 재시도를 하지 않고
+바로 BLOCKED_NO_PATH 로 끝낸다. 멀리서는 평소처럼 복구 · 우회하고, 끝내 길이 없을 때 그 구역에 물건이 보이면 같은 처리를 한다. 비상구 앞 통로는 비어 있어야 하므로 그 안의 장애물은
+돌아갈 대상이 아니라 알릴 대상이다(서버가 목적지 쪽 사진을 찍어 올린다). 막은 물건이 구역 밖이면(통로로 가는 문 등) 지금까지와 똑같다.
 """
 import json
 import math
@@ -56,7 +57,7 @@ import os
 import time
 
 import rclpy
-from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist, TwistStamped
 from tf2_ros import Buffer, TransformListener
 from nav2_msgs.action import ComputePathToPose, NavigateToPose
 from nav2_msgs.srv import ClearEntireCostmap
@@ -81,10 +82,18 @@ ESCAPE_SPEED = 0.10       # 빠져나오는 속도(m/s)
 ESCAPE_REAR_MIN = 0.22    # 나아가는 쪽(±35도) 라이다 거리가 이 아래면 멈춘다(m). 라이다에서 차체 앞 · 뒤 끝까지가 0.14m
 ESCAPE_CLEAR = 0.40       # 사방 라이다 최소 거리가 이만큼 되면(충돌 구역 0.22 를 넉넉히 벗어나면) 그만 간다(m)
 MAX_RETRIES = 3           # Nav2 목표가 실패했을 때 다시 보내는 횟수
+# 바퀴 명령 형식: ROS 2 Jazzy(실제 터틀봇 · Jazzy 시뮬레이션)는 /cmd_vel 이 TwistStamped, Humble 은 Twist.
+# 제어기 출력(/cmd_vel_nav)도 같은 형식이다(Nav2 enable_stamped_cmd_vel). CMD_VEL_STAMPED=0 이면 Twist.
+STAMPED = os.environ.get('CMD_VEL_STAMPED', '1') != '0'
 EXIT_STALL_SEC = 5.0      # 비상구 앞 구역 안에서 이만큼 목표에 가까워지지 못하면 막힌 것으로 보고 바로 끝낸다
 EXIT_APPROACH_DIST = 1.0  # 비상구 앞에서 막히면 앞 장애물까지 이 거리가 될 때까지 천천히 다가간 뒤 끝낸다(근거 사진 거리, m)
 EXIT_APPROACH_SPEED = 0.08
 EXIT_APPROACH_SEC = 10.0
+EXIT_APPROACH_BACK = 1.1  # 먼저 Nav2 로 가는 곳: 목적지 앞(바라보는 방향의 반대쪽)으로 이만큼 물러난 지점(통로 가운데)
+EXIT_APPROACH_NAV_SEC = 45.0
+EXIT_ZONE_MARGIN = 0.3    # 비상구 앞 구역 가장자리(벽)에서 이 안쪽에 찍힌 점만 센다. 통로를 막는 물건은 가운데를 차지하고, 벽 쪽은 위치 추정 오차(0.2m 안팎)와 지도 끝(site 지도는 C2 동쪽 벽이 반만 있음) 때문에 벽이 새 장애물로 보일 수 있다
+EXIT_NEAR_DIST = 1.0      # 로봇이 비상구 앞 구역에서 이 안에 있을 때만 바로 진입 불가로 본다(멀리서 본 점은 문틀 가장자리 라이다 잡음일 수 있다)
+EXIT_MIN_HITS = 5         # 구역 안 '새 장애물' 점이 이만큼 있어야 비상구 앞 적재로 본다(점 하나 · 둘은 잡음. 실제 적재물은 2~3m 밖에서도 수십 점)
 ESCAPE_TIMEOUT = 10.0
 ESCAPE_NEAR = 0.40        # 목표가 실패했을 때 라이다 최소 거리가 이 아래면(장애물에 붙어 있으면) 재시도 전에 물러난다(m)
 STUCK_SAME = 0.5          # 물러났다가 이 안에서 또 막히면 '같은 자리에서 두 번째'로 본다(m)
@@ -127,7 +136,7 @@ class Bridge(Node):
         self.create_timer(0.2, self.publish_map_pose)
         # 제어기 방향: Nav2 제어기의 출력(/cmd_vel_nav, 속도 다듬기 전)을 받아 예상 호를 지도 좌표로 낸다
         self.cmd = None                     # (v, w, 받은 시각)
-        self.create_subscription(Twist, '/cmd_vel_nav', self.on_cmd_nav, 10)
+        self.create_subscription(TwistStamped if STAMPED else Twist, '/cmd_vel_nav', self.on_cmd_nav, 10)
         self.drive_pub = self.create_publisher(String, '/inspection/drive_plan', 5)
         self.create_timer(0.2, self.publish_drive_plan)
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL, reliability=ReliabilityPolicy.RELIABLE)
@@ -148,7 +157,7 @@ class Bridge(Node):
         self.rear_min = 9.0                 # 뒤쪽 라이다 최소 거리
         self.scan_min = 9.0                 # 사방 라이다 최소 거리
         self.scan_polar = []                # 최근 스캔 [(로봇 기준 각, 거리)]
-        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.cmd_pub = self.create_publisher(TwistStamped if STAMPED else Twist, '/cmd_vel', 10)
         self.create_timer(0.1, self.escape_step)
         self.approach = None                # 비상구 앞에서 막힌 뒤 근거 사진 거리까지 다가가는 중 {'g', 'until'}
         self.create_timer(0.1, self.approach_step)
@@ -286,7 +295,7 @@ class Bridge(Node):
                'timeout' if time.monotonic() > e['until'] else
                'goal ended' if not self.nav_active and not e['idle'] else '')
         if why:
-            self.cmd_pub.publish(Twist())
+            self.drive(Twist())
             self.escape = None
             self.fail_at, self.fail_count = None, 0
             if e['block'] and moved >= BLOCK_RADIUS + 0.1 and self.nav_active:
@@ -299,7 +308,7 @@ class Bridge(Node):
         cmd.angular.z = max(-0.8, min(0.8, 2.0 * err))
         if abs(err) < 0.5:
             cmd.linear.x = -ESCAPE_SPEED if e['reverse'] else ESCAPE_SPEED
-        self.cmd_pub.publish(cmd)
+        self.drive(cmd)
 
     # ------------------------------------------------------------ 금지구역
     def on_keepout(self, msg):
@@ -421,7 +430,19 @@ class Bridge(Node):
                 del self.trail[:-60]
 
     def on_cmd_nav(self, msg):
-        self.cmd = (msg.linear.x, msg.angular.z, time.monotonic())
+        t = msg.twist if STAMPED else msg
+        self.cmd = (t.linear.x, t.angular.z, time.monotonic())
+
+    def drive(self, twist):
+        """바퀴 명령을 보낸다(Jazzy 는 TwistStamped 로 감싼다). 브리지가 직접 내는 명령은 빠져나오기 · 비상구 앞 다가가기뿐이다."""
+        if STAMPED:
+            m = TwistStamped()
+            m.header.stamp = self.get_clock().now().to_msg()
+            m.header.frame_id = 'base_link'
+            m.twist = twist
+            self.cmd_pub.publish(m)
+        else:
+            self.cmd_pub.publish(twist)
 
     def publish_drive_plan(self):
         c = self.cmd
@@ -693,6 +714,11 @@ class Bridge(Node):
 
     def classify(self, g, extra):
         def done(code, reason):
+            z = g.get('exit_zone')
+            if (code == 'BLOCKED_NO_PATH' and z and not g.get('exit_done') and self.goal is g
+                    and len(self.exit_hits(z)) >= EXIT_MIN_HITS):
+                # 멀리서 본 비상구 앞 적재: 복구 · 재계획을 다 해도 길이 없고 그 구역에 물건이 보인다 → 다가가 찍고 알린다
+                return self.exit_blocked(g, 'no path, seen from afar')
             self.report(g, 'ABORTED', code, reason, **extra)
             if self.goal is g:
                 self.goal = None
@@ -729,12 +755,20 @@ class Bridge(Node):
 
     # ------------------------------------------------------------ 비상구 앞 구역
     def in_exit_zone(self, g):
-        """그 목표에 비상구 앞 구역이 있고 로봇이 지금 그 안에 있는가."""
+        """그 목표에 비상구 앞 구역이 있고, 지금 라이다에 보이는 '저장 지도에 없는 장애물'이 그 구역 안에 있는가.
+        로봇 위치가 아니라 막은 물건의 위치로 본다: 비상구 앞 통로 밖(예: 통로로 들어가는 문)이 막힌 것은 주행 문제라
+        다른 길로 돌아가야 하고, 통로 안에 물건이 있을 때만 비상구 앞 적재다. 로봇이 통로 밖에서 물건을 먼저 봐도 맞게 가린다."""
         z = g.get('exit_zone') if g else None
         if not z or g.get('exit_done'):
             return False
         xy = self.map_xy()
-        return xy is not None and z[0] <= xy[0] <= z[2] and z[1] <= xy[1] <= z[3]
+        if xy is None or math.hypot(max(z[0] - xy[0], 0, xy[0] - z[2]), max(z[1] - xy[1], 0, xy[1] - z[3])) > EXIT_NEAR_DIST:
+            return False                 # 아직 멀다 → 평소처럼 복구 · 우회. 끝내 길이 없으면 classify 에서 다시 본다
+        return len(self.exit_hits(z)) >= EXIT_MIN_HITS
+
+    def exit_hits(self, z):
+        m = EXIT_ZONE_MARGIN
+        return [(x, y) for x, y in self.new_hits if z[0] + m <= x <= z[2] - m and z[1] + m <= y <= z[3] - m]
 
     def exit_blocked(self, g, why):
         """비상구 앞 구역 안에서 막힘: 복구 · 우회 · 재시도 없이 바로 진입 불가(BLOCKED_NO_PATH)로 끝낸다."""
@@ -742,14 +776,51 @@ class Bridge(Node):
             return
         g['exit_done'] = True
         self.get_logger().warn(f'blocked inside exit zone ({why}) → approach to {EXIT_APPROACH_DIST}m, then BLOCKED_NO_PATH')
+        z = g['exit_zone']
+        inz = [(round(x, 2), round(y, 2)) for x, y in self.exit_hits(z)]
+        self.get_logger().info(f'exit zone hits n={len(inz)}: {inz[:6]} robot={self.map_xy()}')
         self.escape = None
-        self.cmd_pub.publish(Twist())
+        self.drive(Twist())
         if g.get('handle'):
             g['handle'].cancel_goal_async()
         # 막은 물건이 멀리서 먼저 보였을 수 있다 → 근거 사진이 잘 나오게 그 앞 EXIT_APPROACH_DIST 까지 천천히 다가간 뒤 알린다
         # 취소와 엇갈려 Nav2 복구 동작(제자리 회전)이 몇 초 더 돌 수 있다 → 3초 뒤부터 움직인다(명령이 섞이지 않게)
         now = time.monotonic()
-        self.approach = {'g': g, 'start': now + 3.0, 'until': now + 3.0 + EXIT_APPROACH_SEC}
+        # 1) 목적지 앞 EXIT_APPROACH_BACK 지점까지 Nav2 로 간다(문 앞 · 모퉁이에서 막혔을 때 통로 안으로 들어가 정면에 서려고).
+        #    막은 물건은 목적지 쪽에 있으므로 그 지점까지는 보통 길이 있다. 못 가면 그 자리에서 2) 로 넘어간다.
+        # 2) 목적지 쪽을 보며 천천히 다가가 앞 EXIT_APPROACH_DIST 에서 멈추고 알린다
+        self.approach = {'g': g, 'start': now + 3.0, 'until': now + 3.0 + EXIT_APPROACH_NAV_SEC, 'stage': 'nav',
+                         'handle': None, 'sent': False}
+
+    def approach_nav(self, a, g):
+        """다가가기 1단계: 목적지 앞 EXIT_APPROACH_BACK 지점까지 Nav2 로. 끝나거나(성공 · 실패) 시간이 다 되면 2단계로."""
+        ax = g['x'] - EXIT_APPROACH_BACK * math.cos(g['yaw'])
+        ay = g['y'] - EXIT_APPROACH_BACK * math.sin(g['yaw'])
+        xy = self.map_xy()
+
+        def creep():
+            if a.get('handle'):
+                a['handle'].cancel_goal_async()
+            a.update(stage='creep', until=time.monotonic() + EXIT_APPROACH_SEC)
+
+        if not a['sent']:
+            a['sent'] = True
+            # 이미 그 지점보다 목적지에 가깝거나 Nav2 가 준비되지 않았으면 바로 2단계
+            if xy is None or math.hypot(g['x'] - xy[0], g['y'] - xy[1]) <= EXIT_APPROACH_BACK + 0.15                     or not self.nav.server_is_ready():
+                return creep()
+            self.get_logger().info(f'exit approach: go to ({ax:.2f}, {ay:.2f}) in front of the goal first')
+            fut = self.nav.send_goal_async(NavigateToPose.Goal(pose=self.pose(ax, ay, g['yaw'])))
+
+            def accepted(f):
+                h = f.result()
+                if not h.accepted or self.approach is not a:
+                    return creep() if self.approach is a else None
+                a['handle'] = h
+                h.get_result_async().add_done_callback(lambda _r: creep() if self.approach is a and a['stage'] == 'nav' else None)
+            fut.add_done_callback(accepted)
+            return
+        if time.monotonic() > a['until']:
+            creep()
 
     def approach_step(self):
         """비상구 앞에서 막힌 뒤: 목적지 쪽을 보며 천천히 앞으로 간다. 앞(±20°) 라이다 거리가 EXIT_APPROACH_DIST 이하이거나
@@ -759,6 +830,9 @@ class Bridge(Node):
             return
         g = a['g']
         if time.monotonic() < a['start']:
+            return
+        if a['stage'] == 'nav':
+            self.approach_nav(a, g)
             return
         try:
             t = self.tf_buffer.lookup_transform('map', 'base_footprint', Time()).transform
@@ -778,7 +852,7 @@ class Bridge(Node):
         done = (x is None or time.monotonic() > a['until'] or (ahead <= EXIT_APPROACH_DIST and abs(err) < 0.3)
                 or math.hypot(g['x'] - x, g['y'] - y) <= EXIT_APPROACH_DIST)
         if done:
-            self.cmd_pub.publish(Twist())
+            self.drive(Twist())
             self.approach = None
             self.get_logger().warn(f'exit approach done (obstacle ahead {ahead:.2f}m) → BLOCKED_NO_PATH')
             self.report(g, 'ABORTED', 'BLOCKED_NO_PATH', '경로 없음: 비상구 앞 통로가 막힘',
@@ -791,7 +865,7 @@ class Bridge(Node):
         cmd.angular.z = max(-0.6, min(0.6, 1.5 * err))
         if abs(err) < 0.3 and ahead > EXIT_APPROACH_DIST:
             cmd.linear.x = EXIT_APPROACH_SPEED
-        self.cmd_pub.publish(cmd)
+        self.drive(cmd)
 
     def check_exit_stall(self):
         """비상구 앞 구역 안에서 EXIT_STALL_SEC 동안 목표에 가까워지지 못하면(장애물 앞에서 기다리기만 함) 막힌 것으로 본다."""

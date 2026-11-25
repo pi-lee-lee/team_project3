@@ -317,7 +317,7 @@ def build():
     tw = text_width('컨테이너 · 로봇 시스템', False, 11) + 16
     S.rect(sx0 + 16, s_top + 36, tw, 19, fill='#1c1c1e', stroke='#1c1c1e', rx=5)
     S.text(sx0 + 16 + tw / 2, s_top + 49.5, '컨테이너 · 로봇 시스템', 11, 700, '#ffffff', 'middle')
-    S.text(sx0 + 16, s_top + 76, 'ROS 2 Humble · Gazebo(헤드리스) · amd64', 12, 600, '#3a3a3c')
+    S.text(sx0 + 16, s_top + 76, 'ROS 2 Jazzy · Gazebo Harmonic(헤드리스) · amd64', 12, 600, '#3a3a3c')
     S.text(sx0 + 16, s_top + 94, '실제 로봇은 이 상자 전체를 대체한다(같은 노드 · 토픽)', 12, 400, '#636366')
 
     # Docker 호스트 테두리

@@ -96,10 +96,10 @@ scripts/                   E2E 시험
 SIM_MODE=slam docker compose up -d sim          # slam_toolbox + Nav2
 docker compose exec sim /sim/tools/explore.sh    # 경유점을 돌며 지도 작성
 docker compose exec sim /sim/tools/save_map.sh   # ros/maps/site.pgm · site.yaml 저장 + 고립 잡음 점 정리(원본은 site.raw.pgm)
-docker compose up -d sim                         # 기본(nav) 모드로 재시작 → site.yaml 사용
+SIM_MAP=site docker compose up -d sim            # 기본(nav) 모드로 재시작 → 방금 만든 site.yaml 사용
 ```
 
-`site.yaml` 이 없으면 `reference.yaml`(설계도 기준)을 쓴다.
+시뮬레이션의 기본 지도는 `reference.yaml`(설계도 지도, `world_spec.py` 가 월드와 같은 정의로 그린 것)이다(`SIM_MAP=reference`). 월드와 벽 위치가 똑같아 위치 추정이 흔들리지 않는다. `site.*` 는 Gazebo Classic 때 SLAM 으로 만든 지도로, Harmonic 월드와 군데군데 어긋나 (C2 동쪽 벽 윗부분 · 전기실 선반 몸통이 없음) 벽이 새 장애물로 잡히고 위치 추정이 밀려 기본에서 뺐다. 지우지 않고 남겨 두며 `SIM_MAP=site` 로 쓸 수 있다.
 
 순회 주행 계획(`ros/sim/src/tools/explore.py`)은 끼임을 막도록 다음 규칙으로 짠다.
 - 경유점 사이는 직선이고, 구간 전체에서 로봇 중심이 벽·설비와 0.27m 이상(반경 0.22 + 지도 한 칸) 떨어진다.
@@ -112,14 +112,14 @@ docker compose up -d sim                         # 기본(nav) 모드로 재시�
 막혀서 길이 없으면 경로부터 다시 계획한다. 좁은 곳에서도 스스로 줄이지 않는다 — 기준은 "감속 없이 최대 속도로 달리는 것"이다.
 로봇 모양은 경로 계획(전역 비용 지도)과 제어기(지역 비용 지도) 모두 반경 0.22m 원이다.
 
-주행 품질은 `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'` 로 잰다.
+주행 품질은 `docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/drive_probe.py X Y 각도'` 로 잰다.
 걸린 시간 · 평균 속도 · **최대속도 유지**(전진 속도 명령이 최대의 90% 이상이었던 시간 비율) · 벽까지 최소 거리 · 좌우 흔들림 · 전진 멈춤을 낸다.
 
 ```bash
 docker compose exec sim /sim/tools/obstacle.sh place reroute      # C2 아래쪽을 막아 틈이 유일한 길이 되게
 docker compose exec sim /sim/tools/obstacle.sh place gap 0.6      # C1 복도에 폭 0.6m 틈만 남김(좁은 통로)
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --gap 0.6'
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --drop detour 1.6'   # 1.6m 앞에 장애물을 갑자기 놓기
+docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --gap 0.6'
+docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/drive_probe.py 7.0 -0.1 0 --drop detour 1.6'   # 1.6m 앞에 장애물을 갑자기 놓기
 ```
 
 제어기를 바꾸며 잰 값(시뮬레이션, 최대 0.22m/s, 최대속도 유지 / 걸린 시간):
@@ -151,7 +151,7 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
   벽에서 0.45m 띠만 비용을 두어 그 밖은 직선이다. Smac 2D A\* + 다듬기는 열린 곳에서도 S 자로 출렁였다.
 - **한 번만 계획**: 행동 트리 `config/navigate_fixed_plan.xml`. 다시 계획하는 때는 목표가 바뀌었을 때, 경로가 막혔을 때,
   제어기 실패 · 복구 동작 뒤뿐이다(기본 트리는 1초마다 다시 계획해 주행 중 경로가 흔들렸다).
-- **계획 경로 측정**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/plan_probe.py'`
+- **계획 경로 측정**: `docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/plan_probe.py'`
   — 로봇을 움직이지 않고 충전 위치 · P1~P4 사이 경로의 길이 · 꺾임 · 벽 여유를 낸다.
 - **지역 비용 지도 0.025m**: 폭 0.6m 틈(문 바로 아래 골목을 반쯤 막은 `aisle60`)에서 0.05m 일 때는 15~31초 멈칫하거나 실패했고,
   0.025m 에서는 막지 않았을 때와 같은 시간에 지났다(P4 → P1 30~32초, P1 → P4 25~26초. 최근 12회 모두 틈으로 통과).
@@ -164,7 +164,7 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
   - 두 번 막힌 자리 막기 — 물러났다가 같은 자리에서 또 막히면 그 자리를 막아 다른 길로 계획하게 한다.
 - 한계: 로봇을 반지름 0.22m 원으로 본다. 틈이 0.5m 이하면 계획이 막힌 것으로 보고 돌아간다.
   두 번 막힌 자리 막기는 아직 작동한 적이 없다.
-- **반복 시험**: `docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py --rounds 3'`
+- **반복 시험**: `docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/nav_soak.py --rounds 3'`
   — 골목(P4 ↔ P1: 없음 · 폭 0.7 · 0.6 · 0.5m 틈 · 완전 막힘)과 생산동(P1 ↔ P3: 팔레트 · 문 막힘 · 진입 불가)을 장애물이
   서는 시점(출발 전 · 1.2m 앞 · 0.6m 앞)별로 달려, 맞는 결과(직행 · 우회 · 길 없음)인지와 정지 시간을 낸다(`--sets`, `--only`).
   한 회 42번 주행에 한 시간 남짓. 최근 연속 3회(126번)에서 틀린 결과 0, 물러나기는 뒤 2회(84번)에서 6번 작동했다.
@@ -194,6 +194,7 @@ Nav2·AMCL 설정은 `ros/sim/src/config/nav2_params.yaml`(TurtleBot3 기본값�
 docker compose exec sim /sim/tools/obstacle.sh place pallet    # 생산동 가운데 팔레트(P1 → P3 경로 위): 옆으로 비켜 지나감
 docker compose exec sim /sim/tools/obstacle.sh place door      # 생산동 → C2 문 막힘: C1 · C2 로 돌아감
 docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘: P3 진입 불가
+docker compose exec sim /sim/tools/obstacle.sh place exit      # 비상구 앞 낮은 상자: P3 점검이면 다가가 촬영 · 비상구 앞 통로 막힘 경고
 docker compose exec sim /sim/tools/obstacle.sh place aisle     # 전기실 문 바로 아래 골목 막힘(P4 ↔ P1 경로 위): 랙 1 위로 돌아 나옴
 docker compose exec sim /sim/tools/obstacle.sh place aisle60   # 같은 자리를 반쯤 막아 폭 0.6m 틈만 남김(aisle50 은 0.5m)
 docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 복도 팔레트 / reroute: C2 아래쪽 막힘 (C1 · C2 를 따라갈 때만 경로 위)
@@ -207,7 +208,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 | --- | --- | --- | --- |
 | 9-1 | P1 → P3 | `pallet` | 제어기가 비켜 지나감 |
 | 9-2 | P1 → P3 | `door` | 다시 계획해 C1 · C2 로 돌아감 |
-| 9-3 | → P3, P4 | `block`(출발 전) | P3 진입 불가(`BLOCKED_NO_PATH`), P4 은 촬영 |
+| 9-3 | → P3, P4 | `exit`(출발 전, 비상구 앞 낮은 상자) | 비상구 앞 구역이라 복구 · 우회 없이 1m 앞까지 다가가 목적지 쪽 사진 → P3 진입 불가(`BLOCKED_NO_PATH`, "비상구 앞 통로가 막힘"), 경고 탭에 `EXIT_BLOCKED`(WARNING). P4 는 촬영 |
 | 9-4 | P4 → P1 | `aisle` | 다시 계획해 랙 위로 돌아 나옴 |
 | 9-5 | P4 → P1 | `aisle60` | 틈으로 지남 |
 | 9-6 | P1 → P4 | 9-5 의 장애물을 그대로 둠 | 틈으로 지남 |
@@ -258,7 +259,7 @@ docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우�
 
 1. 로봇(또는 Remote PC)에서 SLAM 으로 현장 지도를 만들고 Nav2 를 띄운 뒤, rosbridge(9090)·rosapi, web_video_server(8080), `ros/robot/src/nav2_goal_bridge.py`, `ros/robot/src/cmd_vel_watchdog.py` 를 실행한다. 팀 주행 코드를 쓰려면 같은 토픽 약속(`/inspection/goal`·`goal_status`·`bridge_status`)을 지키는 노드로 바꾼다.
 2. 관리자 화면 → 로봇 → 연결 설정에서 `rosbridgeUrl`, `videoUrl`, 토픽 이름을 실제 값으로 바꾸고 저장한다(어댑터 재연결).
-   카메라 영상은 **압축 토픽**(`/camera/image_raw/compressed`, JPEG)으로 받는다. 로봇에 `ros-humble-compressed-image-transport` 를 설치하면 카메라 노드가 압축 토픽을 함께 발행한다(`imageTransport: "raw"` 로 바꾸면 원본 토픽).
+   카메라 영상은 **압축 토픽**(`/camera/image_raw/compressed`, JPEG)으로 받는다. 로봇에 `ros-jazzy-compressed-image-transport`(실제 터틀봇은 Jazzy) 를 설치하면 카메라 노드가 압축 토픽을 함께 발행한다(`imageTransport: "raw"` 로 바꾸면 원본 토픽).
 3. 시뮬레이터 없이 실행: `docker compose up -d --scale sim=0`
 
 ## 화면

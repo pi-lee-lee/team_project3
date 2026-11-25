@@ -104,7 +104,8 @@ public class DashboardController {
         return jdbc.sql("WITH s AS (" + OBS_STATE + " WHERE o.captured_at >= now() - make_interval(hours => ?)), "
                 + """
                 a AS (
-                    SELECT 'OBS_ABNORMAL' AS type, 'CRITICAL' AS severity, s.reviewed_at AS at, 'observation' AS ref_kind,
+                    -- 사람 판정 '이상'도 경고(WARNING)다. 비상(CRITICAL)은 화재 감지 · 시스템(서비스 중지 · 로봇 끊김)만
+                    SELECT 'OBS_ABNORMAL' AS type, 'WARNING' AS severity, s.reviewed_at AS at, 'observation' AS ref_kind,
                            s.observation_id AS ref_id, s.task_id, s.point_id, NULL::text AS detail FROM s
                     WHERE s.review_result = 'ABNORMAL'
                   UNION ALL

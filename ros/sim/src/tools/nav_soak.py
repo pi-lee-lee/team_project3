@@ -1,5 +1,5 @@
 """주행 안정성 반복 시험: P4 ↔ P1 을 장애물 종류 · 놓는 시점을 바꿔 가며 되풀이하고, 회차마다 결과를 한 줄로 낸다.
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/nav_soak.py [--rounds 1] [--sets aisle,hall,hall_back] [--only aisle60,none]'
+docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/nav_soak.py [--rounds 1] [--sets aisle,hall,hall_back] [--only aisle60,none]'
 
 목표는 서버와 같은 길(/inspection/goal → 목표 브리지 → Nav2)로 보낸다. 브리지의 재시도 · 물러나기까지 포함해 본다.
 기준(타협 없음): 길이 있으면 반드시 도착한다. 끼여서 모든 계획이 실패한 채 멈추는 일이 없어야 한다.
@@ -8,7 +8,7 @@ docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim
            없음 · 폭 0.7 · 0.6 틈 → 직행,  폭 0.5 틈 · 완전 막힘 → 우회
   정지   = 출발한 뒤 속도 명령이 선속도 · 각속도 모두 0 에 가까웠던 시간(초). 제자리 회전은 '전진 없음'에 따로 센다.
 놓는 시점: static = 출발 전에 놓음,  far = 달리는 도중 로봇 중심이 장애물에서 1.2m 일 때,  near = 0.6m 일 때(코앞. 차체와는 0.45m 로 겹치지 않는다)
-장애물은 시작할 때 건물 밖에 미리 만들어 두고 /gazebo/set_entity_state 로 즉시 옮긴다. 그때그때 새로 만들면 서기까지 2.5~4초가
+장애물은 시작할 때 건물 밖에 미리 만들어 두고 /world/factory/set_pose 로 즉시 옮긴다. 그때그때 새로 만들면 서기까지 2.5~4초가
 걸려 로봇 위에 겹쳐 생기곤 했다 — 차체가 튕겨 위치 추정이 깨지는, 실제로는 없는 상황이다.
 """
 import json
@@ -19,10 +19,10 @@ import time
 import uuid
 
 import rclpy
-from gazebo_msgs.msg import EntityState
-from gazebo_msgs.srv import SetEntityState, SpawnEntity
 from nav2_msgs.srv import ClearEntireCostmap
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import TwistStamped
+from ros_gz_interfaces.msg import Entity, EntityFactory
+from ros_gz_interfaces.srv import SetEntityPose, SpawnEntity
 from std_msgs.msg import String
 from tf2_ros import Buffer, TransformListener
 
@@ -52,12 +52,12 @@ class Soak:
         self.n = rclpy.create_node('nav_soak')
         self.goal_pub = self.n.create_publisher(String, '/inspection/goal', 10)
         self.n.create_subscription(String, '/inspection/goal_status', self.on_status, 20)
-        self.n.create_subscription(Twist, '/cmd_vel', self.on_cmd, 20)
+        self.n.create_subscription(TwistStamped, '/cmd_vel', self.on_cmd, 20)   # Jazzy: 바퀴 명령은 TwistStamped
         self.tf = Buffer()
         TransformListener(self.tf, self.n)
         self.status, self.gid = None, None
-        self.spawn = self.n.create_client(SpawnEntity, '/spawn_entity')
-        self.move = self.n.create_client(SetEntityState, '/gazebo/set_entity_state')
+        self.spawn = self.n.create_client(SpawnEntity, '/world/factory/create')      # Gazebo Harmonic 월드 서비스
+        self.move = self.n.create_client(SetEntityPose, '/world/factory/set_pose')
         self.clears = [self.n.create_client(ClearEntireCostmap, f'/{c}/clear_entirely_{c}') for c in ('global_costmap', 'local_costmap')]
         self.parked = {}
         self.stop = self.noforward = 0.0
@@ -68,7 +68,8 @@ class Soak:
         if s.get('goalId') == self.gid and s.get('state') in ('SUCCEEDED', 'ABORTED', 'CANCELED'):
             self.status = s
 
-    def on_cmd(self, m):
+    def on_cmd(self, stamped):
+        m = stamped.twist
         now = time.monotonic()
         dt = min(now - self.cmd_at, 0.5) if self.cmd_at else 0.0
         self.cmd_at = now
@@ -95,15 +96,16 @@ class Soak:
         for i, nm in enumerate(names):
             _, _, sx, sy = W.OBSTACLES[nm]
             self.parked[nm] = (-30.0 - 2 * i, -30.0)
-            req = SpawnEntity.Request(name=f'obstacle_{nm}', xml=sdf(f'obstacle_{nm}', sx, sy))
-            req.initial_pose.position.x, req.initial_pose.position.y, req.initial_pose.position.z = *self.parked[nm], 0.3
-            f = self.spawn.call_async(req)
+            ef = EntityFactory(name=f'obstacle_{nm}', allow_renaming=False,
+                               sdf=f'<sdf version="1.8">{sdf(f"obstacle_{nm}", sx, sy)}</sdf>')
+            ef.pose.position.x, ef.pose.position.y, ef.pose.position.z = *self.parked[nm], 0.3
+            f = self.spawn.call_async(SpawnEntity.Request(entity_factory=ef))
             rclpy.spin_until_future_complete(self.n, f, timeout_sec=90)
 
     def put(self, nm, x, y):
-        st = EntityState(name=f'obstacle_{nm}')
-        st.pose.position.x, st.pose.position.y, st.pose.position.z, st.pose.orientation.w = float(x), float(y), 0.3, 1.0
-        f = self.move.call_async(SetEntityState.Request(state=st))
+        req = SetEntityPose.Request(entity=Entity(name=f'obstacle_{nm}', type=Entity.MODEL))
+        req.pose.position.x, req.pose.position.y, req.pose.position.z, req.pose.orientation.w = float(x), float(y), 0.3, 1.0
+        f = self.move.call_async(req)
         rclpy.spin_until_future_complete(self.n, f, timeout_sec=5)
 
     def place(self, nm):

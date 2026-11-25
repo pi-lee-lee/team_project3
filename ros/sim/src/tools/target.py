@@ -44,7 +44,7 @@ def describe(st):
 
 
 def apply(gz, key, value):
-    """Gazebo 의 모델을 지우고 새 상태로 다시 만든다(이름 뒤에 번호가 붙는다: target_lamp__123 — gz.py 참고)."""
+    """Gazebo 의 모델을 지우고 새 상태로 다시 만든다(이름 뒤에 번호가 붙는다: target_lamp__123 — gazebo.py 참고)."""
     if key == 'gauge':
         gz.replace('target_gauge', lambda name: W.gauge_model(value, name))
     elif key == 'lamp':
@@ -80,7 +80,7 @@ def main():
         changes = {'extinguisher': args[1]}
     else:
         raise SystemExit(__doc__)
-    from gz import Gazebo          # ROS 가 필요한 부분은 여기서부터(status 는 ROS 없이도 된다)
+    from gazebo import Gazebo          # ROS 가 필요한 부분은 여기서부터(status 는 ROS 없이도 된다)
     gz = Gazebo('target_tool')
     for key, value in changes.items():
         apply(gz, key, value)

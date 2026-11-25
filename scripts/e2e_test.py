@@ -124,17 +124,22 @@ def obstacle_scenarios(user, rid, by):
     d = drive_and_block(user, rid, by['P3'], '문 막힘', 'door', lambda p: p['x'] > 5.6 and p['y'] > 3.5)
     check(d['status'] == 'COMPLETED' and d['observations'][0]['status'] == 'CAPTURED', '다시 계획해 C1 · C2 로 돌아 P3 도착·촬영')
 
-    print('9-3. 장애물: C2 위쪽 막힘 (진입 불가)')
+    print('9-3. 장애물: 비상구 앞 적재 (P3 앞 낮은 상자 → 복구 · 우회 없이 다가가 촬영 · 경고, 다음 지점은 그대로)')
     obstacle('clear')
-    d = run_task(user, rid, [by['P1']], '막기 전에 생산동으로 이동')     # 로봇이 막힘 위쪽(P3)에 갇히지 않게
-    check(obstacle('place', 'block'), 'C2 위쪽 막기')
-    d = run_task(user, rid, [by['P3'], by['P4']], '진입 불가')
+    d = run_task(user, rid, [by['P1']], '막기 전에 생산동으로 이동')     # 로봇이 상자 위쪽(P3)에 갇히지 않게
+    check(obstacle('place', 'exit'), '비상구 앞에 상자 놓기(world_spec OBSTACLES exit: 가로 0.7 · 높이 0.22m)')
+    d = run_task(user, rid, [by['P3'], by['P4']], '비상구 앞 진입 불가')
     print('     사건:', ' → '.join(e['type'] for e in d['events']))
     o2 = next(o for o in d['observations'] if o['point_code'] == 'P3')
     o3 = next(o for o in d['observations'] if o['point_code'] == 'P4')
-    check(o2['status'] == 'UNABLE' and o2['reason_code'] == 'BLOCKED_NO_PATH',
+    check(o2['status'] == 'UNABLE' and o2['reason_code'] == 'BLOCKED_NO_PATH' and '비상구 앞 통로가 막힘' in (o2['reason'] or ''),
           f"P3 확인 불가 · 사유 코드 {o2['reason_code']} ({o2['reason']})")
+    check(o2['has_image'], 'P3 근거 사진(목적지 쪽으로 돌아 찍음)')
     check('ARRIVAL_BLOCKED' in [e['type'] for e in d['events']], '사건 기록 ARRIVAL_BLOCKED')
+    s, alerts = user.get('/api/alerts?state=OPEN,ACKED&limit=200')
+    exit_alert = next((a for a in alerts if a['type'] == 'EXIT_BLOCKED' and a['point_code'] == 'P3'), None)
+    check(exit_alert and exit_alert['grade'] == 'WARNING' and exit_alert['ref_id'] == o2['observation_id'],
+          '경고 탭에 비상구 앞 통로 막힘(WARNING, 이 관측이 근거)', str(exit_alert))
     check(o3['status'] == 'CAPTURED', '막힌 지점은 건너뛰고 다음 지점(P4)은 촬영')
 
     print('9-4. 장애물: 가던 골목이 막힘 (P4 → P1, 전기실 문 바로 아래 막힘 → 랙 위로 돌아 나옴)')

@@ -1,7 +1,7 @@
 # 화재 점검 로봇 (team_project3)
 
 로봇이 시설을 돌며 소방 설비를 점검하고, 화재가 감지되면 출동해 소화액을 투척하는 서비스입니다.
-웹(React) + Spring MSA 백엔드 + Python 분석 서비스 + ROS 2 Humble TurtleBot3 시뮬레이션을 Docker Compose 로 한 번에 띄웁니다.
+웹(React) + Spring MSA 백엔드 + Python 분석 서비스 + ROS 2 Jazzy TurtleBot3 시뮬레이션(Gazebo Harmonic)을 Docker Compose 로 한 번에 띄웁니다.
 
 > 지금 브랜치 `feat/scenarios-sim` 은 **터틀봇 한 대로 시뮬레이션에서** 동작합니다. 젯봇과 실물 투척 기구는 아직 연결되지 않았습니다([8. 지금 구현 범위](#8-지금-구현-범위)).
 
@@ -128,7 +128,7 @@ python3 scripts/demo.py all
 | `inspection-service` | Spring Boot | 점검 지점 · 규칙 · 작업 · 예약, 판독 결과, 경고, 사건(화재 대응) 흐름, 설정, 시연 실행 |
 | `robot-service` | Spring Boot | 로봇 연결(rosbridge), 미션 실행, 조종 제어권, 투척 명령, 투척 위치 계산 |
 | `analysis-service` | Python FastAPI | 사진 품질 분석, 판독기(물체 · 계기판 · 표시등 · 열화상) |
-| `sim` | ROS 2 Humble · Gazebo · Nav2 | TurtleBot3 Waffle Pi 시뮬레이션, 목표 브리지, 모의 투척 기구 |
+| `sim` | ROS 2 Jazzy · Gazebo Harmonic · Nav2 | TurtleBot3 Waffle Pi 시뮬레이션, 목표 브리지, 모의 투척 기구 |
 | `db` | PostgreSQL 17 | 서비스마다 DB 분리, 스키마는 Flyway |
 
 - 서버는 로봇에 **목적지만** 보냅니다. 그곳까지의 길과 조종은 로봇(Nav2)이 합니다. 시뮬레이션과 실제 로봇이 같은 토픽 계약을 씁니다.

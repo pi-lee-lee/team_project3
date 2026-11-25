@@ -22,7 +22,7 @@
 1. **정해지지 않은 것은 설정으로 둔다.** 값 · 대상 · 규격이 미정인 항목은 코드에 넣지 않고 설정 자리를 만들어 둔다(8장에 목록).
 2. **카메라로 하는 판독은 인터페이스 하나로 받는다.** 계기판 · 표시등 · 소화기 · 열화상 · 마커 모두 analysis-service 의 판독 인터페이스(3장)를 거친다. 판독 종류를 더해도 다른 서비스는 바뀌지 않는다.
 3. **로봇이 달라도 계약은 같다.** 터틀봇과 젯봇은 같은 목표 계약을 지킨다. 로봇마다 다른 것(토픽 이름 · 허용 오차 · 제공 기능)은 로봇 설정(`robot.config`)에 둔다.
-4. **ROS 2 는 Humble 로 한다.** Jazzy 로 바뀌어도 노드 · 토픽 구성은 같고, 서비스(Spring · Python · 화면 · DB)에는 변경이 없다. 계약 메시지는 표준 메시지(`std_msgs/String` 의 JSON, `geometry_msgs`, `nav_msgs`)만 쓴다.
+4. **ROS 2 는 Jazzy 로 한다**(실제 터틀봇과 같은 판, Humble 에서 옮김 — SCENARIOS.md 3.4). 판이 바뀌어도 노드 · 토픽 구성은 같고, 서비스(Spring · Python · 화면 · DB)에는 변경이 없다. 계약 메시지는 표준 메시지(`std_msgs/String` 의 JSON, `geometry_msgs`, `nav_msgs`)만 쓴다.
 5. **지금 있는 규칙을 그대로 따른다.** 명령에는 ID 를 붙여 한 번만 실행(멱등), 로봇 보고는 outbox 에 담아 재전송, 사건 기록은 추가만, 시각은 timestamptz.
 
 ---
@@ -725,7 +725,7 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 디바이스 쪽 토픽 이름 | 로봇 설정 `topics`, 브리지 파라미터 | 2장의 이름 |
 | 투척 기구의 시리얼 형식 | `launcher_bridge.py` 파라미터 | 2.2 의 줄 형식 |
 | 현업용 열화상 카메라 | 로봇 설정 `camera.frame = THERMAL` | `RGB` |
-| ROS 2 배포판 | 이미지 빌드 인자 `ROS_DISTRO` | `humble` |
+| ROS 2 배포판 | 이미지 빌드 인자 `ROS_DISTRO`(compose.yaml) | `jazzy` |
 
 ---
 

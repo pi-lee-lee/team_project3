@@ -23,7 +23,7 @@
 | 시연용 초기 화재 | **열화상 카메라 출력 이미지를 인쇄해 시연 공간에 둔다.** 그 이미지를 보고 화재 여부를 판독한다. 현업에서는 실제 열화상 카메라 영상이 그 자리에 들어간다 (4.2) |
 | 젯봇 기반 작업 | **별개 항목이다(다른 담당자가 진행 중).** 공개된 젯봇 코드(ROS 1)를 ROS 2 로 옮기고 스테레오 카메라 설정으로 동작하게 한다. 이 문서의 작업은 그 결과물 위에 올린다 (4.0) |
 | 소방 관제를 하는 로봇 | **터틀봇과 젯봇 둘 다 구현한다** (2절 "두 로봇") |
-| ROS 2 배포판 | **젯봇 · 터틀봇 · 브리지 노드를 한 배포판으로 맞춘다. 우선 Humble.** Jazzy 로 바뀌어도 노드 · 토픽 구성은 비슷하고 서비스에는 변경이 없다 (3.4) |
+| ROS 2 배포판 | **젯봇 · 터틀봇 · 브리지 노드를 한 배포판으로 맞춘다. Jazzy(실제 터틀봇과 같은 판).** Humble 에서 옮겼고 노드 · 토픽 구성과 서비스는 그대로다 (3.4) |
 | "멀티 시나리오"의 뜻 | **점검 규칙이 여러 종류**(소화기 위치, 계기판 등). 그 위치에서 찍은 사진으로 **정상 · 경고 · 비상** 등급을 매긴다 (2절) |
 
 ---
@@ -166,30 +166,35 @@
 | 패널 추가 · 배치 변경 | `panels.tsx` 의 `PANELS` 등록, `layout.ts` 의 배치표 |
 | 누르면 뜨는 상세 추가 | `data.ts` 의 `Ref` 에 종류 추가, `details.tsx` 의 `DETAILS` 등록 |
 
-### 3.4 ROS 2 배포판: Humble 예정, 확정 뒤 일괄 전환
+### 3.4 ROS 2 배포판: Jazzy (Humble 에서 옮김)
 
-젯봇 · 터틀봇 · 브리지 노드는 **같은 배포판**을 쓴다. 우선 Humble 로 만든다. Jazzy 로 바뀌어도 노드 · 토픽 구성은 비슷하므로 시스템에 치명적이지 않고, **서비스(Spring · Python · 화면 · DB)에는 변경이 없다** — 서비스는 rosbridge 의 토픽 계약만 본다. 바뀌면 아래 로봇 쪽 항목을 한 번에 고친다.
+젯봇 · 터틀봇 · 브리지 노드는 **같은 배포판**을 쓴다. 실제 터틀봇(라즈베리파이)이 Jazzy 라 시뮬레이션도 Jazzy 로 옮겼다(브랜치 `feat/jazzy`).
+노드 · 토픽 구성은 그대로이고, **서비스(Spring · Python · 화면 · DB)에는 변경이 없다** — 서비스는 rosbridge 의 토픽 계약만 본다.
 
-**그때까지 지킬 것** — 전환 비용을 줄이기 위해 새로 쓰는 코드에 적용한다.
+**지킬 것**
 
 - 우리 노드(`nav2_goal_bridge.py`, `cmd_vel_watchdog.py`, 새로 쓸 `launcher_bridge.py` · `ros/patrol`)는 rclpy 와 표준 메시지만 쓴다. 배포판마다 다른 API 는 피한다.
-- 배포판 이름(`humble`)을 새 파일에 직접 적지 않는다. 도커 이미지는 빌드 인자(`ROS_DISTRO`)로 받고, 스크립트는 `/opt/ros/$ROS_DISTRO/setup.bash` 를 쓴다.
-- 웹 쪽(robot-service)은 rosbridge 의 토픽 계약만 보므로 배포판과 무관하다. 바뀌지 않는다.
+- 배포판 이름을 파일에 직접 적지 않는다. 도커 이미지는 빌드 인자 `ROS_DISTRO`(`compose.yaml` 한 곳, 기본 `jazzy`)로 받고, 스크립트는 `/opt/ros/$ROS_DISTRO/setup.bash` 를 쓴다.
+- 바퀴 명령 `/cmd_vel` 은 Jazzy 에서 `geometry_msgs/TwistStamped` 다. 우리 노드는 환경 변수 `CMD_VEL_STAMPED`(기본 1, 0 이면 `Twist`)로 고른다. 서버와의 약속 `/cmd_vel_teleop` 은 그대로 `Twist` 이고 워치독이 감싼다.
+- 웹 쪽(robot-service)은 rosbridge 의 토픽 계약만 보므로 배포판과 무관하다.
 
-**Jazzy 로 갈 때 바꿀 곳**
+**Humble → Jazzy 에서 바꾼 것**
 
-| 대상 | 지금 | 바꿀 일 | 크기 |
-| --- | --- | --- | --- |
-| 시뮬레이션 이미지 `ros/sim/Dockerfile` | `ros:humble-ros-base` + `ros-humble-*` 패키지 | 기반 이미지 · 패키지 이름 교체 | 작다 |
-| 시뮬레이터 | Gazebo Classic 11 | Jazzy 에는 Gazebo Classic 이 없어 새 Gazebo(gz sim)로 옮겨야 한다. 월드 생성(`world_spec.py`) · 로봇 스폰 · 라이다/카메라 플러그인 · 장애물 도구(`obstacle.py`)가 걸린다 | **가장 크다** |
-| Nav2 설정 `nav2_params.yaml` | Humble 기준으로 조정한 값 | 배포판 사이에 바뀐 파라미터 · 플러그인 이름 맞추기, 주행 품질 다시 측정(`drive_probe.py`) | 중간 |
-| 실행 스크립트 | `source /opt/ros/humble/setup.bash` 가 적힌 곳: `entrypoint.sh`, `tools/*.sh`, `drive_probe.py` 안내 | `$ROS_DISTRO` 로 교체 | 작다 |
-| 터틀봇 실기 | 터틀봇 SBC 의 OS · ROS, OpenCR 펌웨어 | 배포판에 맞는 OS 이미지와 turtlebot3 패키지로 재설치 | 중간 |
-| 젯봇 | 기반 작업의 결과물(4.0) | Jetson Nano 는 기본 OS 가 오래되어 어느 배포판이든 도커로 올릴 가능성이 크다. 기반 작업 쪽에서 확인 | 기반 작업에 포함 |
-| 문서 | `CLAUDE.md`, `RUNNING.md`, 아키텍처 도면 생성 스크립트 | 배포판 이름 고치기 | 작다 |
-| 시험 | — | 전환 뒤 SLAM 재스캔, E2E 전체 | — |
+| 대상 | Humble 때 | Jazzy 로 바꾼 것 |
+| --- | --- | --- |
+| 시뮬레이션 이미지 `ros/sim/Dockerfile` | `ros:humble-ros-base` + `ros-humble-*` | `ros:${ROS_DISTRO}-ros-base` + `ros-${ROS_DISTRO}-*`, `ros-gz` |
+| 시뮬레이터 | Gazebo Classic 11 (`gazebo_ros`) | Gazebo Harmonic(`gz sim`). 로봇 생성 `ros_gz_sim create`, 토픽은 `ros_gz_bridge`(TurtleBot3 Jazzy 설정), 카메라는 `ros_gz_image` |
+| 월드 `world_spec.py` | 플러그인 `gazebo_ros_state`, `model://ground_plane · sun`, 사진 판 `.material` 스크립트 | Harmonic 시스템 플러그인(Physics · UserCommands · SceneBroadcaster · Sensors · Imu), 땅 · 해 직접 정의, 사진 판 PBR 텍스처 |
+| 시뮬레이션 도구(`gz.py` · `obstacle.py` · `nav_soak.py`) | `/spawn_entity` · `/delete_entity` · `/gazebo/set_entity_state` | `/world/factory/create` · `remove` · `set_pose`(`ros_gz_interfaces`), 모델 목록은 `gz model --list` |
+| Nav2 설정 `nav2_params.yaml` | Humble 기준 | 플러그인 이름 `::`, `recoveries_server` → `behavior_server`, `plugin_lib_names` 삭제 · `navigators` 명시, `enable_stamped_cmd_vel`, 새 서버(`velocity_smoother` · `collision_monitor` · `docking_server` · `route_server`) 설정, 행동 트리 `BTCPP_format="4"`. 튜닝값(Theta* · MPPI · 팽창 · AMCL)은 그대로 |
+| 실행 스크립트 | `source /opt/ros/humble/setup.bash` | `source /opt/ros/$ROS_DISTRO/setup.bash` |
+| 시뮬레이션 오도메트리 | Classic 바퀴 계산(정확) | Harmonic 바퀴 계산(DiffDrive)은 회전 · 빠져나오기 때 바퀴가 헛돌아 방향이 크게 틀어졌다(e2e 한 번에 67°). AMCL 오차 계수 0.05(시뮬레이션 odom 이 정확하다는 전제)로는 따라잡지 못해 위치가 1m 넘게 밀렸다 → 바퀴 구동은 DiffDrive 그대로, odom 은 Gazebo OdometryPublisher(로봇의 실제 움직임)로 낸다(`SIM_TRUE_ODOM`). 위치 추정 오차 4~6cm |
+| 시뮬레이션 저장 지도 | `site`(Classic 에서 SLAM) | 기본을 설계도 지도 `reference`(`world_spec.py`, 월드와 같은 정의)로(`SIM_MAP`). `site` 는 Harmonic 월드와 어긋나(C2 동쪽 벽 윗부분 · 선반 몸통 없음) 벽이 새 장애물로 잡히고 위치 추정이 0.6~1.2m 밀렸다. `site` 는 남겨 둔다 |
+| 시뮬레이션 부담(GPU 없이 CPU 로 그림) | 시계 `/clock` 10Hz, 라이다는 CPU 광선(`ray`) | Harmonic 은 라이다(`gpu_lidar`) · 카메라를 그려서 만든다. 시계 · 바퀴 관절 상태가 물리 한 걸음(4ms)마다 나와 모든 노드가 초당 160번 넘게 깨어났다 → 시계는 `clock_relay.py` 가 50Hz 로, 관절 상태는 30Hz 로 줄이고, 카메라는 누가 영상을 받을 때만 5Hz(아니면 0.5Hz)로 그린다(`camera_gate.py`, 신호를 받을 때만 그리는 카메라). Nav2 서버 열네 개를 한 프로세스로 합치고(`use_composition`, 따로 돌 때 가만히 있어도 합쳐 2코어 남짓), 물리 한 걸음을 8ms 로 늘렸다. 시뮬레이션 속도(실제 시간 대비) 0.65 → 0.95(주행 중 0.94, 관제 카메라를 볼 때 0.8 안팎). 실제 로봇과는 관계없다 |
+| 터틀봇 실기 | — | 라즈베리파이 Ubuntu 24.04 + Jazzy 로 이미 세팅(카메라 `camera_ros`) |
+| 젯봇 | 기반 작업의 결과물(4.0) | Jetson Nano 는 기본 OS 가 오래되어 도커로 같은 판을 올린다. 기반 작업 쪽에서 확인 |
 
-시뮬레이터 교체와 Nav2 설정 항목은 실제로 옮겨 보기 전까지 정확한 양을 알 수 없다. 배포판을 확정할 때 이 둘을 먼저 작게 시험해 본다.
+시뮬레이션은 GPU 없이 소프트웨어로 그려 Classic 보다 느리다(실제 시간보다 느리게 흐른다. 시뮬레이션 시간 기준 로봇 속도는 같고, 실제 로봇과는 무관). 주행 품질 수치(`drive_probe.py` · `nav_soak.py`)는 Jazzy 에서 다시 재야 한다.
 
 ---
 
@@ -231,7 +236,7 @@
 
 **미리 맞춰 둘 것**
 
-- **ROS 2 배포판:** 젯봇 · 터틀봇 · 브리지 노드를 한 배포판으로 맞춘다(Humble 예정, 3.4). 젯봇 기반 작업도 같은 배포판을 목표로 한다.
+- **ROS 2 배포판:** 젯봇 · 터틀봇 · 브리지 노드를 한 배포판으로 맞춘다(Jazzy, 3.4). 젯봇 기반 작업도 같은 배포판을 목표로 한다.
 - **`cmd_vel` 단위:** 젯봇은 엔코더가 없어 속도 명령이 실제 속도와 다를 수 있다. 명령 값과 실제 속도의 대략적인 비율을 한 번 재 둔다(오도메트리 추적을 잃었을 때의 추정에 쓴다).
 
 **기반 작업을 기다리지 않고 할 수 있는 것:** 4장의 단계 1~3(사건 흐름 · 투척 모드 · 대시보드)은 `fire.sh` 로 젯봇 보고를 흉내 내므로 젯봇 없이 끝까지 만들고 시험할 수 있다. 젯봇이 필요한 것은 단계 4~5 뿐이다.
@@ -415,6 +420,6 @@
 | 대기 구역 위치, 마커 크기 · 높이, 정렬 구역 추가 | 마커 표 |
 | 위치 기준으로 쓸 고정 대상 | 규칙의 대상 좌표 · 사용 여부 |
 | 젯봇 쪽 토픽 이름, 허용 오차, 카메라 제원 | 로봇 설정 |
-| ROS 2 배포판 | Humble 로 진행. 바뀌어도 서비스에는 변경이 없다(3.4) |
+| ROS 2 배포판 | Jazzy 로 옮김. 서비스에는 변경이 없다(3.4) |
 
 **실측은 구현 후 작업이다.** 장비와 구현이 있어야 잴 수 있으므로 계획 단계에 넣지 않는다. 이 문서에 적힌 정확도 · 속도 수치는 모두 목표값이고, 실측 결과는 위 설정값으로 들어간다. 목록은 [INTERFACES.md](INTERFACES.md) 11장에 있다(젯봇 정렬 · 복귀 오차 · 도착 정확도 · 처리 속도, 스테레오 거리 오차, 투척 사거리 · 편차, 판독기별 오판 비율).

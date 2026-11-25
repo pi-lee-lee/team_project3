@@ -5,7 +5,7 @@
   제어기가 실패했거나 복구 동작(회전·대기·후진)을 한 뒤에는 현재 위치에서 다시 계획한다. 제어기는 새 주행을 시작할 때 경로의
   앞부분(prune_distance)에서만 자기 위치를 찾으므로, 이미 지나온 옛 경로를 다시 주면 "Resulting plan has 0 poses" 로 계속 실패한다.
 -->
-<root main_tree_to_execute="MainTree">
+<root BTCPP_format="4" main_tree_to_execute="MainTree">
   <BehaviorTree ID="MainTree">
     <RecoveryNode number_of_retries="6" name="NavigateRecovery">
       <PipelineSequence>

@@ -100,7 +100,7 @@ export function useDashData(): DashData {
 // ------------------------------------------------------------------ 경고
 // 서버가 보낸 경고 종류 → [아이콘, 제목]. 새 종류(예: 소화기 미비치 EXTINGUISHER_MISSING, 화재 감지 FIRE_DETECTED)는 여기에 한 줄을 더한다.
 const ALERT_TEXT: Record<string, [string, string]> = {
-  OBS_ABNORMAL: ['exclamationmark.octagon.fill', '이상 판정'],
+  OBS_ABNORMAL: ['exclamationmark.triangle.fill', '이상 판정'],   // 경고(주황). 비상(빨강)은 화재뿐
   OBS_UNABLE: ['nosign', '확인 불가'],
   OBS_RETAKE: ['photo', '재촬영 후보'],
   TASK_FAILED: ['xmark.circle.fill', '작업 실패'],
@@ -163,7 +163,7 @@ export type PointState = 'ok' | 'bad' | 'warn' | 'wait' | 'none';
 export function pointState(p: DashPoint): PointState {
   if (!p.observation_id) return 'none';
   // 사람 판정이 있으면 그것이 우선한다
-  if (p.review_result === 'ABNORMAL') return 'bad';
+  if (p.review_result === 'ABNORMAL') return 'warn';     // 사람 판정 '이상'은 경고. 'bad'(빨강)는 비상 등급뿐
   if (p.review_result === 'NORMAL') return 'ok';
   // 규칙 등급: 3 비상 · 2 경고 · 1 판독 불가 · 0 정상
   if (p.grade_rank === 3) return 'bad';

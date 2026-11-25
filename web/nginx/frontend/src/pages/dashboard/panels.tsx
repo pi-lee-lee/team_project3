@@ -46,7 +46,7 @@ function Kpi({ d, open }: PanelProps) {
     { label: '오늘 완료', value: t?.tasks.completed ?? '-', sub: `오늘 요청 ${t?.tasks.total ?? '-'}건`, tone: 'green', icon: 'checkmark.circle.fill', ref: { kind: 'tasks', group: 'done' } },
     { label: '오늘 실패·중단', value: t?.tasks.failed ?? '-', sub: `취소 ${t?.tasks.cancelled ?? '-'}건`, tone: t?.tasks.failed ? 'red' : 'gray', icon: 'xmark.circle.fill', ref: { kind: 'tasks', group: 'failed' } },
     { label: '판정 대기', value: t?.observations.unreviewed ?? '-', sub: `오늘 촬영 ${t?.observations.total ?? '-'}건`, tone: t?.observations.unreviewed ? 'blue' : 'gray', icon: 'eye' },
-    { label: '이상 · 확인 불가', value: <>{t?.observations.abnormal ?? '-'}<small> · {t?.observations.unable ?? '-'}</small></>, sub: `정상 ${t?.observations.normal ?? '-'}건`, tone: t?.observations.abnormal ? 'red' : t?.observations.unable ? 'orange' : 'gray', icon: 'exclamationmark.triangle.fill' },
+    { label: '이상 · 확인 불가', value: <>{t?.observations.abnormal ?? '-'}<small> · {t?.observations.unable ?? '-'}</small></>, sub: `정상 ${t?.observations.normal ?? '-'}건`, tone: t?.observations.abnormal || t?.observations.unable ? 'orange' : 'gray', icon: 'exclamationmark.triangle.fill' },   // 이상 판정도 경고 색(빨강은 비상 = 화재만)
   ];
   return (
     <div className="dz-kpis">

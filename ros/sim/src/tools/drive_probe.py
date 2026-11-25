@@ -1,5 +1,5 @@
 """주행 품질 측정: 목표 하나로 보내고 벽과의 최소 거리, 좌우 흔들림(각속도 부호 바뀜), 걸린 시간, 주행 거리를 잰다.
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/drive_probe.py 7.65 6.1 90'
+docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/drive_probe.py 7.65 6.1 90'
 좁은 통로 시험(obstacle.sh place gap 폭 을 놓은 뒤): 끝에 --gap 폭 을 붙이면 그 상자까지의 거리도 함께 잰다.
 갑자기 나타난 장애물 시험: --drop 이름 거리 — 로봇이 그 장애물 자리에서 '거리'(m) 안으로 들어오면 그때 놓는다.
 전진 멈춤 = 출발한 뒤 전진 속도 명령이 0.02m/s 아래였던 시간(제자리 회전 · 대기 포함).
@@ -12,7 +12,7 @@ import sys
 import time
 
 import rclpy
-from geometry_msgs.msg import PoseStamped, Twist
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 from rclpy.qos import qos_profile_sensor_data
@@ -44,7 +44,8 @@ def main():
         if r:
             st['min'] = min(st['min'], min(r))
 
-    def on_cmd(m):
+    def on_cmd(stamped):
+        m = stamped.twist                   # Jazzy: 바퀴 명령은 TwistStamped
         s = (m.angular.z > 0.15) - (m.angular.z < -0.15)
         if s and st['last'] and s != st['last']:
             st['flips'] += 1
@@ -86,7 +87,7 @@ def main():
         st['clear'].append(min(math.hypot(max(abs(t.x - rx) - sx / 2, 0), max(abs(t.y - ry) - sy / 2, 0)) for rx, ry, sx, sy in rects))
 
     n.create_timer(0.2, on_tick)
-    n.create_subscription(Twist, '/cmd_vel', on_cmd, 10)
+    n.create_subscription(TwistStamped, '/cmd_vel', on_cmd, 10)
     ac = ActionClient(n, NavigateToPose, 'navigate_to_pose')
     ac.wait_for_server()
     p = PoseStamped()

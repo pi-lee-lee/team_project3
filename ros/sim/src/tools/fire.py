@@ -82,7 +82,7 @@ def main():
     if (cmd == 'detect' or with_detect) and variant not in REPORTABLE:
         raise SystemExit('normal 은 감지 보고를 보내지 않습니다 (warning 또는 emergency)')
 
-    from gz import Gazebo          # ROS 가 필요한 부분은 여기서부터(list 는 ROS 없이도 된다)
+    from gazebo import Gazebo          # ROS 가 필요한 부분은 여기서부터(list 는 ROS 없이도 된다)
     gz = Gazebo('fire_tool')
     for n in names if cmd in ('place', 'clear') else ():
         if cmd == 'clear':

@@ -21,7 +21,7 @@ const GRADE_KO: Record<string, string> = { NORMAL: '정상', WARNING: '경고', 
 export const SOURCE: Record<TaskEvent['source'], string> = { USER: '사용자', ROBOT: '로봇', SYSTEM: '시스템' };
 
 /** 사람 판정: [이름, 글자색 class] */
-export const RESULT: Record<string, [string, string]> = { NORMAL: ['정상', 'ok'], ABNORMAL: ['이상', 'bad'], UNABLE: ['확인 불가', 'warn-t'] };
+export const RESULT: Record<string, [string, string]> = { NORMAL: ['정상', 'ok'], ABNORMAL: ['이상', 'warn-t'], UNABLE: ['확인 불가', 'warn-t'] };   // '이상'도 경고 색. 빨강은 비상(화재)만
 
 export function eventText(e: TaskEvent) {
   const d = e.detail || {};
@@ -59,7 +59,7 @@ export function ObservationSummary({ o }: { o: Observation }) {
   );
 }
 
-const REVIEW_TAG: Record<string, [string, 'green' | 'red' | 'orange']> = { NORMAL: ['정상', 'green'], ABNORMAL: ['이상', 'red'], UNABLE: ['확인 불가', 'orange'] };
+const REVIEW_TAG: Record<string, [string, 'green' | 'red' | 'orange']> = { NORMAL: ['정상', 'green'], ABNORMAL: ['이상', 'orange'], UNABLE: ['확인 불가', 'orange'] };   // 빨강은 비상(화재)만
 
 /** 관측 꼬리표: 촬영·품질(양호/재촬영 후보/분석 중/확인 불가) + 사람 판정 */
 export function ObservationTags({ o }: { o: Observation }) {

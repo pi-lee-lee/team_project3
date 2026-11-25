@@ -88,7 +88,8 @@ FIXTURES = [
 # 점검 대상(색 상자): 이름, x, y, 크기 x, 크기 y, 색
 TARGETS = [
     # 소화기 (생산동 서쪽 벽). 지금은 월드에 세우지 않고 그 자리에 소화기 사진 판(P1)을 건다(PHOTO_PANELS).
-    # 저장된 SLAM 지도에는 이 상자가 남아 있어 지도(rects)에는 그대로 둔다 → 지도를 다시 만들 필요가 없다.
+    # 정의는 target.py(소화기 옮기기 · 되돌리기)가 쓰므로 남겨 두지만, 월드 · 설계도 지도(rects)에는 넣지 않는다.
+    # 사진 판은 벽에 붙은 두께 4mm 판이라 지도에는 벽만으로 충분하다.
     ('target_red', 3.2, 3.9, 0.3, 0.5, (0.8, 0.1, 0.1)),
     ('target_green', 7.65, 7.0, 0.5, 0.2, (0.1, 0.7, 0.2)),     # 비상구 표시 (C2 끝)
     ('target_yellow', -0.8, 4.6, 0.3, 0.6, (0.9, 0.8, 0.1)),    # 분전반 (전기실 서쪽 벽)
@@ -130,7 +131,7 @@ FIRE_STAND_DIST = 1.0
 # 이름: (판 중심 x, y, 판이 바라보는 방향(도), 재질 이름). 재질·사진은 /sim/models/photo_panels.
 # photo_p1 = 생산동 서쪽 벽, 소화기가 제자리에 있는 사진(→ 정상). target.py extinguisher remove 면 받침만 있는 사진으로 바뀐다.
 # photo_p2 = 랙 1 남쪽 면, 받침만 있는 사진(→ 소화기 없음, 경고). 늘 이 상태로 두는 비교용.
-PHOTO_MATERIAL = {'present': 'PhotoPanel/Extinguisher', 'empty': 'PhotoPanel/Empty'}
+PHOTO_MATERIAL = {'present': 'extinguisher.jpg', 'empty': 'empty.jpg'}   # 사진 파일(PHOTO_MATERIALS/textures)
 PHOTO_PANELS = {
     'photo_p1': (XO + T / 2, 3.9, 0, PHOTO_MATERIAL['present']),
     'photo_p2': (4.3, 4.4, -90, PHOTO_MATERIAL['empty']),      # 랙 1(4.3, 5.4, 세로 2.0) 남쪽 면 y = 4.4
@@ -155,7 +156,7 @@ def _stand(panel):
 POINTS = {'P1': _stand('photo_p1'), 'P2': _stand('photo_p2'), 'P3': (7.65, 6.1, 90), 'P4': (0.3, 4.6, 180)}
 # 비상구 점검 지점의 비상구 앞 구역 [x1, y1, x2, y2](DB inspection_point.exit_zone 과 같은 값). 로봇이 이 안에서 막히면
 # 복구 · 우회 없이 바로 진입 불가로 끝내고 목적지 쪽 사진을 올린다. P3 = 생산동 → C2 문(y 3.6) 위쪽부터 비상구 벽까지의 C2 복도.
-EXIT_ZONES = {'P3': (XH, 3.6, X1, Y1)}
+EXIT_ZONES = {'P3': (XH + T / 2, 3.6, X1, Y1)}   # C2 복도 안쪽(문은 빼고). 브리지는 막은 물건이 이 안에 있는지로 가린다
 
 # 시험 때 놓고 치우는 적재물 (sim/tools/obstacle.py): x, y, 크기 x, 크기 y
 OBSTACLES = {
@@ -183,6 +184,9 @@ OBSTACLES = {
     # C1 → 생산동 문(y = YC, x 4.2~5.2)을 통째로 막음 → 생산동을 가로지르지 못하고 C1 복도 끝까지 가서 C2 로 꺾어 올라가야 한다.
     # 비상구 앞 구역(P3, y 3.6 위) 밖에서 막히는 것이라 기존 복구 · 우회 로직으로 다시 계획하는지 보는 시험용.
     'c1door': (4.7, YC, 1.2, 0.3),
+    # 생산동 → C2 문(x 7.1, y 3.6~4.6) 들어가기 1.5m 앞, 충전 위치 → P3 계획 경로 위의 상자 하나(0.4m). 길이 막히지는 않으므로
+    # 달리면서 비켜 문으로 들어가는지 보는 시험용(비상구 앞 구역 밖 → 기존 복구 · 우회 로직). 아래 설비 2 와는 0.5m 떨어져 있다.
+    'c2front': (5.85, 3.3, 0.4, 0.4),
 }
 OBSTACLE_H = {'exit': 0.22}   # 상자 높이(m). 없으면 0.6
 # 좁은 통로 시험(obstacle.sh place gap 폭): C1 복도 양쪽 벽에서 상자 둘을 내밀어 가운데에 폭 width 의 틈을 남긴다.
@@ -292,8 +296,11 @@ def photo_panel_model(panel, name=None, material=None, x=None, y=None):
     w, h = PHOTO_SIZE
     v = (f'        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows>'
          f'<geometry><box><size>0.004 {w} {h}</size></box></geometry>'
-         f'<material><script><uri>file://{PHOTO_MATERIALS}/scripts</uri><uri>file://{PHOTO_MATERIALS}/textures</uri>'
-         f'<name>{material}</name></script></material></visual>\n')
+         # Gazebo Harmonic: 사진을 색(albedo)과 발광(emissive)으로 같이 입혀 조명과 무관하게 사진 색 그대로 보이게 한다
+         f'<material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular>'
+         f'<pbr><metal><albedo_map>{PHOTO_MATERIALS}/textures/{material}</albedo_map>'
+         f'<emissive_map>{PHOTO_MATERIALS}/textures/{material}</emissive_map>'
+         f'<metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>\n')
     return _visual_model(name or panel, x, y, PHOTO_Z, facing, v)
 
 
@@ -320,14 +327,30 @@ def world():
     m += ''.join(photo_panel_model(p) for p in PHOTO_PANELS)
     return f'''<?xml version="1.0"?>
 <!-- world_spec.py 로 생성. 직접 고치지 말고 world_spec.py 를 고친 뒤 다시 생성한다. -->
-<sdf version="1.6">
+<sdf version="1.8">
   <world name="factory">
-    <include><uri>model://ground_plane</uri></include>
-    <include><uri>model://sun</uri></include>
-    <scene><shadows>false</shadows><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
-    <physics type="ode"><max_step_size>0.004</max_step_size><real_time_update_rate>250</real_time_update_rate></physics>
-    <!-- 물체를 즉시 옮기는 서비스(/gazebo/set_entity_state): 시험용 장애물을 정한 순간에 정확히 놓는다(nav_soak.py) -->
-    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so"><ros><namespace>/gazebo</namespace></ros><update_rate>1.0</update_rate></plugin>
+    <!-- Gazebo Harmonic(gz sim). 물리 · 물체 만들기/지우기/옮기기(UserCommands → /world/factory/create · remove · set_pose,
+         sim.launch.py 가 ROS 서비스로 연결) · 장면 · 센서(카메라 · 라이다 렌더링) · IMU -->
+    <!-- 물리 한 걸음 8ms: GPU 없는 PC 에서 시뮬레이션 속도를 실제 시간에 맞추려고 4ms 에서 늘렸다(로봇 최고 0.26m/s 라 한 걸음 2mm) -->
+    <physics name="8ms" type="ignored"><max_step_size>0.008</max_step_size><real_time_factor>1.0</real_time_factor></physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <scene><shadows>false</shadows><grid>false</grid><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows><pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse><specular>0.2 0.2 0.2 1</specular><direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="c"><geometry><plane><normal>0 0 1</normal><size>40 40</size></plane></geometry></collision>
+        <visual name="v"><geometry><plane><normal>0 0 1</normal><size>40 40</size></plane></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material></visual>
+      </link>
+    </model>
 {m}  </world>
 </sdf>
 '''
@@ -336,7 +359,7 @@ def world():
 def rects():
     return ([(x, y, sx, sy) for _, x, y, sx, sy in WALLS]
             + [(x, y, sx, sy) for _, x, y, sx, sy, _, _ in FIXTURES]
-            + [(x, y, sx, sy) for _, x, y, sx, sy, _ in TARGETS])
+            + [(x, y, sx, sy) for n, x, y, sx, sy, _ in TARGETS if n != 'target_red'])   # 소화기는 사진 판(P1)으로 대신한다
 
 
 def reference_map():

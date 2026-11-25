@@ -33,6 +33,8 @@ public class InternalController {
     private final RuleService rules;
     private final IncidentService incidents;
     private final AlertService alerts;
+    /** 목표 브리지(nav2_goal_bridge.py exit_blocked)가 비상구 앞 적재로 가렸을 때 보내는 이유 글귀 */
+    private static final String EXIT_REASON = "비상구 앞 통로가 막힘";
     private final Path photoDir;
     private final ObjectMapper om = new ObjectMapper();
 
@@ -98,10 +100,11 @@ public class InternalController {
         long pointId = ((Number) point.get("point_id")).longValue();
         String key = "exit:" + pointId;
         Double x = num(meta, "poseX"), y = num(meta, "poseY");
-        // 로봇이 비상구 앞 구역 '안에서' 막혔을 때만 비상구 통로 막힘이다. 가는 길(구역 밖)에서 막힌 것은 주행 문제라
-        // 경고로 만들지 않는다(목표 브리지가 복구 없이 바로 끝내는 기준과 같다). 위치를 모르면 판단하지 않는다.
+        // 비상구 통로 막힘인지는 목표 브리지가 가린다: 막은 물건(저장 지도에 없는 장애물)이 비상구 앞 구역 안에 있을 때만
+        // 이유를 EXIT_REASON 으로 보낸다. 가는 길(통로로 들어가는 문 등)이 막힌 것은 주행 문제라 경고로 만들지 않는다.
+        // 로봇 위치로 다시 가리지 않는다 — 로봇은 통로 밖에서 통로 안의 물건을 먼저 볼 수 있다.
         if ("UNABLE".equals(status) && "BLOCKED_NO_PATH".equals(meta.path("reasonCode").asText())
-                && insideZone(point.get("exit_zone"), x, y)) {
+                && meta.path("reason").asText("").contains(EXIT_REASON)) {
             Map<String, Object> ev = new java.util.LinkedHashMap<>();
             ev.put("observationId", obsId);
             ev.put("reason", meta.path("reason").asText(""));
@@ -111,29 +114,11 @@ public class InternalController {
             }
             alerts.open(new AlertService.Draft("EXIT_BLOCKED", "WARNING", key,
                     point.get("code") + " " + point.get("name") + " · 비상구 앞 통로 막힘",
-                    "로봇이 비상구 앞 구역에서 막혀 진입하지 못함" + (x != null && y != null
-                            ? String.format(" (멈춘 위치 %.2f, %.2f)", x, y) : "") + " · 근거 사진 확인",
+                    "비상구 앞 통로에 물건이 있어 진입하지 못함" + (x != null && y != null
+                            ? String.format(" (로봇 위치 %.2f, %.2f)", x, y) : "") + " · 근거 사진 확인",
                     pointId, x, y, "observation", obsId, taskId, ev));
         } else if ("CAPTURED".equals(status)) {
             alerts.resolveByKey(key, "SYSTEM", "다음 점검에서 비상구 앞 통로 확인 (관측 #" + obsId + ")");
-        }
-    }
-
-    /** exit_zone 글자 "[x1, y1, x2, y2]" 안에 (x, y) 가 있는가. 구역 · 위치를 모르면 false. */
-    private boolean insideZone(Object zoneText, Double x, Double y) {
-        if (zoneText == null || x == null || y == null) {
-            return false;
-        }
-        try {
-            JsonNode z = om.readTree(zoneText.toString());
-            if (!z.isArray() || z.size() != 4) {
-                return false;
-            }
-            double x1 = Math.min(z.get(0).asDouble(), z.get(2).asDouble()), x2 = Math.max(z.get(0).asDouble(), z.get(2).asDouble());
-            double y1 = Math.min(z.get(1).asDouble(), z.get(3).asDouble()), y2 = Math.max(z.get(1).asDouble(), z.get(3).asDouble());
-            return x >= x1 && x <= x2 && y >= y1 && y <= y2;
-        } catch (Exception e) {
-            return false;
         }
     }
 

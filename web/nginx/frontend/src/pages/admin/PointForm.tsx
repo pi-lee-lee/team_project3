@@ -113,7 +113,7 @@ export default function PointForm() {
         footer={<>비상구 앞 통로를 점검하는 지점이면 그 통로 구역을 지도 좌표로 넣습니다(왼쪽 아래 x1, y1 · 오른쪽 위 x2, y2, m).
           이 지점으로 가는 로봇이 구역 안에서 막히면 돌아가지 않고 바로 '통로 막힘 · 진입 불가'로 끝내고 그 쪽 사진을 올립니다.
           구역 밖에서 막히면 평소처럼 돌아갑니다. 비우면 일반 지점입니다.</>}>
-        <Field label="비상구 앞 구역"><input value={form.exitZone} placeholder="비움 = 일반 지점 · 예: 7.1, 3.6, 8.2, 7.2"
+        <Field label="비상구 앞 구역"><input value={form.exitZone} placeholder="비움 = 일반 지점 · 예: 7.15, 3.6, 8.2, 7.2"
           onChange={(e) => set({ exitZone: e.target.value })} /></Field>
         {zone === undefined && <span className="cell muted">숫자 네 개(x1, y1, x2, y2)를 쉼표로 나눠 넣으세요</span>}
       </Group>

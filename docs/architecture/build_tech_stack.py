@@ -90,14 +90,14 @@ STACK = [
     ('로봇', 'ros', 'sim', ['시뮬레이션 컨테이너(amd64)', '실제 로봇은 이 상자 전체를 대체'],
      'ros/sim/Dockerfile · ros/sim/src/config/nav2_params.yaml',
      'ROS 2 로봇 시스템. 지금은 Gazebo 시뮬레이션이고, 실제 로봇도 같은 노드 · 토픽을 쓴다. 웹과는 rosbridge 로만 만난다.', [
-        ('ROS 2', 'Humble', '로봇 미들웨어(토픽 · 액션)', 'TurtleBot3 와 Nav2 가 공식 지원하는 장기 지원 판.'),
-        ('Gazebo Classic', 'amd64 · Xvfb', '물리 시뮬레이션(헤드리스)', '실물 없이 주행 · 센서를 시험한다. amd64 패키지만 있어 Apple Silicon 에서는 에뮬레이션으로 돈다.'),
+        ('ROS 2', 'Jazzy', '로봇 미들웨어(토픽 · 액션)', 'TurtleBot3 와 Nav2 가 공식 지원하는 장기 지원 판. 실제 터틀봇과 같은 판(빌드 인자 `ROS_DISTRO`).'),
+        ('Gazebo Harmonic', 'gz sim · Xvfb', '물리 시뮬레이션(헤드리스)', '실물 없이 주행 · 센서를 시험한다. ROS 와는 `ros_gz`(토픽 · 서비스 연결)로 만난다. GPU 없이 소프트웨어 렌더링이라 실제 시간보다 느리다.'),
         ('TurtleBot3', 'Waffle Pi', '로봇 모델(라이다 · 카메라)', '보유한 실물과 같은 모델.'),
-        ('Nav2', 'Humble', '자율 주행 묶음(계획 · 제어)', '목표 좌표를 주면 경로를 짜고 따라간다(NavigateToPose 액션).'),
+        ('Nav2', 'Jazzy', '자율 주행 묶음(계획 · 제어)', '목표 좌표를 주면 경로를 짜고 따라간다(NavigateToPose 액션).'),
         ('Theta* 계획기', 'nav2_theta_star', '직선 위주 전역 경로', '격자를 따라 꺾이는 경로 대신 보이는 점끼리 곧게 잇는다.'),
         ('MPPI 제어기', 'nav2_mppi', '경로 추종 · 실시간 회피', '후보 궤적을 많이 굴려 보고 가장 나은 속도를 고른다.'),
         ('AMCL', 'nav2_amcl', '저장 지도에서 위치 추정', '라이다 스캔을 저장 지도에 맞춰 로봇 위치를 잡는다(nav 모드).'),
-        ('slam_toolbox', 'Humble', '지도 작성(SLAM 모드)', '운영 지도 `ros/maps/site.*` 를 만든다.'),
+        ('slam_toolbox', 'Jazzy', '지도 작성(SLAM 모드)', '운영 지도 `ros/maps/site.*` 를 만든다.'),
         ('rosbridge_server', ':9090', 'ROS 토픽 ↔ WebSocket(JSON)', 'Java 서비스가 ROS 를 설치하지 않고도 토픽을 주고받는다.'),
         ('web_video_server', ':8080', '카메라 → MJPEG · 스냅샷', '카메라 토픽을 HTTP 영상으로 바꿔 브라우저까지 중계할 수 있게 한다.'),
         ('compressed_image_transport', 'JPEG', '카메라 영상 압축 전송', '실제 로봇에서 Wi-Fi 로 원본 영상을 보내지 않기 위해서다.'),
@@ -124,7 +124,7 @@ STACK = [
 # 핵심 스택: 시스템 구성도의 구조를 이루는 상위 기술(컨테이너 · 서비스의 뼈대). 도면에서 붉은 둥근 상자로 두른다.
 # 라이브러리 · 기능 같은 하위 기술(Pillow · psycopg · Docker 볼륨 등)은 넣지 않는다.
 CORE = {'React', 'TypeScript', 'Vite', 'nginx', 'Spring Cloud Gateway', 'Java', 'Spring Boot', 'Python', 'FastAPI',
-        'PostgreSQL', 'ROS 2', 'Gazebo Classic', 'Nav2', 'rosbridge_server', 'Docker Compose'}
+        'PostgreSQL', 'ROS 2', 'Gazebo Harmonic', 'Nav2', 'rosbridge_server', 'Docker Compose'}
 RED = '#ff3b30'
 
 # 구성도의 요청 경로를 기술 이름으로: (컨테이너, 기술, 아이콘)
@@ -189,7 +189,7 @@ ICON = {
     'Python': 'python', 'FastAPI': 'fastapi', 'Uvicorn': 'server', 'psycopg': 'database', 'NumPy': 'numpy', 'Pillow': 'image',
     'httpx': 'send', 'python-multipart': 'upload',
     'PostgreSQL': 'postgresql', 'LISTEN / NOTIFY': 'bell', 'SKIP LOCKED': 'lock', 'Docker 볼륨': 'docker',
-    'ROS 2': 'ros', 'Gazebo Classic': 'cube', 'TurtleBot3': 'robot', 'Nav2': 'nav', 'Theta* 계획기': 'route', 'MPPI 제어기': 'fan',
+    'ROS 2': 'ros', 'Gazebo Harmonic': 'cube', 'TurtleBot3': 'robot', 'Nav2': 'nav', 'Theta* 계획기': 'route', 'MPPI 제어기': 'fan',
     'AMCL': 'target', 'slam_toolbox': 'map', 'rosbridge_server': 'bridge', 'web_video_server': 'video',
     'compressed_image_transport': 'shrink', 'rclpy': 'python',
     'Docker Compose': 'docker', '빌드용 컨테이너': 'package', 'E2E 시험': 'check', '문서 도면': 'svg',

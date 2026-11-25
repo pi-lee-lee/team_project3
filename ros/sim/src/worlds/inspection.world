@@ -1,13 +1,29 @@
 <?xml version="1.0"?>
 <!-- world_spec.py 로 생성. 직접 고치지 말고 world_spec.py 를 고친 뒤 다시 생성한다. -->
-<sdf version="1.6">
+<sdf version="1.8">
   <world name="factory">
-    <include><uri>model://ground_plane</uri></include>
-    <include><uri>model://sun</uri></include>
-    <scene><shadows>false</shadows><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
-    <physics type="ode"><max_step_size>0.004</max_step_size><real_time_update_rate>250</real_time_update_rate></physics>
-    <!-- 물체를 즉시 옮기는 서비스(/gazebo/set_entity_state): 시험용 장애물을 정한 순간에 정확히 놓는다(nav_soak.py) -->
-    <plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so"><ros><namespace>/gazebo</namespace></ros><update_rate>1.0</update_rate></plugin>
+    <!-- Gazebo Harmonic(gz sim). 물리 · 물체 만들기/지우기/옮기기(UserCommands → /world/factory/create · remove · set_pose,
+         sim.launch.py 가 ROS 서비스로 연결) · 장면 · 센서(카메라 · 라이다 렌더링) · IMU -->
+    <!-- 물리 한 걸음 8ms: GPU 없는 PC 에서 시뮬레이션 속도를 실제 시간에 맞추려고 4ms 에서 늘렸다(로봇 최고 0.26m/s 라 한 걸음 2mm) -->
+    <physics name="8ms" type="ignored"><max_step_size>0.008</max_step_size><real_time_factor>1.0</real_time_factor></physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+    <scene><shadows>false</shadows><grid>false</grid><ambient>0.6 0.6 0.6 1</ambient><background>0.8 0.85 0.9 1</background></scene>
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows><pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse><specular>0.2 0.2 0.2 1</specular><direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="c"><geometry><plane><normal>0 0 1</normal><size>40 40</size></plane></geometry></collision>
+        <visual name="v"><geometry><plane><normal>0 0 1</normal><size>40 40</size></plane></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material></visual>
+      </link>
+    </model>
     <model name="outer_south_0">
       <static>true</static>
       <pose>3.600 -0.800 0.300 0 0 0</pose>
@@ -236,14 +252,14 @@
       <static>true</static>
       <pose>3.050 3.900 0.280 0 0 0.00000</pose>
       <link name="link">
-        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><script><uri>file:///sim/models/photo_panels/materials/scripts</uri><uri>file:///sim/models/photo_panels/materials/textures</uri><name>PhotoPanel/Extinguisher</name></script></material></visual>
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/extinguisher.jpg</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/extinguisher.jpg</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
       </link>
     </model>
     <model name="photo_p2">
       <static>true</static>
       <pose>4.300 4.400 0.280 0 0 -1.57080</pose>
       <link name="link">
-        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><script><uri>file:///sim/models/photo_panels/materials/scripts</uri><uri>file:///sim/models/photo_panels/materials/textures</uri><name>PhotoPanel/Empty</name></script></material></visual>
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/empty.jpg</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/empty.jpg</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
       </link>
     </model>
   </world>

@@ -54,7 +54,10 @@ public class AlertService {
                         WHERE dedup_key = ? AND state <> 'RESOLVED'""").params(by, comment, dedupKey).update();
     }
 
-    /** 사람이 관측을 판정했을 때: 정상이면 그 관측에서 나온 경고를 풀고, 이상이면 비상으로 올린다. */
+    /**
+     * 사람이 관측을 판정했을 때: 정상이면 그 관측에서 나온 경고를 풀고, 이상이면 그 경고를 다시 연다(확인함 → 열림).
+     * 등급은 올리지 않는다 — 비상(EMERGENCY)은 화재 감지(IncidentService)만 낸다.
+     */
     public void onReview(long observationId, String result, String by) {
         if ("NORMAL".equals(result)) {
             jdbc.sql("""
@@ -64,7 +67,7 @@ public class AlertService {
                     .params(by, observationId).update();
         } else if ("ABNORMAL".equals(result)) {
             jdbc.sql("""
-                            UPDATE alert SET grade = 'EMERGENCY', state = 'OPEN', updated_at = now(), comment = '사람 판정: 이상'
+                            UPDATE alert SET state = 'OPEN', updated_at = now(), comment = '사람 판정: 이상'
                             WHERE ref_kind = 'observation' AND ref_id = ? AND state <> 'RESOLVED'""")
                     .param(observationId).update();
         }

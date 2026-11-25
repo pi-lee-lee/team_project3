@@ -1,33 +1,48 @@
 """로봇 측 워치독: 원격 조종 명령이 끊기면 로봇을 세운다.
 
-서버의 원격 조종은 /cmd_vel_teleop 으로 들어오고, 이 노드가 /cmd_vel 로 전달한다.
+서버의 원격 조종은 /cmd_vel_teleop(geometry_msgs/Twist)으로 들어오고, 이 노드가 /cmd_vel 로 전달한다.
 마지막 명령 이후 TIMEOUT_SEC 동안 새 명령이 없으면 정지 명령을 한 번 발행한다.
 서버나 네트워크가 끊겨도 로봇이 계속 움직이지 않게 하는 안전장치다.
+
+바퀴 명령 형식: ROS 2 Jazzy(실제 터틀봇 · Jazzy 시뮬레이션)는 /cmd_vel 이 TwistStamped 다. CMD_VEL_STAMPED=0 이면 Twist(Humble).
+서버와의 약속(/cmd_vel_teleop = Twist)은 바꾸지 않고 여기서 감싼다.
 """
+import os
 import time
 
 import rclpy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TwistStamped
 from rclpy.node import Node
 
 TIMEOUT_SEC = 0.5
+STAMPED = os.environ.get('CMD_VEL_STAMPED', '1') != '0'
 
 
 class CmdVelWatchdog(Node):
     def __init__(self):
         super().__init__('cmd_vel_watchdog')
-        self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.pub = self.create_publisher(TwistStamped if STAMPED else Twist, '/cmd_vel', 10)
         self.create_subscription(Twist, '/cmd_vel_teleop', self.on_cmd, 10)
         self.last = None
         self.create_timer(0.1, self.check)
 
+    def send(self, twist):
+        if STAMPED:
+            m = TwistStamped()
+            m.header.stamp = self.get_clock().now().to_msg()
+            m.header.frame_id = 'base_link'
+            m.twist = twist
+            self.pub.publish(m)
+        else:
+            self.pub.publish(twist)
+
     def on_cmd(self, msg):
         self.last = time.monotonic()
-        self.pub.publish(msg)
+        self.send(msg)
 
     def check(self):
         if self.last is not None and time.monotonic() - self.last > TIMEOUT_SEC:
-            self.pub.publish(Twist())
+            self.send(Twist())
             self.get_logger().info('teleop timeout -> stop')
             self.last = None
 

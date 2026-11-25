@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
-source /opt/ros/humble/setup.bash
-source /usr/share/gazebo/setup.sh 2>/dev/null || true
-export GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}:$(ros2 pkg prefix turtlebot3_gazebo)/share/turtlebot3_gazebo/models"
+source /opt/ros/$ROS_DISTRO/setup.bash
+# Gazebo Harmonic(gz sim)이 모델 · 사진 판 재질을 찾는 곳: TurtleBot3 모델 + 이 저장소의 모델(사진 판)
+export GZ_SIM_RESOURCE_PATH="${GZ_SIM_RESOURCE_PATH}:$(ros2 pkg prefix turtlebot3_gazebo)/share/turtlebot3_gazebo/models:/sim/models"
 export TURTLEBOT3_MODEL="${TURTLEBOT3_MODEL:-waffle_pi}"   # waffle_pi(라즈베리파이 카메라) 또는 waffle(RealSense)
 
-# 카메라 센서 렌더링에 필요한 가상 디스플레이.
+# 카메라 · 라이다(gpu_lidar) 렌더링에 필요한 가상 디스플레이(GPU 없이 소프트웨어 OpenGL 로 그린다).
 # 컨테이너가 재시작되면 이전 Xvfb 의 잠금 파일이 남아 새 Xvfb 가 뜨지 않는다 → 지우고 시작한다.
 rm -f /tmp/.X99-lock /tmp/.X11-unix/X99
 Xvfb :99 -screen 0 640x480x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &

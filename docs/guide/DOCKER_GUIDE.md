@@ -28,7 +28,7 @@ memory=10GB
 
 CPU별 참고:
 - **Intel·AMD (Windows, Linux, Intel Mac)**: 시뮬레이터가 그대로 실행된다.
-- **Apple Silicon Mac**: Gazebo Classic 이 amd64 전용이라 시뮬레이터만 에뮬레이션(Rosetta)으로 실행된다. 동작하지만 느리다.
+- **Apple Silicon Mac**: 시뮬레이션 이미지는 `compose.yaml` 에서 amd64 로 고정되어 에뮬레이션(Rosetta)으로 실행된다. 동작하지만 느리다.
   Docker Desktop → Settings → General → "Use Rosetta for x86_64/amd64 emulation" 을 켠다.
 
 ## 2. 내려받기
@@ -157,14 +157,14 @@ docker compose up -d --build
 
 ## 10. 시뮬레이션: 지도 만들기와 장애물 시험
 
-지도는 `ros/maps/site.*` (SLAM 으로 만든 것)이 이미 들어 있다. 월드를 바꿨을 때만 다시 만든다.
+시뮬레이션은 설계도 지도 `ros/maps/reference.*`(`world_spec.py` 가 월드와 함께 만든다)를 기본으로 쓴다(`SIM_MAP=reference`). SLAM 으로 만든 `ros/maps/site.*` 도 남아 있고 `SIM_MAP=site` 로 쓸 수 있다. 실제 현장처럼 지도를 만들어 보려면 아래 순서로 한다.
 
 macOS·Linux
 ```bash
 SIM_MODE=slam docker compose up -d sim             # SLAM 모드로 시뮬레이터 재시작
 docker compose exec sim /sim/tools/explore.sh       # 경유점을 돌며 지도 작성 (수 분)
 docker compose exec sim /sim/tools/save_map.sh      # ros/maps/site.* 저장 + 잡음 정리
-docker compose up -d sim                            # 기본(nav) 모드로 복귀
+docker compose up -d sim                            # 기본(nav) 모드로 복귀(설계도 지도). 만든 지도로 달리려면 SIM_MAP=site
 ```
 
 Windows PowerShell
@@ -180,6 +180,7 @@ Remove-Item Env:SIM_MODE; docker compose up -d sim
 docker compose exec sim /sim/tools/obstacle.sh place detour    # C1 복도 팔레트 (돌아갈 수 있음)
 docker compose exec sim /sim/tools/obstacle.sh place reroute   # C2 아래쪽 막힘 (생산동으로 돌아감)
 docker compose exec sim /sim/tools/obstacle.sh place block     # C2 위쪽 막힘 (P3 진입 불가)
+docker compose exec sim /sim/tools/obstacle.sh place exit      # 비상구 앞 낮은 상자 (P3 점검: 다가가 촬영 · 경고)
 docker compose exec sim /sim/tools/obstacle.sh clear           # 모두 치우기
 ```
 

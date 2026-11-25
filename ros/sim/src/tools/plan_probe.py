@@ -1,5 +1,5 @@
 """계획 경로 품질 측정: 로봇을 움직이지 않고 계획기에 경로만 물어 길이와 굽이(출렁임)를 잰다.
-docker compose exec sim bash -c 'source /opt/ros/humble/setup.bash; python3 /sim/tools/plan_probe.py [계획기 이름 ...]'
+docker compose exec sim bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; python3 /sim/tools/plan_probe.py [계획기 이름 ...]'
   계획기 이름을 주지 않으면 GridBased 하나. 구간은 충전 위치·점검 지점 P1 · P3 · P4 사이.
 길이   = 경로 길이(m). 직선비 = 길이 / 출발~도착 직선 거리.
 꺾임   = 진행 방향이 바뀐 양의 합(도). 곧은 길 + 모퉁이만 도는 경로면 모퉁이 각의 합과 같고, 출렁일수록 커진다.

@@ -19,7 +19,7 @@ const Loading = ({ error }: { error: string | null }) => <div className="dz-empt
 const KV = ({ k, children }: { k: string; children: ReactNode }) => <div className="dz-kv"><span>{k}</span><div>{children ?? '-'}</div></div>;
 const Section = ({ title, children }: { title: string; children: ReactNode }) => <section className="dz-sec"><h4>{title}</h4>{children}</section>;
 
-const REVIEW_TONE: Record<string, string> = { NORMAL: 'green', ABNORMAL: 'red', UNABLE: 'orange' };
+const REVIEW_TONE: Record<string, string> = { NORMAL: 'green', ABNORMAL: 'orange', UNABLE: 'orange' };   // 빨강은 비상(화재)만
 function ObsPills({ o }: { o: Observation }) {
   return (
     <>
