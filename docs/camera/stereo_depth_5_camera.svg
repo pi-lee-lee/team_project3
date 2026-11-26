@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1080" viewBox="0 0 1120 1080" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif" xml:space="preserve">
+<defs>
+<marker id="a1c1c1e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c1c1e"/></marker>
+<marker id="a007aff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#007aff"/></marker>
+<marker id="ab25000" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b25000"/></marker>
+<marker id="a248a3d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#248a3d"/></marker>
+<marker id="ae5352b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e5352b"/></marker>
+<marker id="a8e8e93" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8e8e93"/></marker>
+<marker id="a8944ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8944ab"/></marker>
+<marker id="a0a7c8c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0a7c8c"/></marker>
+</defs>
+<rect x="0.0" y="0.0" width="1120.0" height="1080.0" rx="0" fill="#f2f2f7" stroke="none" stroke-width="0"/>
+<text x="30.0" y="38.0" font-size="19" font-weight="700" fill="#1c1c1e" text-anchor="start">⑤ K · D: 카메라 한 대의 구조 — 공간의 점이 몇 번 픽셀에 찍히는가</text>
+<text x="30.0" y="62.0" font-size="13.5" font-weight="400" fill="#636366" text-anchor="start">cv2.calibrateCamera. 값은 IMX219 사양 계산값 (f = 2.96 mm ÷ 픽셀 간격), D 는 보정 전이라 0</text>
+<rect x="20.0" y="80.0" width="560.0" height="420.0" rx="12" fill="#fff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="36.0" y="106.0" font-size="14.5" font-weight="700" fill="#1c1c1e" text-anchor="start">(가) 옆에서 본 그림 — 개략도</text>
+<line x1="80.0" y1="330.0" x2="540.0" y2="330.0" stroke="#8e8e93" stroke-width="1.0" stroke-dasharray="4 4"/>
+<text x="545.0" y="334.0" font-size="13" font-weight="700" fill="#8e8e93" text-anchor="start">Z</text>
+<text x="520.0" y="352.0" font-size="11" font-weight="400" fill="#8e8e93" text-anchor="end">광축</text>
+<line x1="120.0" y1="370.0" x2="120.0" y2="120.0" stroke="#8e8e93" stroke-width="1.0" stroke-dasharray="4 4"/>
+<text x="114.0" y="130.0" font-size="11" font-weight="400" fill="#8e8e93" text-anchor="end">Y</text>
+<rect x="70.0" y="312.0" width="40.0" height="36.0" rx="4" fill="#fff" stroke="#1c1c1e" stroke-width="1.4"/>
+<polygon points="110.0,320.0 120.0,314.0 120.0,346.0 110.0,340.0" fill="#fff" stroke="#1c1c1e" stroke-width="1.4"/>
+<circle cx="120.0" cy="330.0" r="4" fill="#1c1c1e" stroke="none" stroke-width="1.0"/>
+<text x="90.0" y="370.0" font-size="12" font-weight="700" fill="#1c1c1e" text-anchor="middle">렌즈 중심</text>
+<line x1="240.0" y1="150.0" x2="240.0" y2="390.0" stroke="#007aff" stroke-width="3.0"/>
+<text x="246.0" y="406.0" font-size="12" font-weight="700" fill="#007aff" text-anchor="start">영상면</text>
+<circle cx="500.0" cy="170.0" r="6" fill="#e5352b" stroke="none" stroke-width="1.0"/>
+<text x="500.0" y="158.0" font-size="13" font-weight="700" fill="#e5352b" text-anchor="middle">점 (X, Y, Z)</text>
+<line x1="500.0" y1="170.0" x2="120.0" y2="330.0" stroke="#e5352b" stroke-width="1.3"/>
+<circle cx="240.0" cy="279.5" r="5" fill="#007aff" stroke="none" stroke-width="1.0"/>
+<text x="248.0" y="273.5" font-size="14" font-weight="700" fill="#007aff" text-anchor="start" font-style="italic">v</text>
+<circle cx="240.0" cy="330.0" r="3.5" fill="#1c1c1e" stroke="none" stroke-width="1.0"/>
+<text x="248.0" y="348.0" font-size="12.5" font-weight="700" fill="#1c1c1e" text-anchor="start">cy</text>
+<line x1="120.0" y1="360.0" x2="240.0" y2="360.0" stroke="#8944ab" stroke-width="1.4" marker-end="url(#a8944ab)" marker-start="url(#a8944ab)"/>
+<text x="180.0" y="378.0" font-size="12.5" font-weight="700" fill="#8944ab" text-anchor="middle">fy (px)</text>
+<line x1="514.0" y1="170.0" x2="514.0" y2="330.0" stroke="#0a7c8c" stroke-width="1.3" marker-end="url(#a0a7c8c)" marker-start="url(#a0a7c8c)"/>
+<text x="518.0" y="250.0" font-size="13" font-weight="700" fill="#0a7c8c" text-anchor="start">Y</text>
+<line x1="120.0" y1="426.0" x2="500.0" y2="426.0" stroke="#248a3d" stroke-width="1.3" marker-end="url(#a248a3d)" marker-start="url(#a248a3d)"/>
+<text x="310.0" y="420.0" font-size="13" font-weight="700" fill="#248a3d" text-anchor="middle">Z</text>
+<text x="36.0" y="486.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">위에서 보면 같은 그림에서 Y → X, fy → fx, cy → cx, v → u 가 된다.</text>
+<rect x="596.0" y="80.0" width="504.0" height="420.0" rx="12" fill="#fff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="612.0" y="106.0" font-size="14.5" font-weight="700" fill="#1c1c1e" text-anchor="start">(나) 영상면을 정면에서 본 그림 (640 × 360)</text>
+<rect x="650.0" y="160.0" width="396.8" height="223.2" rx="2" fill="#fff" stroke="#1c1c1e" stroke-width="1.8"/>
+<text x="650.0" y="126.0" font-size="14.5" font-weight="700" fill="#1c1c1e" text-anchor="start"></text>
+<line x1="650.0" y1="148.0" x2="1064.8" y2="148.0" stroke="#636366" stroke-width="1.0" marker-end="url(#a636366)"/>
+<text x="1068.8" y="152.0" font-size="13" font-weight="700" fill="#636366" text-anchor="start" font-style="italic">u</text>
+<line x1="650.0" y1="145.0" x2="650.0" y2="151.0" stroke="#636366" stroke-width="1.0"/>
+<text x="650.0" y="141.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="middle">0</text>
+<line x1="749.2" y1="145.0" x2="749.2" y2="151.0" stroke="#636366" stroke-width="1.0"/>
+<text x="749.2" y="141.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="middle">160</text>
+<line x1="848.4" y1="145.0" x2="848.4" y2="151.0" stroke="#636366" stroke-width="1.0"/>
+<text x="848.4" y="141.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="middle">320</text>
+<line x1="947.6" y1="145.0" x2="947.6" y2="151.0" stroke="#636366" stroke-width="1.0"/>
+<text x="947.6" y="141.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="middle">480</text>
+<line x1="1046.8" y1="145.0" x2="1046.8" y2="151.0" stroke="#636366" stroke-width="1.0"/>
+<text x="1046.8" y="141.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="middle">640</text>
+<line x1="638.0" y1="160.0" x2="638.0" y2="401.2" stroke="#636366" stroke-width="1.0" marker-end="url(#a636366)"/>
+<text x="630.0" y="401.2" font-size="13" font-weight="700" fill="#636366" text-anchor="end" font-style="italic">v</text>
+<line x1="635.0" y1="160.0" x2="641.0" y2="160.0" stroke="#636366" stroke-width="1.0"/>
+<text x="631.0" y="164.0" font-size="10.5" font-weight="400" fill="#636366" text-anchor="end">0</text>
+<line x1="635.0" y1="271.6" x2="641.0" y2="271.6" stroke="#636366" stroke-width="1.0"/>
+<text x="631.0" y="275.6" font-size="10.5" font-weight="400" fill="#636366" text-anchor="end">180</text>
+<line x1="635.0" y1="383.2" x2="641.0" y2="383.2" stroke="#636366" stroke-width="1.0"/>
+<text x="631.0" y="387.2" font-size="10.5" font-weight="400" fill="#636366" text-anchor="end">360</text>
+<line x1="848.4" y1="160.0" x2="848.4" y2="383.2" stroke="#1c1c1e" stroke-width="1.0" stroke-dasharray="4 4"/>
+<line x1="650.0" y1="271.6" x2="1046.8" y2="271.6" stroke="#1c1c1e" stroke-width="1.0" stroke-dasharray="4 4"/>
+<circle cx="848.4" cy="271.6" r="4" fill="#1c1c1e" stroke="none" stroke-width="1.0"/>
+<text x="854.4" y="174.0" font-size="11.5" font-weight="700" fill="#1c1c1e" text-anchor="start">cx = 320.0</text>
+<text x="656.0" y="265.6" font-size="11.5" font-weight="700" fill="#1c1c1e" text-anchor="start">cy = 180.0</text>
+<circle cx="907.3" cy="228.2" r="5.5" fill="#007aff" stroke="none" stroke-width="1.0"/>
+<text x="915.3" y="222.2" font-size="13" font-weight="700" fill="#007aff" text-anchor="start">(u, v)</text>
+<text x="612.0" y="430.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">점이 광축 위에 있으면 (cx, cy) 에 찍힌다.</text>
+<text x="612.0" y="452.0" font-size="12.5" font-weight="400" fill="#636366" text-anchor="start">광축에서 벗어난 만큼 (fx, fy 배) 옮겨 찍힌다.</text>
+<rect x="20.0" y="516.0" width="1080.0" height="270.0" rx="12" fill="#fff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="36.0" y="542.0" font-size="14.5" font-weight="700" fill="#1c1c1e" text-anchor="start">(다) 점 (X, Y, Z) → 픽셀 (u, v) 계산 세 단계</text>
+<text x="46.0" y="578.0" font-size="14" font-weight="700" fill="#1c1c1e" text-anchor="start">1</text>
+<text x="70.0" y="578.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="start" font-family="Menlo, Consolas, monospace">x = X / Z ,   y = Y / Z</text>
+<text x="720.0" y="578.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">Z = 1 인 면으로 옮긴 좌표 (광축에서 벗어난 정도)</text>
+<text x="46.0" y="608.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="start">2</text>
+<text x="70.0" y="608.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start" font-family="Menlo, Consolas, monospace">r² = x² + y²</text>
+<text x="720.0" y="608.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">광축에서 떨어진 거리의 제곱</text>
+<text x="46.0" y="638.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="start"></text>
+<text x="70.0" y="638.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start" font-family="Menlo, Consolas, monospace">x_d = x(1 + k1·r² + k2·r⁴ + k3·r⁶) + 2·p1·x·y + p2·(r² + 2x²)</text>
+<text x="720.0" y="638.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">렌즈 왜곡 D 적용</text>
+<text x="46.0" y="668.0" font-size="14" font-weight="700" fill="#b25000" text-anchor="start"></text>
+<text x="70.0" y="668.0" font-size="13.5" font-weight="700" fill="#b25000" text-anchor="start" font-family="Menlo, Consolas, monospace">y_d = y(1 + k1·r² + k2·r⁴ + k3·r⁶) + p1·(r² + 2y²) + 2·p2·x·y</text>
+<text x="720.0" y="668.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start"></text>
+<text x="46.0" y="698.0" font-size="14" font-weight="700" fill="#007aff" text-anchor="start">3</text>
+<text x="70.0" y="698.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="start" font-family="Menlo, Consolas, monospace">u = fx · x_d + cx ,   v = fy · y_d + cy</text>
+<text x="720.0" y="698.0" font-size="12" font-weight="400" fill="#636366" text-anchor="start">픽셀로 바꾼다 (K 적용)</text>
+<line x1="36.0" y1="732.0" x2="1084.0" y2="732.0" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="46.0" y="756.0" font-size="13" font-weight="700" fill="#007aff" text-anchor="start" font-family="Menlo, Consolas, monospace">K:  fx = 515.68   fy = 515.68   cx = 320.00   cy = 180.00   (px)</text>
+<text x="46.0" y="776.0" font-size="13" font-weight="700" fill="#b25000" text-anchor="start" font-family="Menlo, Consolas, monospace">D:  k1 = 0.0000  k2 = 0.0000  p1 = 0.0000  p2 = 0.0000  k3 = 0.0000</text>
+<text x="720.0" y="756.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">k1 k2 k3 = 가운데에서 멀수록 휘는 정도</text>
+<text x="720.0" y="776.0" font-size="11.5" font-weight="400" fill="#636366" text-anchor="start">p1 p2 = 렌즈와 센서가 기울어 생기는 휨</text>
+<rect x="20.0" y="802.0" width="1080.0" height="262.0" rx="12" fill="#fff" stroke="#d1d1d6" stroke-width="1.0"/>
+<text x="36.0" y="828.0" font-size="14.5" font-weight="700" fill="#1c1c1e" text-anchor="start">(라) K · D 를 찾는 방법 — 위치를 아는 점(체커보드 코너)으로 거꾸로 푼다</text>
+<rect x="36.0" y="846.0" width="190.0" height="78.0" rx="8" fill="#fff" stroke="#1c1c1e" stroke-width="1.4"/>
+<text x="131.0" y="870.0" font-size="13.5" font-weight="700" fill="#1c1c1e" text-anchor="middle">사진마다 짝</text>
+<text x="131.0" y="892.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">코너 3D (i·s, j·s, 0)</text>
+<text x="131.0" y="912.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">↔ 검출 픽셀 (u, v)</text>
+<rect x="248.0" y="846.0" width="190.0" height="78.0" rx="8" fill="#fff" stroke="#8944ab" stroke-width="1.4"/>
+<text x="343.0" y="870.0" font-size="13.5" font-weight="700" fill="#8944ab" text-anchor="middle">짐작</text>
+<text x="343.0" y="892.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">K · D (모든 사진 공통)</text>
+<text x="343.0" y="912.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">+ 사진마다 보드 자세</text>
+<line x1="228.0" y1="885.0" x2="245.0" y2="885.0" stroke="#1c1c1e" stroke-width="1.4" marker-end="url(#a1c1c1e)"/>
+<rect x="460.0" y="846.0" width="190.0" height="78.0" rx="8" fill="#fff" stroke="#007aff" stroke-width="1.4"/>
+<text x="555.0" y="870.0" font-size="13.5" font-weight="700" fill="#007aff" text-anchor="middle">투영</text>
+<text x="555.0" y="892.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">위 (다) 1 · 2 · 3 으로</text>
+<text x="555.0" y="912.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">코너를 픽셀로 계산</text>
+<line x1="440.0" y1="885.0" x2="457.0" y2="885.0" stroke="#1c1c1e" stroke-width="1.4" marker-end="url(#a1c1c1e)"/>
+<rect x="672.0" y="846.0" width="190.0" height="78.0" rx="8" fill="#fff" stroke="#e5352b" stroke-width="1.4"/>
+<text x="767.0" y="870.0" font-size="13.5" font-weight="700" fill="#e5352b" text-anchor="middle">비교</text>
+<text x="767.0" y="892.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">계산 픽셀 − 검출 픽셀</text>
+<text x="767.0" y="912.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">= 재투영 오차</text>
+<line x1="652.0" y1="885.0" x2="669.0" y2="885.0" stroke="#1c1c1e" stroke-width="1.4" marker-end="url(#a1c1c1e)"/>
+<rect x="884.0" y="846.0" width="190.0" height="78.0" rx="8" fill="#fff" stroke="#248a3d" stroke-width="1.4"/>
+<text x="979.0" y="870.0" font-size="13.5" font-weight="700" fill="#248a3d" text-anchor="middle">고친다</text>
+<text x="979.0" y="892.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">오차가 줄도록</text>
+<text x="979.0" y="912.0" font-size="12" font-weight="400" fill="#1c1c1e" text-anchor="middle">K · D · 자세를 조금씩</text>
+<line x1="864.0" y1="885.0" x2="881.0" y2="885.0" stroke="#1c1c1e" stroke-width="1.4" marker-end="url(#a1c1c1e)"/>
+<path d="M979.0,924 L979.0,944 L555.0,944 L555.0,928" fill="none" stroke="#248a3d" stroke-width="1.4" marker-end="url(#a248a3d)"/>
+<text x="767.0" y="960.0" font-size="11.5" font-weight="400" fill="#248a3d" text-anchor="middle">더 줄지 않을 때까지 되풀이</text>
+<text x="46.0" y="990.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">끝까지 남은 오차의 평균 = RMS 재투영 오차 (0.5 px 이하면 좋다).</text>
+<text x="46.0" y="1012.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">정면 사진만 있으면 '초점거리가 길고 보드가 멀다'와 '짧고 가깝다'를 가를 수 없다 → 보드를 기울이고,</text>
+<text x="46.0" y="1034.0" font-size="12.5" font-weight="400" fill="#1c1c1e" text-anchor="start">왜곡은 가장자리에서 드러나므로 화면 구석까지 옮겨 가며 찍는다. 영상 해상도가 바뀌면 K 도 바뀐다 (640 × 360 으로 찍는다).</text>
+</svg>

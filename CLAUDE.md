@@ -74,7 +74,7 @@ docker compose exec sim /sim/tools/fire.sh place <자리> [normal|warning|emerge
 
 - 커밋·푸시는 사용자가 요청할 때만. 작업 브랜치는 `feat/msa-sim-stack`이고, main 에는 아직 올리지 않는다(PR·병합 금지).
 - `개선초안/` 은 사용자의 커밋하지 않은 폴더다. 커밋하거나 고치지 않는다.
-- 루트에는 `README.md`(맨 위부터 접속 · 계정 → 실행 → 시연 안내 순서를 지킨다. 그 아래 개요 · 구성 · 구현 범위, 맨 끝에 보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더에 둔다(목록 · 기준은 `docs/README.md`): `guide/`(실행 안내), `architecture/`(시스템 구조 도면), `navigation/`(주행: 지도 3겹 · 제어기 · Theta* · MPPI 설명서), `design/`(시나리오 · 인터페이스 설계), `plan/`(향후 계획 · 일정), `storyboard/`(화면). `docs/_lib/svg.py` 는 SVG 생성 스크립트 공용 도구다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
+- 루트에는 `README.md`(맨 위부터 접속 · 계정 → 실행 → 시연 안내 순서를 지킨다. 그 아래 개요 · 구성 · 구현 범위, 맨 끝에 보유 하드웨어 제원), `도커_실행.md`, 실행에 필요한 파일(`compose.yaml`, `.env.example`, `.gitignore`, `.gitattributes`)만 둔다. 다른 문서는 `docs/` 아래 분류 폴더에 둔다(목록 · 기준은 `docs/README.md`): `guide/`(실행 안내), `architecture/`(시스템 구조 도면), `navigation/`(주행: 지도 3겹 · 제어기 · Theta* · MPPI 설명서), `camera/`(카메라: 스테레오 거리 계산 · 보정 설명서), `design/`(시나리오 · 인터페이스 설계), `plan/`(향후 계획 · 일정), `storyboard/`(화면). `docs/_lib/svg.py` 는 SVG 생성 스크립트 공용 도구다. SVG 문서는 같은 폴더의 `build_*.py` 로 생성하므로 SVG 를 직접 고치지 말고 스크립트를 고친 뒤 다시 생성한다.
 - 시간대: 모든 컨테이너는 `APP_TZ`(기본 Asia/Seoul) — compose 에서 `TZ` 와 PostgreSQL `-c timezone` 으로 맞춘다. 저장 시각은 timestamptz(절대 시각).
 - nginx 설정(`web/nginx/web/`·`web/nginx/cdn/` 의 `default.conf`)은 폴더째 마운트한다(파일 하나만 마운트하면 편집기가 파일을 새로 쓸 때 컨테이너가 옛 파일을 본다). 고친 뒤 `docker compose exec web nginx -s reload`(cdn 도 같음)로 반영한다.
 - 화면을 다시 빌드한 뒤 결과가 안 바뀐 것처럼 보이면 먼저 브라우저 새로고침 여부를 확인한다.
