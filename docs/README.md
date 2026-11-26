@@ -7,6 +7,7 @@
 | [`guide/`](guide/) | 어떻게 띄우고 쓰는가 | Markdown |
 | [`architecture/`](architecture/) | 시스템이 어떻게 짜여 있는가 (컨테이너 · 서비스 · 요청 흐름 · 기술 스택) | SVG 도면 · Markdown |
 | [`navigation/`](navigation/) | 로봇이 어떻게 달리는가 (지도 · 계획 · 제어 · 장애물) | SVG 설명서 |
+| [`camera/`](camera/) | 카메라로 거리를 어떻게 재는가 (스테레오 거리 · 보정) | SVG 설명서 |
 | [`design/`](design/) | 무엇을 만들고, 서로 무엇을 주고받는가 (시나리오 · 인터페이스) | Markdown |
 | [`plan/`](plan/) | 앞으로 무엇을 언제 하는가 (향후 계획 · 일정 · 주차별 진행 도면) | Markdown · SVG 도면 |
 | [`storyboard/`](storyboard/) | 화면이 어떻게 생겼고 어떻게 이어지는가 | SVG 도면 |
@@ -44,6 +45,20 @@
 먼저 `drive_layers.svg`(무엇을 보고 달리는가)를 보고, 이어서 `drive_controller.svg`(그것으로 어떻게 달리는가)를 본다.
 계획기 · 제어기가 낯설면 `theta_star.svg`(길은 어떻게 찾나) → `mppi.svg`(그 길을 어떻게 따라가나) 순서로 본다.
 측정값과 시험 방법의 글 설명은 [guide/RUNNING.md](guide/RUNNING.md) 의 "계획 방식과 좁은 틈", 남은 일은 [plan/ROADMAP.md](plan/ROADMAP.md) 에 있다.
+
+## camera — 카메라
+
+| 파일 | 내용 |
+| --- | --- |
+| [stereo_depth_1_formula.svg](camera/stereo_depth_1_formula.svg) | ① 거리 식 Z = f′ · B / d: 위에서 본 두 카메라와 점 P → P 를 왼쪽 광축 위로 옮겨 생기는 직각삼각형(세로 Z · 밑변 B ↔ 세로 f′ · 밑변 d) → 두 식을 빼서 확인 → 평행화된 두 영상에서 xL · xR · cx′ · v · d 의 위치 → 기호 표 |
+| [stereo_depth_2_values.svg](camera/stereo_depth_2_values.svg) | ② f′ · B 는 보정 결과 P 행렬(projection_matrix)의 어느 칸인가, K 의 fx 와 P 의 f′ 가 다른 이유, d → Z 곡선과 1 px 오차, 직선거리 |
+| [stereo_depth_3_rectify.svg](camera/stereo_depth_3_rectify.svg) | ③ 평행화: 원본 영상에서는 같은 점의 행이 다르다 → 원본 픽셀이 K · D → R1 · R2 → P1 · P2 를 거쳐 평행화된 픽셀이 되는 과정 → 같은 행만 훑는 SGBM |
+| [stereo_depth_4_rt.svg](camera/stereo_depth_4_rt.svg) | ④ R · T: 같은 순간에 찍은 보드 쌍으로 두 카메라 사이 회전 · 이동을 구한다, \|T\| = B, 한 칸 길이 s 가 틀리면 모든 거리가 같은 비율로 틀린다 |
+| [stereo_depth_5_camera.svg](camera/stereo_depth_5_camera.svg) | ⑤ K · D: 카메라 한 대의 구조(점 → 픽셀 세 단계, 왜곡 k1 k2 p1 p2 k3)와 calibrateCamera 가 값을 고쳐 가는 반복 |
+| [stereo_depth_6_chain.svg](camera/stereo_depth_6_chain.svg) | ⑥ 정리: 거리에서 체커보드 사진까지 거꾸로 따라간 사슬과 실제 보정 · 운용 순서(OpenCV 함수) |
+
+① 부터 차례로 본다(목표인 거리 식에서 시작해 그 값을 만드는 단계로 거슬러 올라간다).
+숫자는 젯봇 카메라(IMX219) 사양으로 계산한 값이고, 두 카메라 간격 B(60 mm) · 두 카메라 사이 회전은 **가정값**이다. 스테레오 보정(SCHEDULE B 4주차) 뒤 스크립트의 `SPEC` 을 보정 결과로 바꿔 다시 생성한다.
 
 ## design — 설계
 
@@ -83,6 +98,7 @@ SVG 를 직접 고치지 않는다. 같은 폴더의 `build_*.py` 를 고친 뒤
 | `navigation/drive_layers.svg` | `python3 docs/navigation/build_drive_layers.py` |
 | `navigation/theta_star.svg` | `python3 docs/navigation/build_theta_star.py` (numpy 필요) |
 | `navigation/mppi.svg` | `python3 docs/navigation/build_mppi.py` (numpy 필요) |
+| `camera/stereo_depth_1_formula.svg` ~ `stereo_depth_6_chain.svg` | `python3 docs/camera/build_stereo_depth.py` (numpy · opencv-python 필요, 6장을 한 번에) |
 | `plan/weekly/week_1.svg` ~ `week_9.svg` | `python3 docs/plan/weekly/build_weekly.py` (9장을 한 번에) |
 | `storyboard/web_storyboard.svg` | `python3 docs/storyboard/build_storyboard.py` |
 | `storyboard/web_screen_tree.svg` | `python3 docs/storyboard/build_screen_tree.py` |
@@ -98,6 +114,6 @@ SVG 를 직접 고치지 않는다. 같은 폴더의 `build_*.py` 를 고친 뒤
 
 ## 새 문서를 둘 곳
 
-- 실행 · 사용법 → `guide/` · 시스템 구성 → `architecture/` · 주행(지도 · Nav2 · 브리지) → `navigation/`
+- 실행 · 사용법 → `guide/` · 시스템 구성 → `architecture/` · 주행(지도 · Nav2 · 브리지) → `navigation/` · 카메라(보정 · 거리) → `camera/`
 - 기능의 설계 · 계약 → `design/` · 일정 · 앞으로 할 일 → `plan/` · 화면 → `storyboard/`
 - 어디에도 맞지 않으면 폴더를 새로 만들고 이 표에 한 줄을 더한다. `docs/` 바로 아래에는 이 파일만 둔다.
