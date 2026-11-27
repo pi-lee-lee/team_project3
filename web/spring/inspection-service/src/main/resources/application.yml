@@ -11,6 +11,10 @@ spring:
     password: ${DB_PASSWORD}
     hikari:
       maximum-pool-size: 8
+  task:
+    scheduling:
+      pool:
+        size: 4        # 사건 흐름(2초) · 순찰 감시(1.5초) · 예약 점검이 서로 기다리지 않게
   servlet:
     multipart:
       max-file-size: 10MB

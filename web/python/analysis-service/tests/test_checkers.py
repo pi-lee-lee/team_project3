@@ -116,6 +116,68 @@ def test_gauge_dial():
     print('dial 없음: ok')
 
 
+def draw_zone_gauge(value, cx=320, cy=240, r=150, squash=1.0, wall=(225, 225, 228), bezel=False):
+    """시연 압력계: 흰 판 + 검은 테두리 + 굵은 초록(0~0.6) · 노랑(0.6~0.8) · 빨강(0.8~1.0) 띠(0.62~0.92) + 검은 바늘(0.78).
+    bezel: 화면 둘레에 모니터 틀 같은 큰 검은 테두리(dial 방식이 테두리로 오인하던 것)."""
+    img, d = canvas(wall)
+    if bezel:
+        d.rectangle([0, 0, W - 1, H - 1], outline=(15, 15, 15), width=40)
+    rx = r * squash
+
+    def pt(rho, deg):
+        a = math.radians(deg)
+        return cx + rho * rx * math.cos(a), cy - rho * r * math.sin(a)
+
+    def ang(val):
+        return 225 - val * 270
+
+    d.ellipse([cx - rx, cy - r, cx + rx, cy + r], fill=(20, 20, 20))
+    d.ellipse([cx - 0.92 * rx, cy - 0.92 * r, cx + 0.92 * rx, cy + 0.92 * r], fill=(250, 250, 247))
+    for lo, hi, col in ((0.0, 0.6, (20, 165, 60)), (0.6, 0.8, (250, 195, 0)), (0.8, 1.0, (225, 25, 25))):
+        steps = int((hi - lo) * 120) + 2
+        outer = [pt(0.92, ang(lo + (hi - lo) * i / (steps - 1))) for i in range(steps)]
+        inner = [pt(0.62, ang(hi - (hi - lo) * i / (steps - 1))) for i in range(steps)]
+        d.polygon(outer + inner, fill=col)
+    for k in (0.0, 0.6, 0.8, 1.0):
+        d.line([pt(0.6, ang(k)), pt(0.92, ang(k))], fill=(20, 20, 20), width=max(2, r // 30))
+    a = ang(value)
+    d.line([pt(-0.15, a), pt(0.78, a)], fill=(10, 10, 10), width=max(4, r // 14))
+    d.ellipse([cx - 0.11 * rx, cy - 0.11 * r, cx + 0.11 * rx, cy + 0.11 * r], fill=(10, 10, 10))
+    return img
+
+
+def test_gauge_zone():
+    rule = {'ruleId': 12, 'kind': 'GAUGE', 'params': {'style': 'zone', 'unit': 'MPa'},
+            'grading': {'type': 'ranges', 'ranges': [{'min': 0.0, 'max': 0.6, 'grade': 'NORMAL'}], 'default': 'WARNING'}}
+    zones = {0.35: 'green', 0.7: 'yellow', 0.9: 'red'}
+    cases = [('가운데·큼', dict(), None), ('작음', dict(cx=200, cy=170, r=70), None),
+             ('비스듬히(가로 0.75배)', dict(squash=0.75), None), ('어두운 음영(0.7배)', dict(), 'shade'),
+             ('모니터 틀 같은 검은 테두리', dict(bezel=True, r=120), None),
+             ('아래에 큰 노란 함(시뮬레이션 P4)', dict(cy=130, r=80), 'box')]
+    for name, kw, how in cases:
+        for v, z in zones.items():
+            img = draw_zone_gauge(v, **kw)
+            if how == 'shade':
+                img = shade(img, 0.7)
+            if how == 'box':                          # 계기판보다 훨씬 큰 같은 색 물체가 옆에 있어도 띠만 골라야 한다
+                ImageDraw.Draw(img).rectangle([60, 230, 580, 400], fill=(180, 170, 60))
+            out = run_rule(frame(img), rule)
+            assert out['value'] is not None and abs(out['value'] - v) <= 0.05, (name, v, out)
+            assert out['evidence']['zoneColor'] == z, (name, v, out)
+            assert out['grade'] == ('NORMAL' if v < 0.6 else 'WARNING'), (name, v, out)
+            print(f'zone {name}: 기대 {v} → {out["value"]} 구간 {out["evidence"]["zoneColor"]} {out["grade"]}')
+    # 압력계가 아닌 것: 빈 벽, 검은 막대, 모니터 틀만, 색 순서가 다른 계기판(dial 시험판: 빨강·초록·빨강), 무지개 열화상
+    img, d = canvas((225, 225, 228))
+    d.line([100, 200, 400, 220], fill=(0, 0, 0), width=8)
+    bezel, bd = canvas((225, 225, 228))
+    bd.rectangle([0, 0, W - 1, H - 1], outline=(15, 15, 15), width=40)
+    for what, im in (('빈 벽', canvas((225, 225, 228))[0]), ('검은 막대', img), ('모니터 틀만', bezel),
+                     ('색 순서가 다른 계기판', draw_dial(0.5)), ('무지개 열화상', draw_thermal_rainbow(0.08))):
+        out = run_rule(frame(im), rule)
+        assert out['grade'] == 'UNKNOWN' and out['value'] is None, (what, out)
+    print('zone 압력계 아님(빈 벽 · 막대 · 모니터 틀 · 다른 계기판 · 열화상): 찾지 못함 ok')
+
+
 def draw_lamp(color, cx=320, cy=240, r=26):
     img, d = canvas()
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
@@ -244,6 +306,62 @@ def test_thermal():
     print('thermal 없음·판독기 오류: ok')
 
 
+def rainbow_rgb(t_c, lo=15.0, hi=300.0):
+    """°C → 무지개 색표 색(시연 사진과 같은 15~300°C 로그 눈금)."""
+    from checkers.thermal import PALETTES, relative
+    u = relative(t_c, lo, hi, 'log')
+    lut = PALETTES['rainbow']
+    for (a, ca), (b, cb) in zip(lut[:-1], lut[1:]):
+        if a <= u <= b:
+            k = (u - a) / (b - a)
+            return tuple(int(round(ca[i] + (cb[i] - ca[i]) * k)) for i in range(3))
+    return lut[-1][1]
+
+
+def draw_thermal_rainbow(hot_fraction, x=160, y=120, w=300, h=225, wall=(205, 205, 200)):
+    """무지개 열화상 인쇄물: 방 온도(22°C) 바탕 위 가운데 아래에 뜨거운 부분(120°C 고리 · 250°C 심부),
+    판 오른쪽 검은 띠 위에 온도 막대(위 = 300°C). 막대의 뜨거운 색은 판이 아니므로 세면 안 된다."""
+    img, d = canvas(wall)
+    d.rectangle([x, y, x + w, y + h], fill=rainbow_rgb(22))
+    d.rectangle([x, y + h * 0.7, x + w, y + h], fill=rainbow_rgb(19))          # 바닥(조금 차가움)
+    if hot_fraction > 0:
+        r = math.sqrt(w * h * hot_fraction / math.pi)
+        cx, cy = x + w * 0.5, y + h * 0.6
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=rainbow_rgb(120))
+        d.ellipse([cx - r * 0.45, cy - r * 0.45, cx + r * 0.45, cy + r * 0.45], fill=rainbow_rgb(250))
+    bx = x + w + 4                                                            # 판 옆 검은 띠 + 온도 막대
+    d.rectangle([bx, y, bx + 26, y + h], fill=(0, 0, 0))
+    for k in range(int(h) - 20):
+        t = 300 - (300 - 15) * k / (h - 21)
+        d.line([bx + 8, y + 10 + k, bx + 18, y + 10 + k], fill=rainbow_rgb(t))
+    return img
+
+
+def test_thermal_rainbow():
+    rule = {'ruleId': 5, 'kind': 'THERMAL',
+            'params': {'palette': 'rainbow', 'tempMin': 15, 'tempMax': 300, 'tempScale': 'log', 'hotC': 80},
+            'grading': {'type': 'ranges', 'ranges': [{'max': 0.002, 'grade': 'NORMAL'},
+                                                     {'min': 0.002, 'max': 0.03, 'grade': 'WARNING'}], 'default': 'EMERGENCY'}}
+    for frac, (lo, hi, g) in {0.0: (0.0, 0.001, 'NORMAL'), 0.01: (0.006, 0.014, 'WARNING'), 0.08: (0.065, 0.095, 'EMERGENCY')}.items():
+        for name, img in (('정면', draw_thermal_rainbow(frac)), ('어둡게', shade(draw_thermal_rainbow(frac), 0.8))):
+            out = run_rule(frame(img), rule)
+            ev = out['evidence']
+            assert out['value'] is not None and lo <= out['value'] <= hi, (name, frac, out)
+            assert out['grade'] == g, (name, frac, out)
+            box = out['located']['bbox']
+            assert box[2] <= (160 + 300 + 4) / W + 0.01, ('온도 막대가 판에 들어감', box)
+            assert ev['hotC'] == 80.0, ev
+            if frac:
+                px, py = ev['peak']['point']                                   # 발화점 = 심부(판 가운데 아래)
+                assert abs(px - (160 + 150) / W) < 0.03 and abs(py - (120 + 225 * 0.6) / H) < 0.03, ev['peak']
+                if name == '정면':
+                    assert 200 <= ev['peak']['celsius'] <= 300, ev['peak']
+            print(f'thermal rainbow {name} {frac}: {out["value"]} {out["grade"]} 최고 {ev["peak"].get("celsius")}°C 판 {box}')
+    from checkers.thermal import celsius, relative
+    assert abs(float(celsius(relative(80, 15, 300, 'log'), 15, 300, 'log')) - 80) < 0.01
+    print('thermal rainbow °C 변환: ok')
+
+
 def test_object():
     region = [0.30, 0.30, 0.70, 0.95]
     rule = {'ruleId': 4, 'kind': 'OBJECT', 'params': {'label': 'fire_extinguisher', 'expect': 'PRESENT'},
@@ -304,6 +422,6 @@ def test_engine():
 
 
 if __name__ == '__main__':
-    for t in (test_grade, test_gauge, test_gauge_dial, test_lamp, test_thermal, test_object, test_engine):
+    for t in (test_grade, test_gauge, test_gauge_dial, test_gauge_zone, test_lamp, test_thermal, test_thermal_rainbow, test_object, test_engine):
         t()
     print('ALL OK')

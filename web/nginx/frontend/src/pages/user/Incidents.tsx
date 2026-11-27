@@ -1,7 +1,7 @@
 import type { LaunchMode } from '../../api/types';
 import { ErrorBox, ago, fmtTime, useAction, useApi, usePoll } from '../../util';
 import { Empty, Group, Meta, MetaLine, Page, Row, Segmented, Tag } from '../../ui';
-import { IncidentStateTag, LAUNCH_MODE, checkText, isOpenIncident } from './scenarioText';
+import { INCIDENT_TYPE, IncidentStateTag, LAUNCH_MODE, checkText, isOpenIncident } from './scenarioText';
 import './user.css';
 
 const MODES: [LaunchMode, string][] = [['APPROVAL', '사람 승인'], ['AUTO', '자동 투척']];
@@ -38,8 +38,8 @@ export default function Incidents() {
             const open = isOpenIncident(i.state);
             return (
               <Row key={i.incidentId} to={`/app/incidents/${i.incidentId}`} rich className={open ? '' : 'dim'}
-                icon="flame.fill" iconColor={!open ? '#8e8e93' : i.state === 'AWAITING_APPROVAL' ? 'var(--orange)' : 'var(--red)'}
-                title={<>사건 #{i.incidentId}<IncidentStateTag state={i.state} /><Tag tone={i.launchMode === 'AUTO' ? 'purple' : 'blue'}>{LAUNCH_MODE[i.launchMode]}</Tag></>}
+                icon="flame.fill" iconColor={!open ? '#8e8e93' : i.state === 'AWAITING_APPROVAL' || i.type === 'HEAT' ? 'var(--orange)' : 'var(--red)'}
+                title={<>사건 #{i.incidentId}<Tag tone={i.type === 'HEAT' ? 'orange' : 'red'}>{INCIDENT_TYPE[i.type] ?? '화재 감지'}</Tag><IncidentStateTag state={i.state} /><Tag tone={i.launchMode === 'AUTO' ? 'purple' : 'blue'}>{LAUNCH_MODE[i.launchMode]}</Tag></>}
                 subtitle={<>
                   <MetaLine>
                     <Meta icon="location.fill">x {i.x.toFixed(2)} · y {i.y.toFixed(2)}</Meta>

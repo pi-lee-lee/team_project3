@@ -222,23 +222,11 @@
           <material><ambient>0.1 0.7 0.2 1</ambient><diffuse>0.1 0.7 0.2 1</diffuse></material></visual>
       </link>
     </model>
-    <model name="target_yellow">
-      <static>true</static>
-      <pose>-0.800 4.600 0.100 0 0 0</pose>
-      <link name="link">
-        <collision name="c"><geometry><box><size>0.300 0.600 0.200</size></box></geometry></collision>
-        <visual name="v"><geometry><box><size>0.300 0.600 0.200</size></box></geometry>
-          <material><ambient>0.9 0.8 0.1 1</ambient><diffuse>0.9 0.8 0.1 1</diffuse></material></visual>
-      </link>
-    </model>
     <model name="target_gauge">
       <static>true</static>
-      <pose>-0.950 4.600 0.410 0 0 0.00000</pose>
+      <pose>-0.950 4.600 0.280 0 0 0.00000</pose>
       <link name="link">
-        <visual name="rim"><pose>0.0030 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.1300</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 0.0000 0.0000 1</emissive></material></visual>
-        <visual name="face"><pose>0.0060 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.1200</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>1.0000 1.0000 1.0000 1</emissive></material></visual>
-        <visual name="needle"><pose>0.010 0.0494 0.0078 0.15708 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.1 0.015</size></box></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>1.0000 0.0000 0.0000 1</emissive></material></visual>
-        <visual name="hub"><pose>0.0130 0 0 0 1.57080 0</pose><cast_shadows>false</cast_shadows><geometry><cylinder><radius>0.0200</radius><length>0.004</length></cylinder></geometry><material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse><specular>0 0 0 1</specular><emissive>0.0000 0.0000 1.0000 1</emissive></material></visual>
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/gauge_normal.png</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/gauge_normal.png</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
       </link>
     </model>
     <model name="target_lamp">
@@ -260,6 +248,20 @@
       <pose>4.300 4.400 0.280 0 0 -1.57080</pose>
       <link name="link">
         <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/empty.jpg</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/empty.jpg</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
+      </link>
+    </model>
+    <model name="thermal_c2_east">
+      <static>true</static>
+      <pose>8.150 4.100 0.280 0 0 3.14159</pose>
+      <link name="link">
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/thermal_normal.png</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/thermal_normal.png</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
+      </link>
+    </model>
+    <model name="thermal_elec_door">
+      <static>true</static>
+      <pose>3.050 4.900 0.280 0 0 0.00000</pose>
+      <link name="link">
+        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows><geometry><box><size>0.004 0.6 0.45</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular><pbr><metal><albedo_map>/sim/models/photo_panels/materials/textures/thermal_normal.png</albedo_map><emissive_map>/sim/models/photo_panels/materials/textures/thermal_normal.png</emissive_map><metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>
       </link>
     </model>
   </world>

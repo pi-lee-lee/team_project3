@@ -230,7 +230,7 @@
 | --- | --- | --- | --- |
 | `OBJECT` | `label`, `expect`(`PRESENT`/`ABSENT`), `minConfidence`, `model` | `IN_REGION` · `OUT_OF_REGION` · `MISSING` (ABSENT 규칙: `ABSENT` · `PRESENT`) | 위 예 |
 | `GAUGE` | `minAngle`, `maxAngle`, `minValue`, `maxValue`, `unit`, `needle`(색 · 굵기 힌트) | 숫자(눈금 값) | `{"type": "ranges", "ranges": [{"min": 0.7, "max": 0.98, "grade": "NORMAL"}, {"min": 0.5, "max": 0.7, "grade": "WARNING"}], "default": "EMERGENCY"}` |
-| `LAMP` | `colors`: 이름 → 색 범위(HSV), `offBelow`(밝기) | `green` · `yellow` · `red` · `off` 등 이름 | `{"type": "map", "map": {"green": "NORMAL", "yellow": "WARNING", "red": "EMERGENCY", "off": "WARNING"}}` |
+| `LAMP` | `colors`: 이름 → 색 범위(HSV), `offBelow`(밝기) | `green` · `yellow` · `red` · `off` 등 이름 | `{"type": "map", "map": {"green": "NORMAL", "yellow": "WARNING", "red": "WARNING", "off": "WARNING"}}` (규칙 판독은 경고까지 — 비상은 화재 사건만. 기준에 비상을 넣어도 서버가 경고로 낮춘다) |
 | `THERMAL` | `palette`(`iron` 등), `hotThreshold`(상대 온도 0~1), `minAreaRatio` | 숫자(뜨거운 영역이 프레임에서 차지하는 비율 0~1) | `{"type": "ranges", "ranges": [{"max": 0.01, "grade": "NORMAL"}, {"min": 0.01, "max": 0.08, "grade": "WARNING"}], "default": "EMERGENCY"}` |
 | `MARKER` | `dictionary`, `markerId`, `sizeM` | 숫자(마커까지 거리 m) — 등급 없이 위치 재기에 쓴다 | — |
 
@@ -639,6 +639,21 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | → `FAILED` | 서버 | 갈 수 없음 · 로봇 없음 · 투척 실패(`ACTUATE_FAILED`). 경고는 열린 채로 둔다 |
 | 닫힌 뒤 → 새 사건 | 감지 보고(S3) | **닫는 것은 기록을 닫는 것이지 실제 상황의 종료가 아니다.** 사건을 닫은 뒤 `incident.reopen_grace_sec` 가 지나도 같은 감지(`detId`)가 계속 오면 새 사건으로 다시 연다(`REOPENED`, 이전 사건 번호를 남긴다). 그래서 robot-service 는 같은 감지도 15초마다 다시 넘긴다 |
 | 닫힐 때 | 서버 | 출동 미션 끝내기(S2 finish) → 그 로봇의 밀린 예약이 이어진다 |
+| 닫힌 뒤 → 순찰 이어 가기 | 서버 | 출동 때문에 멈춘 점검 작업(`PREEMPTED`)이 있으면, 로봇이 한가해진 뒤 그 작업의 남은 지점(관측이 없는 지점)으로 새 점검 작업을 만든다(`PATROL_RESUMED`, 설정 `patrol.resume`) |
+
+**열원 확인(사건 종류 `HEAT`):** 감지 보고의 등급이 경고(과열)면 같은 흐름을 투척 없이 탄다. 그 자리(`incident.merge_radius_m` 안)에 열린 열원 경고(`HEAT_WARNING`)가 있으면 이미 확인한 열원이라 사건을 만들지 않는다.
+
+| 전이 | 누가 | 조건 · 하는 일 |
+| --- | --- | --- |
+| → `DETECTED` | 감지 보고(S3) · 순찰 감시 | 사건 종류 `HEAT`, 경고는 아직 열지 않는다 |
+| `DETECTED` → `DISPATCHED` → `ARRIVED` | 서버 · 로봇 | 화재와 같다. 다만 서는 거리는 `heat.check_distance_m` |
+| `ARRIVED` → 확인 | 서버 | 2초 간격으로 `heat.check_looks` 번 찍어 판독(`HEAT_CHECKED`). 가장 많이 나온 등급(같으면 높은 쪽), 비상이 두 번이면 바로 비상 |
+| 확인 → `RESOLVED` | 서버 | 과열(경고): 사진과 함께 열원 경고 `HEAT_WARNING`(사건으로 이어짐)을 연다 |
+| 확인 → `DISMISSED` | 서버 | 정상 · 판을 못 찾음: 경고 없이 기록만 남긴다 |
+| 확인 → 화재 | 서버 | 비상: 사건 종류를 `FIRE` 로 바꾸고(`ESCALATED`) 비상 경고를 연 뒤 `ARRIVED` 재판독부터 화재 흐름을 이어 간다 |
+| 열원 경고 해제 | 순찰 감시 | 다음 순찰에서 그 자리가 연속으로 정상으로 보이면 푼다 |
+
+**순찰 감시(시뮬레이션 · 젯봇이 붙기 전):** 점검 작업이 `RUNNING` 인 동안 inspection-service `PatrolWatchService` 가 1.5초마다 로봇 사진(S2 snapshot, 헤더 `X-Pose`)을 `detect.thermal` 로 판독한다. 판이 사진 가로의 `patrol.watch_min_width` 보다 작으면 넘기고, 같은 등급이 `patrol.watch_confirm` 번 연속이면 판의 방향(`camera.hfov_deg`) · 로봇 위치로 지도에서 그 방향의 벽을 찾아(`POST /internal/robots/{id}/raycast`, 벽에서 로봇 쪽으로 0.1m 당긴 자리) 감지 보고와 같은 길로 넣는다(`detId` = `watch-{로봇}-{등급}-{0.5m 격자}`).
 
 사건이 열려 있는 동안 대응 로봇의 예약 회차는 실행 버퍼에서 기다린다.
 
@@ -709,7 +724,10 @@ DETECTED ─▶ DISPATCHED ─▶ ARRIVED ─▶ [재판독] ─┬─ AUTO, 비
 | 투척 뒤 현장 감시 간격 · 종료 기준 | 설정 `incident.monitor_interval_sec`, `incident.monitor_clear_count` | 10, 2 |
 | 닫은 뒤에도 감지가 계속될 때 다시 여는 유예 | 설정 `incident.reopen_grace_sec` | 60 |
 | 지도에 제어기 방향(주황 실선) 표시 | 설정 `display.control_direction`(관제 지도 · 대시보드 지도) | `false`(숨김) |
-| 열화상 인쇄물의 색상표 · 열원 기준 | 감지 설정 `detect.thermal`(= `THERMAL` 규칙의 `params` · `grading`) | `iron`, 3.3 의 예 |
+| 열화상 사진의 색상표 · 온도 범위 · 열원 기준 | 감지 설정 `detect.thermal`(= `THERMAL` 규칙의 `params` · `grading`) | `rainbow`, 15~300°C(로그 눈금), 80°C 이상이 뜨거운 곳, 넓이 0.2% 이상 경고 · 3% 이상 비상 |
+| 순찰 감시(점검 중 1.5초마다 열화상 판독) 켜기 · 판이 이보다 작으면 판단 안 함 · 연속 횟수 | 설정 `patrol.watch`, `patrol.watch_min_width`, `patrol.watch_confirm` | `true`, 0.12(사진 가로 비율), 2 |
+| 사건이 끝난 뒤 멈춘 순찰을 남은 지점부터 이어 가기 | 설정 `patrol.resume` | `true` |
+| 열원(과열) 확인 거리 · 찍어 보는 횟수 | 설정 `heat.check_distance_m`, `heat.check_looks` | 1.0, 3 |
 | 감지 보고에 필요한 연속 프레임 수 | 설정 `detect.report_frames` | 5 |
 | 계기판 · 표시등의 실제 대상, 눈금 · 색 | 규칙의 `params` | — (규칙을 만들 때 입력) |
 | 등급 기준 값 | 규칙의 `grading` | — |

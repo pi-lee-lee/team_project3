@@ -50,19 +50,24 @@ const STEPS: [string, IncidentState[]][] = [
   ['감지', ['DETECTED']], ['출동', ['DISPATCHED']], ['도착', ['ARRIVED']], ['승인 대기', ['AWAITING_APPROVAL']],
   ['투척 · 감시', ['LAUNCHING', 'LAUNCHED', 'MONITORING']], ['종료', ['RESOLVED', 'DISMISSED']],
 ];
+/** 열원 확인(HEAT): 감지 → 출동 → 도착 · 확인 → 종료(투척 없음) */
+const HEAT_STEPS: [string, IncidentState[]][] = [
+  ['감지', ['DETECTED']], ['출동', ['DISPATCHED']], ['도착 · 확인', ['ARRIVED']], ['종료', ['RESOLVED', 'DISMISSED']],
+];
 /** 지금 단계 번호(0부터). 실패는 멈춘 자리를 사건 기록에서 찾기 어렵므로 -1 로 두고 따로 표시한다 */
-export function incidentStep(i: Pick<Incident, 'state'>) {
-  return STEPS.findIndex(([, states]) => states.includes(i.state));
+export function incidentStep(i: Pick<Incident, 'state'> & { type?: string }) {
+  return (i.type === 'HEAT' ? HEAT_STEPS : STEPS).findIndex(([, states]) => states.includes(i.state));
 }
-export function IncidentSteps({ incident, className = 'inc-steps' }: { incident: Pick<Incident, 'state' | 'launchMode'>; className?: string }) {
+export function IncidentSteps({ incident, className = 'inc-steps' }: { incident: Pick<Incident, 'state' | 'launchMode'> & { type?: string }; className?: string }) {
   const cur = incidentStep(incident);
   const failed = incident.state === 'FAILED';
+  const heat = incident.type === 'HEAT';
   return (
     <ol className={`${className} ${failed ? 'failed' : ''}`}>
-      {STEPS.map(([label], i) => (
+      {(heat ? HEAT_STEPS : STEPS).map(([label], i) => (
         // 자동 투척 모드에서는 승인 대기를 건너뛸 수 있다
         <li key={label} className={`${cur > i || incident.state === 'RESOLVED' || incident.state === 'DISMISSED' ? 'done' : ''} ${cur === i ? 'now' : ''}`}>
-          <i />{label}{i === 3 && incident.launchMode === 'AUTO' ? <small> (자동이면 생략)</small> : null}
+          <i />{label}{!heat && i === 3 && incident.launchMode === 'AUTO' ? <small> (자동이면 생략)</small> : null}
         </li>
       ))}
     </ol>
@@ -70,11 +75,14 @@ export function IncidentSteps({ incident, className = 'inc-steps' }: { incident:
 }
 
 export const INCIDENT_EVENT: Record<string, string> = {
-  DETECTED: '화재 감지', DETECTION_REPEATED: '같은 자리 다시 감지', REOPENED: '닫은 뒤에도 감지 계속 · 다시 엶', REOPENED_AS: '새 사건으로 다시 열림', PREEMPTED: '점검 작업을 멈춤', DISPATCHED: '출동',
+  DETECTED: '감지', DETECTION_REPEATED: '같은 자리 다시 감지', REOPENED: '닫은 뒤에도 감지 계속 · 다시 엶', REOPENED_AS: '새 사건으로 다시 열림', PREEMPTED: '점검 작업을 멈춤', DISPATCHED: '출동',
   ARRIVED: '투척 위치 도착', RECHECKED: '도착 후 재판독', APPROVAL_REQUESTED: '투척 승인 요청', APPROVAL_REMINDER: '승인 재알림',
   APPROVED: '투척 승인', LAUNCH_ORDERED: '투척 명령', LAUNCH_REJECTED: '투척 명령 거부됨', AIM_CORRECTED: '조준 보정(제자리 회전)', AIM_FAILED: '조준 보정 실패', LAUNCHED: '투척 완료', MONITORING: '열원이 남음 · 현장 감시 시작', MONITOR_CHECKED: '현장 감시 판독(등급 변화)', MONITOR_STOPPED: '현장 감시 끊김',
   AFTER_CHECKED: '투척 후 판독', ROBOT_RELEASED: '로봇 대기 해제', RESOLVED: '조치 완료', DISMISSED: '오탐으로 닫음', FAILED: '대응 실패',
+  HEAT_CHECKED: '열원 앞에서 확인', ESCALATED: '화재로 커짐 · 화재 대응으로 넘김', PATROL_RESUMED: '순찰 이어서 시작', PATROL_RESUME_SKIPPED: '순찰 이어가기 안 함',
 };
+/** 사건 종류: FIRE(화재 · 투척) · HEAT(열원 확인 — 과열을 보고 그 앞에 가서 확인, 투척 없음) */
+export const INCIDENT_TYPE: Record<string, string> = { FIRE: '화재 감지', HEAT: '열원 확인' };
 export function incidentEventText(e: IncidentEvent) {
   const d = e.detail || {};
   const parts: string[] = [];

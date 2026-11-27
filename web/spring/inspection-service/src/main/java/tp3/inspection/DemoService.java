@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,28 +40,37 @@ public class DemoService {
     private static final Map<String, String[]> SCENARIOS = new LinkedHashMap<>();
 
     /** 통합 시연이 차례로 돌리는 시나리오(사람 손이 필요 없는 것만). scripts/demo.py 의 all 과 같다. */
-    private static final List<String> ALL = List.of("reset", "rules-abnormal", "rules-restore", "fire-false", "fire-auto");
+    private static final List<String> ALL = List.of("reset", "rules-abnormal", "rules-restore", "fire-false", "fire-auto", "heat-check");
 
     static {
         SCENARIOS.put("all", new String[]{"통합 시연",
-                "초기화 → 소방 관제(이상 발생 → 복구) → 화재(오탐 → 자동 투척)를 사람 손 없이 이어서 실행한다. 10분 안팎.", "통합"});
+                "초기화 → 소방 관제(이상 발생 → 복구) → 화재(오탐 → 순찰 중 자동 투척) → 열원 확인을 사람 손 없이 이어서 실행한다. 20분 안팎.", "통합"});
         SCENARIOS.put("fire-approval", new String[]{"화재 · 사람 승인",
-                "투척 모드를 사람 승인으로 두고 화재를 낸다. 터틀봇이 출동해 도착하면 투척 승인 팝업이 뜬다 — 승인은 화면에서 직접 한다.", "소화액 투척"});
+                "C2 복도 동쪽 벽(생산동 → C2 문 맞은편)의 열화상 사진을 화재로 바꾸고 순찰을 시작한다. 지나가며 화재를 보면 순찰을 멈추고 출동하고, 도착하면 "
+                        + "투척 승인 팝업이 뜬다 — 승인은 화면에서 직접 한다. 투척 뒤 불이 꺼지면(사진이 정상으로 바뀜) 해결되고 남은 지점부터 순찰을 이어 간다.", "소화액 투척"});
         SCENARIOS.put("fire-auto", new String[]{"화재 · 자동 투척",
-                "투척 모드를 자동으로 두고 화재를 낸다. 도착 → 재판독 → 자동 투척 → 현장 감시 → 30초 뒤 열원을 없애 스스로 종료되는 것까지.", "소화액 투척"});
+                "투척 모드를 자동으로 두고 C2 복도 동쪽 벽의 열화상 사진을 화재로 바꾼 뒤 순찰을 시작한다. 순찰 중 발견 → 출동 → 재판독 → 자동 투척 → "
+                        + "불이 꺼짐(사진이 정상으로 바뀜) → 연속 정상 확인으로 해결 → 남은 지점부터 순찰을 이어 가는 것까지.", "소화액 투척"});
         SCENARIOS.put("fire-false", new String[]{"화재 · 오탐",
-                "열원이 없는 곳에 비상 감지 보고를 보낸다. 터틀봇이 가서 보고 쏘지 않고 오탐으로 닫는다.", "소화액 투척"});
-        SCENARIOS.put("fire-preempt", new String[]{"점검 중 화재",
-                "점검을 시작한 뒤 화재를 낸다. 하던 점검을 멈추고 출동한다(사람 승인 모드, 승인은 화면에서).", "소화액 투척"});
+                "열화상 사진은 정상인데 그 자리에서 화재 감지 보고만 보낸다. 터틀봇이 가서 보고 쏘지 않고 오탐으로 닫는다.", "소화액 투척"});
+        SCENARIOS.put("heat-check", new String[]{"열원 확인",
+                "전기실 문 옆 벽의 열화상 사진을 과열로 바꾸고 순찰을 시작한다. 지나가며 과열을 보면 순찰을 멈추고 그 앞에 가서 몇 초 확인한 뒤 "
+                        + "사진과 함께 경고를 열고(투척은 하지 않는다) 남은 지점부터 순찰을 이어 간다. 사진을 정상으로 되돌리고 다시 순찰하면 경고가 스스로 풀린다.", "소화액 투척"});
         SCENARIOS.put("rules-abnormal", new String[]{"소방 관제 · 이상 발생",
-                "소화기를 치우고 표시등을 빨강, 계기판을 0.6 으로 바꾼 뒤 세 지점을 점검한다. 비상 1건 · 경고 2건이 뜬다(소화기 없음은 경고 — 비상은 화재·위험 상황에만).", "소방 관제"});
+                "소화기를 치우고, 비상구 앞에 상자를 놓고(표시등도 빨강), 압력계를 위험(빨강 구간) 사진으로 바꾼 뒤 세 지점을 점검한다. "
+                        + "경고 3건(소화기 없음 · 비상구 앞 통로 막힘 · 압력계 위험 구간)이 뜬다 — 비상은 화재만이다.", "소방 관제"});
         SCENARIOS.put("rules-restore", new String[]{"소방 관제 · 복구",
-                "대상을 원위치하고 다시 점검한다. 경고가 스스로 풀린다.", "소방 관제"});
+                "상자를 치우고 대상을 원위치한 뒤 다시 점검한다. 경고가 스스로 풀린다.", "소방 관제"});
+        SCENARIOS.put("rules-gauge", new String[]{"소방 관제 · 압력계 단계",
+                "분전반(P4) 압력계를 정상 → 주의(노랑) → 위험(빨강) → 정상 사진으로 바꿔 가며 P4 만 네 번 점검한다. "
+                        + "주의 · 위험은 경고 한 건(내용만 '주의 구간' → '위험 구간'으로 바뀜), 정상으로 돌아오면 스스로 풀린다. "
+                        + "지난 과정은 P4 지점 이력에 회차마다 남는다.", "소방 관제"});
         SCENARIOS.put("reset", new String[]{"초기화",
-                "열화상 인쇄물을 치우고 대상을 원위치하며, 열린 사건을 닫고 투척 모드를 사람 승인으로 되돌린다.", "정리"});
+                "열화상 사진을 모두 정상(꺼짐)으로, 비상구 앞 상자를 치우고 대상을 원위치하며, 열린 사건을 닫고 열원 경고를 풀고 투척 모드를 사람 승인으로 되돌린다.", "정리"});
     }
 
-    /** 시연용 규칙(이름이 이 머리로 시작). 지점에 규칙이 하나도 없을 때만 만든다. 값은 scripts/e2e_scenarios.py 와 같다.
+    /** 시연용 규칙(이름이 이 머리로 시작). 같은 이름의 규칙이 있으면 이 정의로 고치고, 없으면 지점에 켜진 규칙이 없을 때만
+     *  만든다(관리자가 만든 규칙은 건드리지 않는다). 시험이 만든 '[e2e] …' 규칙은 시연 동안 꺼 둔다. 값은 scripts/e2e_scenarios.py 와 같다.
      *  P1 · P2 = 소화기 사진 판(인식 모델 fire_v1). P2 는 늘 받침만 있는 비교용이라 시연 점검(DEMO_POINTS)에는 넣지 않는다. */
     private static final String RULE_TAG = "[시연]";
     private static final Map<String, String> DEMO_RULES = Map.of(
@@ -82,14 +92,15 @@ public class DemoService {
                     {"name": "[시연] 상태 표시등", "kind": "LAMP", "enabled": true, "params": {},
                      "regions": {"INSPECTOR": [0.0, 0.0, 1.0, 0.33]},
                      "grading": {"type": "map", "default": "UNKNOWN",
-                                 "map": {"green": "NORMAL", "yellow": "WARNING", "red": "EMERGENCY", "off": "WARNING"}}}""",
+                                 "map": {"green": "NORMAL", "yellow": "WARNING", "red": "WARNING", "off": "WARNING"}}}""",
+            // P4 = 시연 압력계 사진(초록 0~0.6 · 노랑 0.6~0.8 · 빨강 0.8~1.0). 색 띠로 계기판을 찾는다(style zone).
+            // 비상은 화재만이라 노랑 · 빨강 모두 경고(판독 이유에 '주의 구간' · '위험 구간'이 붙는다)
             "P4", """
                     {"name": "[시연] 압력계", "kind": "GAUGE", "enabled": true,
-                     "params": {"minAngle": 225, "maxAngle": -45, "minValue": 0, "maxValue": 1, "unit": "MPa"},
-                     "regions": {"INSPECTOR": [0.0, 0.0, 1.0, 0.37]},
-                     "grading": {"type": "ranges", "default": "EMERGENCY",
-                                 "ranges": [{"min": 0.7, "max": 0.98, "grade": "NORMAL"},
-                                            {"min": 0.5, "max": 0.7, "grade": "WARNING"}]}}""");
+                     "params": {"style": "zone", "minAngle": 225, "maxAngle": -45, "minValue": 0, "maxValue": 1, "unit": "MPa"},
+                     "regions": {},
+                     "grading": {"type": "ranges", "default": "WARNING",
+                                 "ranges": [{"min": 0.0, "max": 0.6, "grade": "NORMAL"}]}}""");
 
     private static final class Run {
         final String key;
@@ -115,6 +126,7 @@ public class DemoService {
         }
     }
 
+    private final JdbcClient jdbc;
     private final Store store;
     private final TaskService tasks;
     private final RuleService rules;
@@ -129,8 +141,9 @@ public class DemoService {
     });
     private volatile Run current;
 
-    public DemoService(Store store, TaskService tasks, RuleService rules, IncidentService incidents,
+    public DemoService(JdbcClient jdbc, Store store, TaskService tasks, RuleService rules, IncidentService incidents,
                        SettingsService settings, @Value("${app.robot-url}") String robotUrl) {
+        this.jdbc = jdbc;
         this.store = store;
         this.tasks = tasks;
         this.rules = rules;
@@ -227,68 +240,89 @@ public class DemoService {
         switch (key) {
             case "fire-approval" -> {
                 mode(r, "APPROVAL", u);
-                String spot = spot(r, robotId, 0);
+                sim(r, robotId, "fire", "set", FIRE_SPOT, "emergency");
+                say(r, "step", "C2 복도 동쪽 벽의 열화상 사진을 화재로 바꿈");
                 long base = lastIncident();
-                sim(r, robotId, "fire", "place", spot, "emergency", "--detect");
-                long id = waitIncident(r, base);
+                long task = inspect(r, robotId, u, "시연: 순찰(화재 · 사람 승인)");
+                long id = waitIncident(r, base, 600);
                 waitState(r, id, 600, "AWAITING_APPROVAL");
-                say(r, "ok", "터틀봇이 투척 위치에 도착했습니다. 화면의 투척 승인 팝업에서 승인하세요(사용자 화면 또는 대시보드)");
-                String st = waitState(r, id, 600, "MONITORING", "RESOLVED", "DISMISSED");
-                say(r, "info", "MONITORING".equals(st) ? "투척함 · 열원이 남아 현장 감시 중입니다. 끝내려면 '초기화' 또는 사건을 닫으세요" : "사건이 닫혔습니다");
+                say(r, "ok", "점검 작업 #" + task + " 을 멈추고 출동해 투척 위치에 도착했습니다. 화면의 투척 승인 팝업에서 승인하세요(사용자 화면 또는 대시보드)");
+                waitState(r, id, 900, "RESOLVED");
+                say(r, "ok", "불이 꺼진 것을 연속으로 확인해 사건을 닫았습니다");
+                waitResumed(r, id);
+                sim(r, robotId, "fire", "reset");
             }
             case "fire-auto" -> {
                 mode(r, "AUTO", u);
-                String spot = spot(r, robotId, 1);
+                sim(r, robotId, "fire", "set", FIRE_SPOT, "emergency");
+                say(r, "step", "C2 복도 동쪽 벽의 열화상 사진을 화재로 바꿈");
                 long base = lastIncident();
-                sim(r, robotId, "fire", "place", spot, "emergency", "--detect");
-                long id = waitIncident(r, base);
+                long task = inspect(r, robotId, u, "시연: 순찰(화재 · 자동 투척)");
+                long id = waitIncident(r, base, 600);
+                say(r, "info", "순찰 작업 #" + task + " 이 지나가며 화재를 보고 사건을 열었습니다");
                 String st = waitState(r, id, 600, "MONITORING", "RESOLVED", "AWAITING_APPROVAL");
                 if ("AWAITING_APPROVAL".equals(st)) {
                     say(r, "warn", "자동 투척 조건을 채우지 못해 승인 대기로 넘어갔습니다 — 팝업에서 승인하세요");
-                    st = waitState(r, id, 600, "MONITORING", "RESOLVED");
                 }
-                if ("MONITORING".equals(st)) {
-                    say(r, "info", "투척함 · 현장 감시 중. 30초 뒤 열원을 없앱니다");
-                    pause(r, 30);
-                    sim(r, robotId, "fire", "place", spot, "normal");
-                    waitState(r, id, 180, "RESOLVED");
-                }
-                sim(r, robotId, "fire", "clear");
+                waitState(r, id, 900, "RESOLVED");
+                say(r, "ok", "투척 뒤 불이 꺼진 것을 연속으로 확인해 사건을 닫았습니다");
+                waitResumed(r, id);
+                sim(r, robotId, "fire", "reset");
                 mode(r, "APPROVAL", u);
             }
             case "fire-false" -> {
-                String spot = spot(r, robotId, 0);
+                sim(r, robotId, "fire", "set", FIRE_SPOT, "normal");
                 long base = lastIncident();
-                sim(r, robotId, "fire", "place", spot, "normal");
-                sim(r, robotId, "fire", "detect", spot, "emergency");
-                long id = waitIncident(r, base);
+                sim(r, robotId, "fire", "detect", FIRE_SPOT, "emergency");
+                say(r, "step", "사진은 정상인 자리에서 화재 감지 보고만 보냄(오탐)");
+                long id = waitIncident(r, base, 120);
                 waitState(r, id, 600, "DISMISSED");
                 say(r, "ok", "가 보니 열원이 없어 쏘지 않고 오탐으로 닫았습니다");
-                sim(r, robotId, "fire", "clear");
             }
-            case "fire-preempt" -> {
+            case "heat-check" -> {
                 mode(r, "APPROVAL", u);
-                long task = inspect(r, robotId, u, "시연: 가로채기 대상 점검");
-                waitTask(r, task, 120, "RUNNING");
-                pause(r, 15);
-                String spot = spot(r, robotId, 2);
+                sim(r, robotId, "fire", "set", HEAT_SPOT, "warning");
+                say(r, "step", "전기실 문 옆 벽의 열화상 사진을 과열로 바꿈");
                 long base = lastIncident();
-                sim(r, robotId, "fire", "place", spot, "emergency", "--detect");
-                long id = waitIncident(r, base);
-                waitState(r, id, 600, "AWAITING_APPROVAL");
-                say(r, "ok", "점검 작업 #" + task + " 을 멈추고 출동했습니다. 투척 승인 팝업에서 승인하세요");
+                long task = inspect(r, robotId, u, "시연: 순찰(열원 확인)");
+                long id = waitIncident(r, base, 900);
+                say(r, "info", "순찰 작업 #" + task + " 이 지나가며 과열을 보고 열원 확인에 나섰습니다");
+                waitState(r, id, 600, "RESOLVED");
+                say(r, "ok", "열원 앞에서 확인했습니다: " + incidents.detail(id).get("closeReason"));
+                waitResumed(r, id);
+                sim(r, robotId, "fire", "set", HEAT_SPOT, "normal");
+                say(r, "step", "열화상 사진을 정상으로 되돌리고 다시 순찰(P3 → P4 로 그 앞을 지나간다)");
+                long again = inspect(r, robotId, u, "시연: 순찰(열원 정상 확인)", List.of("P3", "P4"));
+                waitTask(r, again, 900, "COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED");
+                long open = jdbc.sql("SELECT count(*) FROM alert WHERE type = 'HEAT_WARNING' AND state <> 'RESOLVED'").query(Long.class).single();
+                say(r, open == 0 ? "ok" : "warn", open == 0 ? "다음 순찰에서 정상으로 보여 열원 경고가 풀렸습니다" : "열원 경고가 아직 열려 있습니다(" + open + "건)");
             }
             case "rules-abnormal" -> {
                 ensureRules(r);
                 sim(r, robotId, "target", "extinguisher", "remove");
-                sim(r, robotId, "target", "lamp", "red");
-                sim(r, robotId, "target", "gauge", "0.6");
+                sim(r, robotId, "obstacle", "place", "exit");
+                sim(r, robotId, "target", "lamp", "red");          // 비상구 앞 상자와 함께 켜 두는 표시. 판단은 상자로 막힌 것(경고)
+                sim(r, robotId, "target", "gauge", "danger");
                 long task = inspect(r, robotId, u, "시연: 소방 관제(이상)");
                 waitTask(r, task, 1200, "COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED");
                 reportGrades(r, task);
+                long exit = jdbc.sql("SELECT count(*) FROM alert WHERE type = 'EXIT_BLOCKED' AND state <> 'RESOLVED'").query(Long.class).single();
+                say(r, exit > 0 ? "warn" : "error", exit > 0 ? "P3 · 비상구 앞 통로 막힘 → 경고" : "비상구 앞 통로 막힘 경고가 열리지 않았습니다");
+            }
+            case "rules-gauge" -> {
+                ensureRules(r);
+                String[][] steps = {{"normal", "정상(초록)"}, {"warning", "주의(노랑)"}, {"danger", "위험(빨강)"}, {"normal", "다시 정상(초록)"}};
+                for (String[] st : steps) {
+                    sim(r, robotId, "target", "gauge", st[0]);
+                    say(r, "step", "압력계를 " + st[1] + " 사진으로 바꿈");
+                    long task = inspect(r, robotId, u, "시연: 압력계 " + st[1], List.of("P4"));
+                    waitTask(r, task, 600, "COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED");
+                    reportGrades(r, task);
+                }
             }
             case "rules-restore" -> {
                 ensureRules(r);
+                sim(r, robotId, "obstacle", "clear");
                 sim(r, robotId, "target", "reset");
                 long task = inspect(r, robotId, u, "시연: 소방 관제(복구)");
                 waitTask(r, task, 1200, "COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED");
@@ -300,7 +334,14 @@ public class DemoService {
                     incidents.closeByUser(id, "DISMISSED", u, "시연 초기화");
                     say(r, "info", "사건 #" + id + " 닫음");
                 }
-                sim(r, robotId, "fire", "clear");
+                int heat = jdbc.sql("""
+                        UPDATE alert SET state = 'RESOLVED', resolved_by = ?, resolved_at = now(), updated_at = now(), comment = '시연 초기화'
+                        WHERE type = 'HEAT_WARNING' AND state <> 'RESOLVED'""").param(u.login()).update();
+                if (heat > 0) {
+                    say(r, "info", "열원 경고 " + heat + "건 풂");
+                }
+                sim(r, robotId, "fire", "reset");
+                sim(r, robotId, "obstacle", "clear");
                 sim(r, robotId, "target", "reset");
                 mode(r, "APPROVAL", u);
             }
@@ -346,19 +387,39 @@ public class DemoService {
         return res;
     }
 
-    /** n 번째 화재 자리 이름(fire.sh list). */
-    private String spot(Run r, long robotId, int n) {
-        String out = sim(r, robotId, "fire", "list").path("output").asText();
-        try {
-            JsonNode spots = om.readTree(out.substring(out.indexOf('{'), out.lastIndexOf('}') + 1)).path("spots");
-            List<String> names = new ArrayList<>();
-            spots.fieldNames().forEachRemaining(names::add);
-            String name = names.get(n % names.size());
-            say(r, "info", "화재 자리 " + name + " (" + spots.path(name).path("x").asDouble() + ", " + spots.path(name).path("y").asDouble() + ")");
-            return name;
-        } catch (Exception e) {
-            throw new Abort("화재 자리 목록을 읽지 못했습니다: " + out);
+    /** 열화상 사진 판 자리(ros/sim/src/worlds/world_spec.py THERMAL_SPOTS): 화재 시연 · 과열 시연 */
+    private static final String FIRE_SPOT = "c2_east";
+    private static final String HEAT_SPOT = "elec_door";
+
+    /** 사건이 끝난 뒤 멈췄던 순찰이 남은 지점으로 다시 시작되고 끝날 때까지 기다린다. */
+    private void waitResumed(Run r, long incidentId) throws InterruptedException {
+        say(r, "wait", "멈췄던 순찰이 이어지기를 기다림");
+        for (int i = 0; i < 60; i++) {
+            check(r);
+            var ev = jdbc.sql("""
+                            SELECT type, detail::text FROM incident_event WHERE incident_id = ?
+                            AND type IN ('PATROL_RESUMED', 'PATROL_RESUME_SKIPPED') ORDER BY event_id DESC LIMIT 1""")
+                    .param(incidentId).query().listOfRows();
+            if (!ev.isEmpty()) {
+                JsonNode d;
+                try {
+                    d = om.readTree(String.valueOf(ev.get(0).get("detail")));
+                } catch (Exception e) {
+                    d = om.createObjectNode();
+                }
+                if ("PATROL_RESUME_SKIPPED".equals(ev.get(0).get("type"))) {
+                    say(r, "info", "순찰을 이어 가지 않음: " + d.path("reason").asText());
+                    return;
+                }
+                long next = d.path("nextTaskId").asLong();
+                say(r, "ok", "작업 #" + d.path("taskId").asLong() + " 의 남은 지점 " + d.path("points").asInt() + "곳으로 순찰을 이어 감(작업 #" + next + ")");
+                waitTask(r, next, 900, "COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED");
+                reportGrades(r, next);
+                return;
+            }
+            Thread.sleep(2000);
         }
+        throw new Abort("사건 #" + incidentId + " 뒤에 순찰이 이어지지 않았습니다");
     }
 
     private void mode(Run r, String mode, CurrentUser u) {
@@ -372,20 +433,20 @@ public class DemoService {
         return l.isEmpty() ? 0 : ((Number) l.get(0).get("incidentId")).longValue();
     }
 
-    private long waitIncident(Run r, long after) throws InterruptedException {
-        say(r, "wait", "감지 보고 → 사건 생성을 기다림");
-        for (int i = 0; i < 60; i++) {
+    private long waitIncident(Run r, long after, int timeoutSec) throws InterruptedException {
+        say(r, "wait", "열원 발견 → 사건 생성을 기다림");
+        for (int i = 0; i < Math.max(1, timeoutSec / 2); i++) {
             check(r);
             for (var x : incidents.list(true, 5)) {
                 long id = ((Number) x.get("incidentId")).longValue();
                 if (id > after) {
-                    say(r, "ok", "사건 #" + id + " 생성");
+                    say(r, "ok", "사건 #" + id + " 생성 (" + ("HEAT".equals(x.get("type")) ? "열원 확인" : "화재") + ")");
                     return id;
                 }
             }
             Thread.sleep(2000);
         }
-        throw new Abort("사건이 만들어지지 않았습니다(감지 보고가 서버에 닿지 않음)");
+        throw new Abort("사건이 만들어지지 않았습니다(순찰 중 열원을 보지 못했거나 감지 보고가 서버에 닿지 않음)");
     }
 
     /** 사건이 주어진 상태 가운데 하나가 될 때까지 기다린다. 상태가 바뀔 때마다 기록한다. */
@@ -422,15 +483,19 @@ public class DemoService {
 
     /** 시연 지점 점검을 시작한다(실행한 관리자 이름으로). */
     private long inspect(Run r, long robotId, CurrentUser u, String note) {
+        return inspect(r, robotId, u, note, DEMO_POINTS);
+    }
+
+    private long inspect(Run r, long robotId, CurrentUser u, String note, List<String> codes) {
         check(r);
         List<Long> ids = new ArrayList<>();
         for (var p : store.points(false)) {
-            if (DEMO_POINTS.contains(String.valueOf(p.get("code")))) {
+            if (codes.contains(String.valueOf(p.get("code")))) {
                 ids.add(((Number) p.get("point_id")).longValue());
             }
         }
         if (ids.isEmpty()) {
-            throw new Abort("점검 지점 " + DEMO_POINTS + " 가 없습니다");
+            throw new Abort("점검 지점 " + codes + " 가 없습니다");
         }
         var d = tasks.create(u, robotId, ids, note, null);
         long id = ((Number) d.get("task_id")).longValue();
@@ -467,12 +532,38 @@ public class DemoService {
             String code = String.valueOf(p.get("code"));
             String json = DEMO_RULES.get(code);
             long pid = ((Number) p.get("point_id")).longValue();
-            if (json == null || !rules.rulesOfPoint(pid, false).isEmpty()) {
+            if (json == null) {
                 continue;
             }
             try {
-                var made = rules.create(pid, om.readTree(json));
-                say(r, "step", code + " 에 규칙 '" + made.get("name") + "' 만듦");
+                var def = om.readTree(json);
+                // 시험(scripts/e2e_scenarios.py)이 만든 '[e2e] …' 규칙은 끈다 — 같은 사진을 두 규칙이 판단해 경고가 두 번 뜨지 않게.
+                // 시험은 거꾸로 '[시연] …' 규칙을 끄고 돈다. 관리자가 만든 다른 규칙은 건드리지 않는다
+                for (var x : rules.rulesOfPoint(pid, true)) {
+                    if (String.valueOf(x.get("name")).startsWith("[e2e]")) {
+                        var off = (com.fasterxml.jackson.databind.node.ObjectNode) om.valueToTree(x);
+                        off.put("enabled", false);
+                        rules.update(((Number) x.get("ruleId")).longValue(), off);
+                        say(r, "step", code + " 의 시험 규칙 '" + x.get("name") + "' 을 끔");
+                    }
+                }
+                var existing = rules.rulesOfPoint(pid, false);
+                var same = existing.stream().filter(x -> def.path("name").asText().equals(x.get("name"))).findFirst();
+                if (same.isPresent()) {
+                    long id = ((Number) same.get().get("ruleId")).longValue();
+                    var cur = om.valueToTree(same.get());
+                    boolean changed = !def.path("params").equals(cur.path("params")) || !def.path("grading").equals(cur.path("grading"))
+                            || !def.path("regions").equals(cur.path("regions")) || !cur.path("enabled").asBoolean(true);
+                    if (changed) {
+                        rules.update(id, def);
+                        say(r, "step", code + " 규칙 '" + def.path("name").asText() + "' 을 시연 정의로 고침");
+                    }
+                } else if (existing.stream().noneMatch(x -> Boolean.TRUE.equals(x.get("enabled")))) {   // 켜진 규칙이 없을 때만 만든다
+                    var made = rules.create(pid, def);
+                    say(r, "step", code + " 에 규칙 '" + made.get("name") + "' 만듦");
+                }
+            } catch (Abort a) {
+                throw a;
             } catch (Exception e) {
                 throw new Abort(code + " 규칙을 만들지 못했습니다: " + e.getMessage());
             }

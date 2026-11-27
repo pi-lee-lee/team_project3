@@ -33,6 +33,10 @@ import java.util.Set;
  *                                                                                └ 열원이 남음 → MONITORING(현장 감시) ┘
  *                                               └ 자동 모드 · 비상 확인 ┘                 (또는 DISMISSED / FAILED)
  *
+ * 열원(경고, 종류 HEAT)도 같은 흐름을 탄다: DETECTED → DISPATCHED(열원 앞 heat.check_distance_m) → ARRIVED → 몇 번 찍어 확인
+ *   → 과열이면 사진과 함께 열원 경고(HEAT_WARNING)를 열고 해결로 닫는다 / 정상이면 기록만 남기고 닫는다 / 화재면 화재(FIRE)로 올려
+ *   재판독 · 투척 흐름을 이어 간다. 투척은 화재만 한다.
+ * 점검(순찰) 중에 출동하면 그 작업을 멈추고, 사건이 끝나면 남은 지점으로 순찰을 이어 간다(resumePatrols, 설정 patrol.resume).
  * 판단은 모두 여기(서버)서 한다: 누구를 보낼지, 재판독 결과가 무엇인지, 쏠지 말지.
  * 로봇은 이동(출동 미션)과 투척 명령을 실행하고 결과를 사건 기록으로 알린다.
  * 2초마다 열린 사건을 보고 상태에 맞는 다음 일을 한다 — 서비스가 재시작되어도 DB 의 상태에서 이어진다.
@@ -95,14 +99,7 @@ public class IncidentService {
                 out.put("duplicate", false);
                 return out;            // 정상 · 판독 불가는 기록하지 않는다
             }
-            // 경고: 로봇을 부르지 않고 관제에만 알린다. 같은 자리(0.5m 격자)는 하나로 묶는다
-            long alertId = alerts.open(new AlertService.Draft("HEAT_WARNING", "WARNING",
-                    "heat:" + Math.round(x * 2) + ":" + Math.round(y * 2), "열원 감지 (경고)",
-                    String.format("위치 (%.1f, %.1f)", x, y), null, x, y, "robot", robotId, null, ev));
-            out.put("alertId", alertId);
-            out.put("incidentId", null);
-            out.put("duplicate", false);
-            return out;
+            return heatDetected(meta, image, detId, x, y, robotId, ev, out);
         }
 
         // 같은 감지(detId)로 만든 사건이 있는가. 로봇은 같은 것을 보는 동안 같은 ID 로 계속 보고한다.
@@ -164,15 +161,96 @@ public class IncidentService {
                     "reason", "사건 #" + reopenOf + " 을 닫은 뒤에도 같은 감지가 계속되어 다시 엶"), null);
             event(reopenOf, "SYSTEM", "REOPENED_AS", Map.of("next", id), null);
         }
-        long alertId = alerts.open(new AlertService.Draft("FIRE_DETECTED", "EMERGENCY", "incident:" + id,
-                "화재 감지 · 사건 #" + id, (reopenOf != null ? "닫은 뒤에도 감지가 계속됨(이전 사건 #" + reopenOf + ") · " : "")
-                        + String.format("위치 (%.1f, %.1f) · 투척 %s", x, y, "AUTO".equals(mode) ? "자동" : "승인 후"),
-                null, x, y, "incident", id, null, ev));
+        long alertId = fireAlert(id, x, y, mode, reopenOf != null ? "닫은 뒤에도 감지가 계속됨(이전 사건 #" + reopenOf + ") · " : "", ev);
         log.info("사건 #{} 생성: ({}, {}) 모드 {}", id, x, y, mode);
         out.put("alertId", alertId);
         out.put("incidentId", id);
         out.put("duplicate", false);
         return out;
+    }
+
+    private long fireAlert(long id, double x, double y, String mode, String prefix, Map<String, ?> ev) {
+        return alerts.open(new AlertService.Draft("FIRE_DETECTED", "EMERGENCY", "incident:" + id,
+                "화재 감지 · 사건 #" + id, prefix + String.format("위치 (%.1f, %.1f) · 투척 %s", x, y, "AUTO".equals(mode) ? "자동" : "승인 후"),
+                null, x, y, "incident", id, null, ev));
+    }
+
+    /**
+     * 열원(경고) 감지: 그 자리에 열린 열원 경고가 있으면 이미 확인한 열원이라 다시 가지 않는다(경고는 다음 순찰에서 정상이면 풀린다).
+     * 근처에 열린 사건이 있으면 그 사건에 붙인다. 아니면 열원 확인 사건(HEAT)을 만들어 로봇을 그 앞으로 보낸다.
+     */
+    private Map<String, Object> heatDetected(JsonNode meta, byte[] image, String detId, double x, double y, long robotId,
+                                             Map<String, Object> ev, Map<String, Object> out) {
+        double r = settings.number("incident.merge_radius_m");
+        Long open = openHeatAlertNear(x, y);
+        if (open != null) {
+            out.put("alertId", open);
+            out.put("incidentId", null);
+            out.put("duplicate", true);
+            return out;
+        }
+        Long near = jdbc.sql("""
+                        SELECT incident_id FROM incident
+                        WHERE state NOT IN ('RESOLVED', 'DISMISSED') AND sqrt(power(x - ?, 2) + power(y - ?, 2)) <= ?
+                        ORDER BY incident_id DESC LIMIT 1""").params(x, y, r).query(Long.class).optional().orElse(null);
+        if (near != null) {
+            out.put("alertId", null);
+            out.put("incidentId", near);
+            out.put("duplicate", true);
+            return out;
+        }
+        if (!detId.isBlank()) {      // 같은 감지 ID 의 닫힌 사건이 있으면 그 ID 를 비켜 둔다(det_id 는 하나만)
+            jdbc.sql("UPDATE incident SET det_id = det_id || ':closed:' || incident_id WHERE det_id = ? AND state IN ('RESOLVED', 'DISMISSED')")
+                    .param(detId).update();
+        }
+        String mode = "AUTO".equals(settings.text("launch.mode")) ? "AUTO" : "APPROVAL";
+        long id = jdbc.sql("""
+                        INSERT INTO incident (type, state, grade, x, y, pose_quality, detected_by, det_id, launch_mode)
+                        VALUES ('HEAT', 'DETECTED', 'WARNING', ?, ?, ?, ?, ?, ?) RETURNING incident_id""")
+                .params(x, y, meta.hasNonNull("poseQuality") ? meta.path("poseQuality").asDouble() : null, robotId,
+                        detId.isBlank() ? null : detId, mode).query(Long.class).single();
+        if (image != null && image.length > 0) {
+            saveImage(id, "detection", image);
+        }
+        event(id, "ROBOT", "DETECTED", ev, null);
+        log.info("열원 확인 사건 #{} 생성: ({}, {})", id, x, y);
+        out.put("alertId", null);
+        out.put("incidentId", id);
+        out.put("duplicate", false);
+        return out;
+    }
+
+    /** (x, y) 가까이(incident.merge_radius_m)에 열린 열원 경고가 있으면 그 ID. */
+    public Long openHeatAlertNear(double x, double y) {
+        return jdbc.sql("""
+                        SELECT alert_id FROM alert WHERE type = 'HEAT_WARNING' AND state <> 'RESOLVED'
+                        AND sqrt(power(x - ?, 2) + power(y - ?, 2)) <= ? ORDER BY alert_id DESC LIMIT 1""")
+                .params(x, y, settings.number("incident.merge_radius_m")).query(Long.class).optional().orElse(null);
+    }
+
+    /** 순찰 감시가 그 자리를 정상으로 봤다: 가까운 열린 열원 경고를 푼다. 푼 개수. */
+    public int resolveHeatNear(double x, double y, String reason) {
+        return jdbc.sql("""
+                        UPDATE alert SET state = 'RESOLVED', resolved_by = 'SYSTEM', resolved_at = now(), updated_at = now(),
+                                         comment = ?
+                        WHERE type = 'HEAT_WARNING' AND state <> 'RESOLVED' AND sqrt(power(x - ?, 2) + power(y - ?, 2)) <= ?""")
+                .params(reason, x, y, settings.number("incident.merge_radius_m")).update();
+    }
+
+    /** 순찰 감시(PatrolWatchService)가 연속으로 본 열원을 감지 보고로 넣는다. 로봇의 감지 보고와 같은 길로 간다. */
+    public Map<String, Object> watchDetected(long robotId, String grade, double x, double y, Double value, Double confidence,
+                                             byte[] image) {
+        var meta = om.createObjectNode();
+        // 같은 자리(0.5m 격자) · 같은 등급이면 같은 감지 ID — 계속 보이는 동안 사건이 하나만 생긴다
+        meta.put("detId", "watch-" + robotId + "-" + grade.toLowerCase() + "-" + Math.round(x * 2) + ":" + Math.round(y * 2))
+                .put("kind", "THERMAL").put("grade", grade).put("x", x).put("y", y).put("robotId", robotId).put("poseQuality", 1.0);
+        if (value != null) {
+            meta.put("value", value);
+        }
+        if (confidence != null) {
+            meta.put("confidence", confidence);
+        }
+        return detect(meta, image);
     }
 
     // ------------------------------------------------------------- 흐름(2초마다)
@@ -185,6 +263,74 @@ public class IncidentService {
                 step(inc);
             } catch (Exception e) {
                 log.warn("사건 #{} 처리 중 오류: {}", inc.get("incident_id"), e.toString());
+            }
+        }
+        try {
+            resumePatrols();
+        } catch (Exception e) {
+            log.warn("순찰 이어가기 오류: {}", e.toString());
+        }
+    }
+
+    /**
+     * 화재 · 열원 확인으로 멈췄던 순찰(점검 작업)을 사건이 끝나면(해결 · 오탐 · 실패) 남은 지점으로 다시 시작한다.
+     * 남은 지점 = 그 작업의 지점 가운데 관측(사진 또는 촬영 불가)이 남지 않은 것. 로봇이 출동을 마치고 한가해질 때까지 기다린다.
+     * 한 사건에 한 번만(PATROL_RESUMED · PATROL_RESUME_SKIPPED 기록).
+     */
+    private void resumePatrols() {
+        for (var r : jdbc.sql("""
+                SELECT i.incident_id, i.responder_id, (e.detail->>'taskId')::bigint AS task_id FROM incident i
+                JOIN incident_event e ON e.incident_id = i.incident_id AND e.type = 'PREEMPTED'
+                WHERE i.state IN ('RESOLVED', 'DISMISSED', 'FAILED') AND i.updated_at > now() - interval '30 minutes'
+                  AND i.responder_id IS NOT NULL
+                  AND NOT EXISTS (SELECT 1 FROM incident_event x WHERE x.incident_id = i.incident_id
+                                  AND x.type IN ('PATROL_RESUMED', 'PATROL_RESUME_SKIPPED'))
+                ORDER BY i.incident_id""").query().listOfRows()) {
+            long id = num(r.get("incident_id"));
+            long taskId = num(r.get("task_id"));
+            if (!settings.get("patrol.resume").asBoolean(true)) {
+                event(id, "SYSTEM", "PATROL_RESUME_SKIPPED", Map.of("reason", "설정(patrol.resume)이 꺼져 있음"), null);
+                continue;
+            }
+            long robotId = num(r.get("responder_id"));
+            if (!TaskService.TERMINAL.contains(String.valueOf(store.taskStatus(taskId)))) {
+                continue;                       // 멈춘 작업이 아직 정리 중
+            }
+            boolean busy = jdbc.sql("""
+                            SELECT count(*) FROM incident WHERE responder_id = ? AND state NOT IN ('RESOLVED', 'DISMISSED', 'FAILED')""")
+                    .param(robotId).query(Long.class).single() > 0;
+            if (busy) {
+                continue;                       // 그 로봇이 다른 사건을 처리 중
+            }
+            try {
+                JsonNode rb = robot.get().uri("/internal/robots/{id}", robotId).retrieve().body(JsonNode.class);
+                if (rb == null || !rb.path("connected").asBoolean() || (rb.hasNonNull("mission") && !rb.path("mission").isEmpty())) {
+                    continue;                   // 출동을 마무리하는 중(또는 연결 끊김) — 다음 틱에
+                }
+            } catch (Exception e) {
+                continue;
+            }
+            List<Long> done = jdbc.sql("SELECT DISTINCT point_id FROM observation WHERE task_id = ?").param(taskId)
+                    .query(Long.class).list();
+            List<Long> left = new ArrayList<>();
+            for (var p : store.taskPoints(taskId)) {
+                long pid = num(p.get("point_id"));
+                if (!done.contains(pid)) {
+                    left.add(pid);
+                }
+            }
+            if (left.isEmpty()) {
+                event(id, "SYSTEM", "PATROL_RESUME_SKIPPED", Map.of("taskId", taskId, "reason", "남은 점검 지점이 없음"), null);
+                continue;
+            }
+            try {
+                var t = tasks.create(SYSTEM, robotId, left, "순찰 이어서 (사건 #" + id + " 뒤, 작업 #" + taskId + " 의 남은 지점)", null);
+                long next = num(t.get("task_id"));
+                event(id, "SYSTEM", "PATROL_RESUMED", Map.of("taskId", taskId, "nextTaskId", next, "points", left.size()), null);
+                tasks.systemEvent(next, "RESUMED", Map.of("reason", "사건 #" + id + " 이 끝나 작업 #" + taskId + " 의 남은 지점을 이어서 점검"));
+                log.info("사건 #{} 뒤 순찰 이어감: 작업 #{} → #{} ({}곳)", id, taskId, next, left.size());
+            } catch (Exception e) {
+                log.info("사건 #{} 뒤 순찰 이어가기 실패(다음 틱에 다시): {}", id, message(e));
             }
         }
     }
@@ -231,9 +377,10 @@ public class IncidentService {
         if (r.hasNonNull("mission") && !r.path("mission").isEmpty()) {
             long busyTask = r.path("mission").path("missionId").asLong();
             if (!hasEvent(id, "PREEMPTED")) {
-                event(id, "SYSTEM", "PREEMPTED", Map.of("taskId", busyTask, "reason", "화재 출동을 위해 점검 작업을 멈춤"), null);
+                String what = heat(inc) ? "열원 확인" : "화재 출동";
+                event(id, "SYSTEM", "PREEMPTED", Map.of("taskId", busyTask, "reason", what + "을 위해 점검 작업을 멈춤"), null);
                 try {
-                    tasks.systemEvent(busyTask, "PREEMPTED", Map.of("reason", "화재 출동(사건 #" + id + ")으로 중단"));
+                    tasks.systemEvent(busyTask, "PREEMPTED", Map.of("reason", what + "(사건 #" + id + ")으로 중단"));
                     tasks.cancel(busyTask, SYSTEM);
                 } catch (Exception e) {
                     log.info("사건 #{}: 작업 #{} 취소 요청 실패 {}", id, busyTask, e.toString());
@@ -245,7 +392,7 @@ public class IncidentService {
         try {
             cands = robot.post().uri("/internal/robots/{id}/standoff", robotId).contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("targetX", inc.get("x"), "targetY", inc.get("y"),
-                            "rangeM", settings.number("launch.range_m"),
+                            "rangeM", heat(inc) ? settings.number("heat.check_distance_m") : settings.number("launch.range_m"),
                             "toleranceM", settings.number("launch.range_tolerance_m"), "max", 6))
                     .retrieve().body(JsonNode.class);
         } catch (Exception e) {
@@ -267,11 +414,12 @@ public class IncidentService {
         }
         Long taskId = inc.get("task_id") == null ? null : (Long) num(inc.get("task_id"));
         if (taskId == null) {
-            taskId = store.insertTask(robotId, r.path("code").asText(), 0, "system", "화재 출동 (사건 #" + id + ")", null, null);
+            String what = heat(inc) ? "열원 확인" : "화재 출동";
+            taskId = store.insertTask(robotId, r.path("code").asText(), 0, "system", what + " (사건 #" + id + ")", null, null);
             jdbc.sql("UPDATE inspection_task SET kind = 'RESPONSE', incident_id = ? WHERE task_id = ?").params(id, taskId).update();
             jdbc.sql("UPDATE incident SET task_id = ?, standoff = CAST(? AS jsonb), updated_at = now() WHERE incident_id = ?")
                     .params(taskId, list.toString(), id).update();
-            tasks.systemEvent(taskId, "REQUESTED", Map.of("reason", "화재 출동 (사건 #" + id + ")"));
+            tasks.systemEvent(taskId, "REQUESTED", Map.of("reason", what + " (사건 #" + id + ")"));
         }
         try {
             robot.post().uri("/internal/missions").contentType(MediaType.APPLICATION_JSON)
@@ -334,6 +482,10 @@ public class IncidentService {
 
     /** ARRIVED: 로봇 카메라로 다시 본다. 결과와 투척 모드로 다음을 정한다. */
     private void recheck(long id, Map<String, Object> inc) {
+        if (heat(inc)) {
+            heatCheck(id, inc);
+            return;
+        }
         long robotId = num(inc.get("responder_id"));
         JsonNode prev = json(inc.get("recheck"));
         int attempt = prev.path("attempt").asInt(0) + 1;
@@ -345,24 +497,14 @@ public class IncidentService {
                 .params(text(res), id).update();
         String grade = String.valueOf(res.get("grade"));
         int max = Math.max(1, settings.integer("launch.search_steps"));
-        if (!"EMERGENCY".equals(grade) && !"WARNING".equals(grade) && attempt < max) {
-            return;          // 아직 안 보인다 — 다음 틱에 다시 본다
+        // 조준 보정: 열원은 보이는데 정면에서 벗어나 있으면(도착 방향 오차) 제자리에서 그만큼 돌리고 다시 본다. 최대 3번.
+        // 판이 사진 끝에 잘려 보이면(감지 자리가 조금 어긋나 다른 쪽을 보고 섰다) 정상으로 읽혀도 그쪽으로 돌려 다시 본다
+        boolean hot = "EMERGENCY".equals(grade) || "WARNING".equals(grade);
+        if (aimTries < 3 && (hot || Boolean.TRUE.equals(res.get("cut"))) && aim(id, inc, res, aimTries)) {
+            return;          // 다음 틱에 다시 본다
         }
-        // 조준 보정: 열원은 보이는데 정면에서 벗어나 있으면(도착 방향 오차) 제자리에서 그만큼 돌리고 다시 본다. 최대 3번
-        if (res.get("bearingDeg") != null && !Boolean.TRUE.equals(res.get("aimed")) && aimTries < 3
-                && ("EMERGENCY".equals(grade) || "WARNING".equals(grade))) {
-            double bearing = ((Number) res.get("bearingDeg")).doubleValue();
-            try {
-                JsonNode turned = robot.post().uri("/internal/missions/{id}/aim", num(inc.get("task_id")))
-                        .contentType(MediaType.APPLICATION_JSON).body(Map.of("deltaDeg", bearing)).retrieve().body(JsonNode.class);
-                res.put("aimTries", aimTries + 1);
-                jdbc.sql("UPDATE incident SET recheck = CAST(? AS jsonb) WHERE incident_id = ?").params(text(res), id).update();
-                event(id, "SYSTEM", "AIM_CORRECTED", Map.of("bearingDeg", bearing,
-                        "turnedDeg", Math.round(Math.toDegrees(turned == null ? 0 : turned.path("turnedRad").asDouble()) * 10) / 10.0), null);
-                return;      // 다음 틱에 다시 본다
-            } catch (Exception e) {
-                event(id, "SYSTEM", "AIM_FAILED", Map.of("reason", message(e)), null);
-            }
+        if (!hot && attempt < max) {
+            return;          // 아직 안 보인다 — 다음 틱에 다시 본다
         }
         event(id, "SYSTEM", "RECHECKED", res, null);
         if ("NORMAL".equals(grade)) {
@@ -382,6 +524,85 @@ public class IncidentService {
         event(id, "SYSTEM", "APPROVAL_REQUESTED", Map.of("reason", why), null);
         jdbc.sql("UPDATE alert SET detail = ?, state = 'OPEN', updated_at = now() WHERE dedup_key = ? AND state <> 'RESOLVED'")
                 .params("투척 승인 대기 · " + why, "incident:" + id).update();
+    }
+
+    /**
+     * ARRIVED(열원 확인): 열원 앞에서 heat.check_looks 번(틱마다, 약 2초 간격) 찍어 본다. 가장 많이 나온 등급(같으면 높은 쪽)으로 정한다.
+     * 화재가 두 번 보이면 바로 화재로 올린다. 판을 찾지 못한 사진(판독 불가)은 세지 않는다.
+     */
+    private void heatCheck(long id, Map<String, Object> inc) {
+        long robotId = num(inc.get("responder_id"));
+        JsonNode prev = json(inc.get("recheck"));
+        List<String> looks = new ArrayList<>();
+        prev.path("looks").forEach(g -> looks.add(g.asText()));
+        Map<String, Object> res = look(id, robotId, "recheck");
+        int aimTries = prev.path("aimTries").asInt(0);
+        res.put("aimTries", aimTries);
+        res.put("looks", looks);
+        // 판이 정면에서 벗어나 있으면 먼저 돌려서 본다(이 사진은 세지 않는다). 최대 2번
+        if (aimTries < 2 && aim(id, inc, res, aimTries)) {
+            return;
+        }
+        String grade = String.valueOf(res.get("grade"));
+        looks.add(grade);
+        res.put("looks", looks);
+        res.put("attempt", looks.size());
+        jdbc.sql("UPDATE incident SET recheck = CAST(? AS jsonb), updated_at = now() WHERE incident_id = ?")
+                .params(text(res), id).update();
+        long fire = looks.stream().filter("EMERGENCY"::equals).count();
+        long warn = looks.stream().filter("WARNING"::equals).count();
+        long normal = looks.stream().filter("NORMAL"::equals).count();
+        if (fire < 2 && looks.size() < Math.max(1, settings.integer("heat.check_looks"))) {
+            return;                              // 다음 틱에 한 번 더 찍는다
+        }
+        String result = fire >= 2 || (fire > 0 && fire >= warn && fire >= normal) ? "EMERGENCY"
+                : warn > 0 && warn >= normal ? "WARNING" : normal > 0 ? "NORMAL" : "UNKNOWN";
+        Map<String, Object> summary = new LinkedHashMap<>(res);
+        summary.put("result", result);
+        event(id, "SYSTEM", "HEAT_CHECKED", summary, null);
+        double x = ((Number) inc.get("x")).doubleValue();
+        double y = ((Number) inc.get("y")).doubleValue();
+        switch (result) {
+            case "EMERGENCY" -> {
+                // 화재로 커졌다: 화재 사건으로 올리고(투척 위치에 이미 서 있다) 재판독 · 투척 흐름을 이어 간다
+                jdbc.sql("UPDATE incident SET type = 'FIRE', grade = 'EMERGENCY', recheck = NULL, updated_at = now() WHERE incident_id = ?")
+                        .param(id).update();
+                event(id, "SYSTEM", "ESCALATED", Map.of("reason", "열원 확인 중 화재(비상)로 보임 — 화재 대응으로 넘김"), null);
+                fireAlert(id, x, y, String.valueOf(inc.get("launch_mode")), "열원 확인 중 화재로 커짐 · ", Map.of("incidentId", id));
+            }
+            case "WARNING" -> {
+                alerts.open(new AlertService.Draft("HEAT_WARNING", "WARNING", "heat:" + Math.round(x * 2) + ":" + Math.round(y * 2),
+                        "열원 감지 (경고)", "열원 확인 · " + res.getOrDefault("reason", "") + String.format(" · 위치 (%.1f, %.1f)", x, y),
+                        null, x, y, "incident", id, null, summary));
+                close(id, "RESOLVED", "SYSTEM", "열원 확인: 과열(경고) — 사진과 함께 경고를 엶");
+            }
+            case "NORMAL" -> close(id, "DISMISSED", "SYSTEM", "열원 확인: 가 보니 정상 — 기록만 남김");
+            default -> close(id, "DISMISSED", "SYSTEM", "열원 확인: 사진에서 열화상 판을 찾지 못함 — 기록만 남김");
+        }
+    }
+
+    /** 사진 속 판이 정면에서 벗어나 있으면 그만큼 제자리에서 돌린다(S2 aim). 돌렸으면 true(다음 틱에 다시 본다). */
+    private boolean aim(long id, Map<String, Object> inc, Map<String, Object> res, int aimTries) {
+        if (res.get("bearingDeg") == null || Boolean.TRUE.equals(res.get("aimed"))) {
+            return false;
+        }
+        double bearing = ((Number) res.get("bearingDeg")).doubleValue();
+        try {
+            JsonNode turned = robot.post().uri("/internal/missions/{id}/aim", num(inc.get("task_id")))
+                    .contentType(MediaType.APPLICATION_JSON).body(Map.of("deltaDeg", bearing)).retrieve().body(JsonNode.class);
+            res.put("aimTries", aimTries + 1);
+            jdbc.sql("UPDATE incident SET recheck = CAST(? AS jsonb) WHERE incident_id = ?").params(text(res), id).update();
+            event(id, "SYSTEM", "AIM_CORRECTED", Map.of("bearingDeg", bearing,
+                    "turnedDeg", Math.round(Math.toDegrees(turned == null ? 0 : turned.path("turnedRad").asDouble()) * 10) / 10.0), null);
+            return true;
+        } catch (Exception e) {
+            event(id, "SYSTEM", "AIM_FAILED", Map.of("reason", message(e)), null);
+            return false;
+        }
+    }
+
+    private static boolean heat(Map<String, Object> inc) {
+        return "HEAT".equals(String.valueOf(inc.get("type")));
     }
 
     /** 로봇의 지금 사진을 받아 열화상 판독(C2)한다. 돌려주는 값: grade, value, bearingDeg, aimed, reason. */
@@ -419,6 +640,7 @@ public class IncidentService {
                 double bearing = (0.5 - cx) * settings.number("camera.hfov_deg");
                 out.put("bearingDeg", Math.round(bearing * 10) / 10.0);
                 out.put("aimed", Math.abs(bearing) <= settings.number("launch.aim_tolerance_deg"));
+                out.put("cut", bbox.get(0).asDouble() < 0.02 || bbox.get(2).asDouble() > 0.98);   // 판이 사진 끝에 잘림
             } else {
                 out.put("aimed", false);
             }

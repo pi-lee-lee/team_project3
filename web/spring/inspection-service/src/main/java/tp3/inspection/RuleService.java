@@ -229,6 +229,12 @@ public class RuleService {
                 continue;   // 판독하는 사이 규칙이 지워졌다
             }
             String grade = GRADES.contains(r.path("grade").asText()) ? r.path("grade").asText() : "UNKNOWN";
+            String reason = r.path("reason").asText(null);
+            if ("EMERGENCY".equals(grade)) {
+                // 비상은 화재(사건, IncidentService)만 낸다. 규칙의 등급 기준에 비상이 있어도 점검 판독은 경고까지로 낮춘다
+                grade = "WARNING";
+                reason = (reason == null || reason.isBlank() ? "" : reason + " · ") + "규칙 판독은 경고까지(비상은 화재만)";
+            }
             JsonNode v = r.path("value");
             jdbc.sql("""
                             INSERT INTO rule_result (observation_id, rule_id, grade, value_num, value_label, unit, confidence,
@@ -239,7 +245,7 @@ public class RuleService {
                             r.hasNonNull("confidence") ? r.path("confidence").asDouble() : null,
                             r.hasNonNull("located") ? r.path("located").toString() : null,
                             r.hasNonNull("evidence") ? r.path("evidence").toString() : null,
-                            r.path("reason").asText(null), r.path("checkerVersion").asText(null), json(rule))
+                            reason, r.path("checkerVersion").asText(null), json(rule))
                     .update();
             if (GRADES.indexOf(grade) > GRADES.indexOf(worst)) {
                 worst = grade;

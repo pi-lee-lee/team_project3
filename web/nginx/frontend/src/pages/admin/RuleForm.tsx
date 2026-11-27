@@ -6,15 +6,16 @@ import { ActionBar, Field, Group, Notice, Page, Picker, Row, Switch } from '../.
 import { CHECKER_LABEL, GradeTag, PhotoOverlay, valueText } from '../user/scenarioText';
 import './admin.css';
 
-/** 등급 기준 예시: 종류를 고르면 값의 모양(이름/숫자)에 맞는 것을 채워 준다. 실제 기준은 대상에 맞게 고친다 */
+/** 등급 기준 예시: 종류를 고르면 값의 모양(이름/숫자)에 맞는 것을 채워 준다. 실제 기준은 대상에 맞게 고친다.
+ *  규칙 판독은 경고까지다(비상은 화재 사건만 — 기준에 비상을 넣어도 서버가 경고로 낮춘다) */
 function gradingExample(c: CheckerInfo): Record<string, unknown> {
   if (c.valueType === 'number') {
     return c.kind === 'THERMAL'
-      ? { type: 'ranges', ranges: [{ max: 0.01, grade: 'NORMAL' }, { min: 0.01, max: 0.08, grade: 'WARNING' }], default: 'EMERGENCY' }
-      : { type: 'ranges', ranges: [{ min: 0.7, max: 0.98, grade: 'NORMAL' }, { min: 0.5, max: 0.7, grade: 'WARNING' }], default: 'EMERGENCY' };
+      ? { type: 'ranges', ranges: [{ max: 0.002, grade: 'NORMAL' }], default: 'WARNING' }
+      : { type: 'ranges', ranges: [{ min: 0.0, max: 0.6, grade: 'NORMAL' }], default: 'WARNING' };
   }
   if (c.kind === 'OBJECT') return { type: 'map', map: { IN_REGION: 'NORMAL', OUT_OF_REGION: 'WARNING', MISSING: 'WARNING' }, default: 'UNKNOWN' };
-  if (c.kind === 'LAMP') return { type: 'map', map: { green: 'NORMAL', yellow: 'WARNING', red: 'EMERGENCY', off: 'WARNING' }, default: 'UNKNOWN' };
+  if (c.kind === 'LAMP') return { type: 'map', map: { green: 'NORMAL', yellow: 'WARNING', red: 'WARNING', off: 'WARNING' }, default: 'UNKNOWN' };
   return { type: 'map', map: Object.fromEntries(c.labels.map((l) => [l, 'NORMAL'])), default: 'UNKNOWN' };
 }
 
@@ -188,7 +189,7 @@ export default function RuleForm() {
           footer={checker?.valueType === 'number'
             ? '숫자 값: ranges 를 위에서부터 보고 처음 맞는 구간(min 이상 max 미만)의 등급을 씁니다. 어디에도 안 맞으면 default.'
             : `이름 값: map 에서 읽은 값에 해당하는 등급을 씁니다. 없으면 default.${checker?.labels.length ? ` 나올 수 있는 값: ${checker.labels.join(', ')}` : ''}`}>
-          <Field label="등급(grading)" stack hint="등급: NORMAL(정상) · WARNING(경고) · EMERGENCY(비상) · UNKNOWN(판독 불가)">
+          <Field label="등급(grading)" stack hint="등급: NORMAL(정상) · WARNING(경고) · UNKNOWN(판독 불가). 규칙 판독은 경고까지이며 EMERGENCY 를 넣어도 경고로 낮춘다(비상은 화재만)">
             <textarea rows={9} className="mono" spellCheck={false} value={grading} onChange={(e) => setGrading(e.target.value)} />
           </Field>
         </Group>

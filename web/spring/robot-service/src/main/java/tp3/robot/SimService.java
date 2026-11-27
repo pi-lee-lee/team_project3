@@ -18,14 +18,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 시뮬레이션 전용: 시뮬레이션 도구(fire · target)를 실행한다. 관리자 "시연" 화면과 시연 스크립트가 쓴다.
+ * 시뮬레이션 전용: 시뮬레이션 도구(fire · target · obstacle)를 실행한다. 관리자 "시연" 화면과 시연 스크립트가 쓴다.
  * sim 컨테이너의 sim_control.py 가 /sim/command 를 받아 실행하고 /sim/command_status 로 답한다.
  * 실제 로봇에는 그 노드가 없으므로 응답이 오지 않고 "시뮬레이션이 아닙니다"로 끝난다.
  */
 @Service
 public class SimService {
 
-    private static final Set<String> TOOLS = Set.of("fire", "target");
+    private static final Set<String> TOOLS = Set.of("fire", "target", "obstacle");
 
     private final RobotRegistry registry;
     private final ObjectMapper om = new ObjectMapper();

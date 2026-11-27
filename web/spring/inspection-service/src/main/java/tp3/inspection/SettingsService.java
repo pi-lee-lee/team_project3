@@ -35,10 +35,18 @@ public class SettingsService {
         DEFAULTS.put("incident.reopen_grace_sec", "60");     // 사건을 닫은 뒤 이 시간이 지나도 같은 감지가 계속 오면 새 사건으로 다시 연다
         DEFAULTS.put("incident.monitor_interval_sec", "10"); // 투척 뒤 열원이 남았을 때 현장에서 다시 찍어 보는 간격
         DEFAULTS.put("incident.monitor_clear_count", "2");   // 연속으로 이만큼 정상이면 열원이 사라진 것으로 보고 닫는다
+        // 열화상 판독(순찰 감시 · 열원 확인 · 화재 재판독): 시연 열화상 사진(무지개 색표, 15~300°C 로그 눈금)에 맞춘 값.
+        // 80°C 이상을 뜨거운 곳으로 보고, 그 넓이가 사진 판의 0.2% 이상이면 경고(과열), 3% 이상이면 비상(화재)
         DEFAULTS.put("detect.thermal", """
-                {"params": {"palette": "iron", "hotThreshold": 0.6},
-                 "grading": {"type": "ranges", "ranges": [{"max": 0.01, "grade": "NORMAL"},
-                             {"min": 0.01, "max": 0.08, "grade": "WARNING"}], "default": "EMERGENCY"}}""");
+                {"params": {"palette": "rainbow", "tempMin": 15, "tempMax": 300, "tempScale": "log", "hotC": 80},
+                 "grading": {"type": "ranges", "ranges": [{"max": 0.002, "grade": "NORMAL"},
+                             {"min": 0.002, "max": 0.03, "grade": "WARNING"}], "default": "EMERGENCY"}}""");
+        DEFAULTS.put("patrol.watch", "true");                   // 순찰(점검) 중 1.5초마다 카메라 사진을 열화상 판독(PatrolWatchService)
+        DEFAULTS.put("patrol.watch_min_width", "0.12");         // 열화상 판이 사진 가로의 이 비율보다 작게 보이면 판단하지 않는다
+        DEFAULTS.put("patrol.watch_confirm", "2");              // 같은 등급이 연속 이만큼 나와야 감지로 본다
+        DEFAULTS.put("patrol.resume", "true");                  // 화재 · 열원 확인으로 멈춘 순찰을 사건이 끝나면 남은 지점부터 이어서
+        DEFAULTS.put("heat.check_distance_m", "1.0");           // 열원(경고)을 보면 이 거리 앞에 가서 확인한다
+        DEFAULTS.put("heat.check_looks", "3");                  // 열원 앞에서 몇 번 찍어 볼지(2초 간격 → 3번이면 약 4~6초)
         DEFAULTS.put("camera.hfov_deg", "62.2");                // 로봇 카메라 수평 화각(조준 각 계산)
         DEFAULTS.put("display.control_direction", "false");     // 지도(관제 · 대시보드)에 제어기 방향(주황 실선)을 그릴지. 기본은 숨김
     }

@@ -1,13 +1,16 @@
-"""화재 흉내: 열화상 인쇄물을 벽에 세우고, (젯봇이 없으므로) 젯봇의 감지 보고를 대신 보낸다.
+"""열화상 사진 판의 상태 바꾸기 + (오탐 시험용) 가짜 감지 보고.
 
-  /sim/tools/fire.sh list                                        자리 이름·좌표·그 앞에 설 자세 (JSON)
-  /sim/tools/fire.sh place <자리> [normal|warning|emergency] [--detect]
-                                                                 인쇄물 세우기(기본 emergency). --detect 면 바로 보고까지
-  /sim/tools/fire.sh detect <자리> [warning|emergency]            감지 보고만 보내기(기본 emergency)
-  /sim/tools/fire.sh clear [자리]                                 인쇄물 치우기(자리가 없으면 전부)
+  /sim/tools/fire.sh list                                  자리 이름 · 좌표 · 지금 상태 · 그 앞에 설 자세 (JSON)
+  /sim/tools/fire.sh set <자리> normal|warning|emergency    사진만 바꾼다: 꺼짐(정상) · 과열(경고) · 화재(비상)
+  /sim/tools/fire.sh reset                                 모든 자리를 꺼짐(정상)으로
+  /sim/tools/fire.sh extinguish                            화재(emergency)인 자리를 꺼짐으로(투척 뒤 sim_control 이 부른다)
+  /sim/tools/fire.sh detect <자리> [warning|emergency]      가짜 감지 보고만 보낸다(기본 emergency) — 오탐 시험용
 
-자리·판 모양의 원본은 worlds/world_spec.py (FIRE_SPOTS, thermal_model). 판은 충돌체가 없어 주행과 지도에 영향이 없다.
-감지 보고: /patrol/detection (std_msgs/String JSON) 에 같은 detId 로 1초 간격 3번 — docs/design/INTERFACES.md 2.3 절.
+사진 판은 월드에 늘 걸려 있다(worlds/world_spec.py 의 THERMAL_SPOTS · thermal_model, 사진은 worlds/demo_images.py).
+순찰 중인 로봇이 그 앞을 지나가며 사진을 판독해 스스로 찾는다(서버의 순찰 감시). 그래서 화재 · 과열은 사진만 바꾸면 되고
+감지 보고를 따로 보내지 않는다. detect 는 '사진은 정상인데 보고만 온' 오탐을 만들 때만 쓴다:
+/patrol/detection (std_msgs/String JSON) 에 같은 detId 로 1초 간격 3번 — docs/design/INTERFACES.md 2.3 절.
+상태는 컨테이너 안 파일에 적어 두며, sim 을 다시 띄우면 월드와 함께 꺼짐으로 돌아간다.
 """
 import json
 import math
@@ -19,38 +22,51 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'worlds'))
 import world_spec as W  # noqa: E402
 
-VARIANTS = tuple(W.THERMAL_HOT_RATIO)                 # normal, warning, emergency
+STATE_FILE = Path('/tmp/sim_fire_state.json')
 REPORTABLE = ('warning', 'emergency')                 # NORMAL 은 보고하지 않는다(계약)
 REPORT_COUNT, REPORT_INTERVAL = 3, 1.0
+HOT_RATIO = {'normal': 0.0, 'warning': 0.009, 'emergency': 0.07}   # 사진 속 뜨거운 영역 비율(가짜 보고의 value)
 
 
-def spots():
+def load():
+    try:
+        st = json.loads(STATE_FILE.read_text())
+        return {s: st.get(s, 'normal') if st.get(s) in W.THERMAL_STATES else 'normal' for s in W.THERMAL_SPOTS}
+    except (OSError, ValueError):
+        return {s: 'normal' for s in W.THERMAL_SPOTS}
+
+
+def save(st):
+    STATE_FILE.write_text(json.dumps(st))
+
+
+def spots(st):
     out = {}
-    for name, (x, y, facing) in W.FIRE_SPOTS.items():
-        sx, sy, syaw = W.fire_stand(name)
-        out[name] = {'x': round(x, 3), 'y': round(y, 3), 'z': W.FIRE_Z, 'facingDeg': facing,
+    for name, (x, y, facing) in W.THERMAL_SPOTS.items():
+        sx, sy, syaw = W.thermal_stand(name)
+        out[name] = {'x': round(x, 3), 'y': round(y, 3), 'z': W.THERMAL_Z, 'facingDeg': facing, 'state': st[name],
                      'stand': {'x': sx, 'y': sy, 'yaw': round(math.radians(syaw), 4), 'yawDeg': syaw}}
     return out
 
 
-DET_ID = None      # --id=<detId>: 같은 화재를 계속 보고 있는 것처럼 같은 ID 로 다시 보고할 때
-
-
-def detection(spot, variant):
-    x, y, _ = W.FIRE_SPOTS[spot]
-    return {'detId': DET_ID or f'sim-{spot}-{int(time.time())}', 'kind': 'THERMAL', 'grade': variant.upper(),
-            'value': W.THERMAL_HOT_RATIO[variant], 'confidence': 0.9, 'x': round(x, 3), 'y': round(y, 3),
+def detection(spot, grade, det_id):
+    # 판 앞 0.1m(판이 바라보는 쪽)를 열원 자리로 보낸다 — 순찰 감시(raycast)와 같은 기준. 벽면 위를 보내면 벽 반대편 방에서도
+    # 보인다고 판단해(투척 위치 계산) 판 뒷면 쪽으로 로봇이 간다
+    px, py, facing = W.THERMAL_SPOTS[spot]
+    x, y = px + 0.1 * math.cos(math.radians(facing)), py + 0.1 * math.sin(math.radians(facing))
+    return {'detId': det_id or f'sim-{spot}-{int(time.time())}', 'kind': 'THERMAL', 'grade': grade.upper(),
+            'value': HOT_RATIO[grade], 'confidence': 0.9, 'x': round(x, 3), 'y': round(y, 3),
             'poseQuality': 1.0, 'stamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
 
 
-def report(node, spot, variant):
+def report(node, spot, grade, det_id):
     import rclpy
     from std_msgs.msg import String
     pub = node.create_publisher(String, '/patrol/detection', 10)
     end = time.monotonic() + 3.0                      # 받는 쪽(rosbridge)과 연결될 때까지 잠깐 기다린다
     while pub.get_subscription_count() == 0 and time.monotonic() < end:
         rclpy.spin_once(node, timeout_sec=0.1)
-    body = json.dumps(detection(spot, variant), ensure_ascii=False)
+    body = json.dumps(detection(spot, grade, det_id), ensure_ascii=False)
     for i in range(REPORT_COUNT):
         pub.publish(String(data=body))
         rclpy.spin_once(node, timeout_sec=0.05)
@@ -60,38 +76,47 @@ def report(node, spot, variant):
 
 
 def main():
-    global DET_ID
-    DET_ID = next((a[5:] for a in sys.argv[1:] if a.startswith('--id=')), None)
-    args = [a for a in sys.argv[1:] if a != '--detect' and not a.startswith('--id=')]
-    with_detect = '--detect' in sys.argv[1:]
-    cmd = args[0] if args else ''
-    if cmd == 'list' and len(args) == 1:
-        print(json.dumps({'standDistance': W.FIRE_STAND_DIST, 'size': list(W.THERMAL_SIZE), 'spots': spots()}, ensure_ascii=False))
+    det_id = next((a[5:] for a in sys.argv[1:] if a.startswith('--id=')), None)
+    args = [a for a in sys.argv[1:] if not a.startswith('--id=')]
+    cmd, rest = (args[0], args[1:]) if args else ('', [])
+    st = load()
+    if cmd == 'list' and not rest:
+        print(json.dumps({'standDistance': W.THERMAL_STAND_DIST, 'size': list(W.THERMAL_SIZE), 'spots': spots(st)},
+                         ensure_ascii=False))
         return
-    if cmd not in ('place', 'detect', 'clear') or len(args) > 3 or (cmd != 'clear' and len(args) < 2):
+    changes = {}
+    if cmd == 'set' and len(rest) == 2:
+        spot, state = rest
+        if spot not in W.THERMAL_SPOTS:
+            raise SystemExit(f'모르는 자리 {spot}: {list(W.THERMAL_SPOTS)}')
+        if state not in W.THERMAL_STATES:
+            raise SystemExit(f'모르는 상태 {state}: {list(W.THERMAL_STATES)}')
+        changes = {spot: state}
+    elif cmd == 'reset' and not rest:
+        changes = {s: 'normal' for s in W.THERMAL_SPOTS}
+    elif cmd == 'extinguish' and not rest:
+        changes = {s: 'normal' for s, v in st.items() if v == 'emergency'}
+    elif cmd == 'detect' and 1 <= len(rest) <= 2:
+        spot, grade = rest[0], (rest[1] if len(rest) > 1 else 'emergency')
+        if spot not in W.THERMAL_SPOTS:
+            raise SystemExit(f'모르는 자리 {spot}: {list(W.THERMAL_SPOTS)}')
+        if grade not in REPORTABLE:
+            raise SystemExit('감지 보고는 warning 또는 emergency 만 보낸다')
+    else:
         raise SystemExit(__doc__)
-    names = args[1:2] or list(W.FIRE_SPOTS)
-    for n in names:
-        if n not in W.FIRE_SPOTS:
-            raise SystemExit(f'모르는 자리 {n}: {list(W.FIRE_SPOTS)}')
-    variant = args[2] if len(args) > 2 else 'emergency'
-    if cmd == 'clear' and len(args) > 2:
-        raise SystemExit(__doc__)
-    if variant not in VARIANTS:
-        raise SystemExit(f'모르는 종류 {variant}: {list(VARIANTS)}')
-    if (cmd == 'detect' or with_detect) and variant not in REPORTABLE:
-        raise SystemExit('normal 은 감지 보고를 보내지 않습니다 (warning 또는 emergency)')
 
     from gazebo import Gazebo          # ROS 가 필요한 부분은 여기서부터(list 는 ROS 없이도 된다)
     gz = Gazebo('fire_tool')
-    for n in names if cmd in ('place', 'clear') else ():
-        if cmd == 'clear':
-            print(f'clear {n}: {gz.remove(f"fire_{n}") > 0}')
-        else:                      # 이미 서 있으면 치우고 새 종류로 세운다
-            gz.replace(f'fire_{n}', lambda name, n=n: W.thermal_model(n, variant, name))
-            print(f'place {n} {variant}: {json.dumps(spots()[n])}')
-    if cmd == 'detect' or (cmd == 'place' and with_detect):
-        report(gz.node, names[0], variant)
+    for spot, state in changes.items():
+        gz.replace(f'thermal_{spot}', lambda name, s=spot, v=state: W.thermal_model(s, v, name))
+        st[spot] = state
+        print(f'{spot} → {state}')
+    if changes or cmd in ('reset', 'extinguish'):
+        save(st)
+        if not changes:
+            print('바꿀 자리 없음')
+    if cmd == 'detect':
+        report(gz.node, rest[0], grade, det_id)
     gz.close()
 
 

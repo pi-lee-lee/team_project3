@@ -4,7 +4,7 @@ import { ErrorBox, ago, fmtTime, useAction, useApi, usePoll } from '../../util';
 import { ActionBar, Group, Notice, Page, Row, Tag } from '../../ui';
 import { SOURCE } from './inspectionText';
 import {
-  INCIDENT_EVENT, IncidentStateTag, IncidentSteps, LAUNCH_MODE, checkText, gradeText, incidentEventText, isOpenIncident,
+  INCIDENT_TYPE, INCIDENT_EVENT, IncidentStateTag, IncidentSteps, LAUNCH_MODE, checkText, gradeText, incidentEventText, isOpenIncident,
 } from './scenarioText';
 import './user.css';
 
@@ -35,7 +35,7 @@ export default function IncidentDetail() {
 
   return (
     <Page title={`사건 #${i.incidentId}`} back={back} width="narrow"
-      sub={<>화재 감지 · {fmtTime(i.createdAt)} ({ago(i.createdAt)})</>}>
+      sub={<>{INCIDENT_TYPE[i.type] ?? '화재 감지'} · {fmtTime(i.createdAt)} ({ago(i.createdAt)})</>}>
       <div className={open ? 'has-action-bar' : ''}>
         <ErrorBox msg={act.error || q.error} />
         {i.state === 'AWAITING_APPROVAL' && <Notice tone="warn">로봇이 투척 위치에서 승인을 기다리고 있습니다. 아래 사진과 재판독 결과를 보고 승인하거나 닫으세요.</Notice>}

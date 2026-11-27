@@ -20,6 +20,8 @@ final class Standoff {
     private static final double NEAR_TARGET = 0.15;    // 대상이 벽면에 붙어 있으므로 대상 바로 앞(벽 칸)은 막혀 있어도 된다.
                                                        // 너무 크게 잡으면 벽 반대편 방에서도 '보인다'고 판단한다
 
+    private static final double RAY_BACK = 0.1;      // raycast: 벽 칸에서 로봇 쪽으로 당기는 거리
+
     private Standoff() {
     }
 
@@ -99,6 +101,30 @@ final class Standoff {
             }
         }
         return true;
+    }
+
+    /**
+     * (x, y) 에서 방향 angle(rad)로 나아가 처음 만나는 막힌 칸(벽 · 설비)의 자리. maxM 안에 없으면 null.
+     * 순찰 감시가 사진 속 열원 방향을 지도 위 자리로 바꿀 때 쓴다(열원은 벽에 붙은 판이다). 출발점 둘레(로봇 몸통)는 건너뛴다.
+     * 돌려주는 자리는 벽 칸에서 로봇 쪽으로 RAY_BACK 만큼 당긴 곳이다 — 벽 칸 위를 대상으로 잡으면 벽 반대편 방에서도
+     * '보인다'고 판단해(lineOfSight 는 대상 둘레 NEAR_TARGET 을 건너뛴다) 판 뒷면 쪽으로 로봇을 보내게 된다.
+     */
+    static Map<String, Object> ray(RobotAdapter.Grid g, double x, double y, double angle, double maxM) {
+        double step = g.resolution() / 2;
+        for (double d = ROBOT_RADIUS; d <= maxM; d += step) {
+            double px = x + d * Math.cos(angle);
+            double py = y + d * Math.sin(angle);
+            int c = cell(g, px, py);
+            if (c > 50) {
+                double back = Math.max(ROBOT_RADIUS, d - RAY_BACK);
+                Map<String, Object> hit = new LinkedHashMap<>();
+                hit.put("x", round(x + back * Math.cos(angle)));
+                hit.put("y", round(y + back * Math.sin(angle)));
+                hit.put("distanceM", round(d));
+                return hit;
+            }
+        }
+        return null;
     }
 
     private static double round(double v) {

@@ -9,7 +9,7 @@ SLAM 지도가 없을 때의 대체용이고, 스토리보드 그림에도 쓴�
    y
    7 ┌────────────────────┬──────────────────────┬────┐
      │ 전기실             │ 생산동               │ C2 │ ← 비상구(초록)
-     │ 분전반(노랑) P4    │  랙      랙          │폭  │  P3 = 비상구 표시등(C2 끝)
+     │ 압력계 사진 P4     │  랙      랙          │폭  │  P3 = 비상구 표시등(C2 끝)
      │            ┌─문    문─┐ P2(랙 앞 사진: 받침만) │1.1 │
    3 ├──── 문 ────┤소화기 사진←P1  설비     설비      │
      │ 사무실     │          │                    문───┤
@@ -19,7 +19,7 @@ SLAM 지도가 없을 때의 대체용이고, 스토리보드 그림에도 쓴�
      -1                                               8
 실행: python3 world_spec.py  → inspection.world, ros/maps/reference.pgm/.yaml
 
-카메라 판독 대상(계기판·표시등·열화상 인쇄물)도 여기서 정의한다. 이것들은 충돌체 없이 모양(visual)만 있어서
+카메라 판독 대상(압력계·표시등·소화기·열화상 사진 판)도 여기서 정의한다. 이것들은 충돌체 없이 모양(visual)만 있어서
 라이다(ray 센서는 충돌체만 본다)에 잡히지 않고 지도에도 넣지 않는다 → 넣고 빼도 SLAM 재스캔이 필요 없다.
 """
 import math
@@ -92,40 +92,47 @@ TARGETS = [
     # 사진 판은 벽에 붙은 두께 4mm 판이라 지도에는 벽만으로 충분하다.
     ('target_red', 3.2, 3.9, 0.3, 0.5, (0.8, 0.1, 0.1)),
     ('target_green', 7.65, 7.0, 0.5, 0.2, (0.1, 0.7, 0.2)),     # 비상구 표시 (C2 끝)
-    ('target_yellow', -0.8, 4.6, 0.3, 0.6, (0.9, 0.8, 0.1)),    # 분전반 (전기실 서쪽 벽)
 ]
 # 색 상자 높이(m). 라이다 평면(약 0.13m)보다 높기만 하면 지도는 같다.
 # 로봇 카메라는 바닥에서 0.10m, 세로 화각 48.7° 라서 0.9m 앞에서는 높이 0.5m 까지만 찍힌다. 초록·노랑 상자를 0.6m 로 두면
 # 사진 위쪽이 상자로 꽉 차서 표시등·계기판을 "상자 위"에 둘 수 없다 → 0.2m 로 낮추고 그 위 벽에 붙인다.
-TARGET_H = {'target_red': 0.6, 'target_green': 0.2, 'target_yellow': 0.2}
+TARGET_H = {'target_red': 0.6, 'target_green': 0.2}
 
 # ---- 카메라 판독 대상 (모양만 있고 충돌체가 없다. 상태는 sim/tools/target.py 로 바꾼다) ----
 # 색은 사진 판독기와의 약속이다(0~255). 발광 재질이라 조명과 무관하게 거의 이 색 그대로 찍힌다.
 WHITE, BLACK = (255, 255, 255), (0, 0, 0)
 GAUGE_HUB_RGB, GAUGE_NEEDLE_RGB = (0, 0, 255), (255, 0, 0)
 LAMP_COLORS = {'green': (0, 255, 0), 'yellow': (255, 220, 0), 'red': (255, 0, 0), 'off': (40, 40, 40)}
-THERMAL_BG, THERMAL_HOT = (40, 0, 80), ((255, 120, 0), (255, 230, 0), (255, 255, 255))   # 바탕, 뜨거운 부분(밖 → 안)
-THERMAL_SIZE = (0.40, 0.30)                                         # 인쇄물 가로, 세로(m)
-THERMAL_HOT_RATIO = {'normal': 0.0, 'warning': 0.03, 'emergency': 0.15}   # 뜨거운 부분(주황 원) 넓이 / 판 넓이
 
-# 계기판: 전기실 서쪽 벽, 분전반(노랑 상자) 바로 위. facing = 판이 바라보는 방향(도), z = 중심 높이
-GAUGE = {'x': X0 + T / 2, 'y': 4.6, 'z': 0.41, 'facing': 0, 'value': 0.8}
-GAUGE_R, GAUGE_RIM_R, GAUGE_HUB_R, GAUGE_NEEDLE = 0.12, 0.13, 0.02, (0.10, 0.015)   # 원판, 테두리, 허브 반지름, 바늘(길이, 굵기)
+# 계기판(압력계): 전기실 서쪽 벽, P4 정면. facing = 판이 바라보는 방향(도), z = 중심 높이.
+# 예전에는 분전반(노랑 상자) 위에 작게 붙였으나 상자가 판독을 헷갈리게 해 상자를 빼고 소화기 사진 판과 같은 크기 · 높이로 건다.
+# 시연 압력계 사진(demo_images.py: 흰 판 · 초록 0~0.6 · 노랑 0.6~0.8 · 빨강 0.8~1.0 띠 · 검은 바늘)을 입힌 판이다.
+# 판독은 GAUGE style 'zone'(색 띠로 계기판을 찾는다). P4(벽에서 1.25m)에서도 판 전체가 사진에 들어온다.
+GAUGE = {'x': X0 + T / 2, 'y': 4.6, 'z': 0.28, 'facing': 0, 'state': 'normal'}
+GAUGE_SIZE = (0.60, 0.45)                                            # 사진 판 가로, 세로(m), 4:3 (PHOTO_SIZE 와 같다)
+GAUGE_VALUES = {'normal': 0.35, 'warning': 0.70, 'danger': 0.90}     # 사진 속 바늘 값(demo_images.GAUGE_VALUES 와 같다)
+GAUGE_R, GAUGE_RIM_R, GAUGE_HUB_R, GAUGE_NEEDLE = 0.12, 0.13, 0.02, (0.10, 0.015)   # (옛 색 계기판 — gauge_color_model)
 # 표시등: C2 끝 북쪽 벽, 비상구 표시(초록 상자) 위. 구가 벽에 닿게 중심을 반지름만큼 띄운다
 LAMP_R = 0.05
 LAMP = {'x': 7.65, 'y': Y1 - T / 2 - LAMP_R, 'z': 0.36, 'color': 'green'}
 # 소화기 사진 판(P1)을 "자리에서 벗어남"으로 만들 때 옮겨 놓는 곳: 같은 벽을 따라 남쪽으로 0.5m
 EXTINGUISHER_MOVED = (XO + T / 2, 3.4)
 
-# 화재(열화상 인쇄물)를 세우는 자리: 벽면 위 판 중심의 지도 좌표 x, y 와 판이 바라보는 방향(도). sim/tools/fire.py 가 쓴다.
-# 로봇은 판 앞 FIRE_STAND_DIST 에 판을 바라보고 선다(fire_stand). 점검 지점과 다른 벽이고 그 앞이 비어 있는 곳만 골랐다.
-FIRE_SPOTS = {
-    'office_south': (1.5, Y0 + T / 2, 90),     # 사무실 남쪽 벽
-    'elec_north': (0.3, Y1 - T / 2, -90),      # 전기실 북쪽 벽
-    'hall_east': (XH - T / 2, 3.2, 180),       # 생산동 동쪽 벽(C2 로 나가는 문 아래)
+# 열화상 사진 판(시연 사진 demo_images.py: 무지개 색, 15~300°C): 순찰 경로에서 보이는 고정 자리 두 곳에 늘 걸어 둔다.
+# 상태(normal 꺼짐 · warning 과열 · emergency 화재)는 sim/tools/fire.py 가 사진만 바꾼다. 판 중심의 지도 좌표 x, y 와 판이 바라보는 방향(도).
+# 자리는 순찰 한 바퀴(P1 → P2 → P3 → P4)의 로봇 위치를 기록해, 지나가며 판이 화면 가로 100픽셀 이상으로 몇 초 동안
+# 보이고 점검 지점 정지 사진에는 찍히지 않는 곳으로 골랐다(화재 사진의 동심원이 압력계 띠처럼 보여 같이 찍히면 압력계를 잘못 읽는다).
+#   c2_east   : C2 복도 동쪽 벽, 생산동 → C2 문 바로 맞은편 — P1 · P2 → P3 로 문을 향해 가는 동안 정면에 보인다(화재 시연).
+#               처음 자리(생산동 동쪽 벽, 문 아래)는 그 길에서 화면 끝에 걸려 잘려 보이기만 해 옮겼다(판 전체가 보이는 시간 4초 → 17초)
+#   elec_door : 전기실 벽 생산동 쪽, 전기실 문 바로 아래 — P3 → P4 로 가며 정면에 보인다(과열 시연)
+THERMAL_SPOTS = {
+    'c2_east': (X1 - T / 2, 4.1, 180),
+    'elec_door': (XO + T / 2, 4.9, 0),
 }
-FIRE_Z = 0.27            # 판 중심 높이: 1m 앞 카메라(높이 0.10m)에 판 전체(0.12~0.42m)가 들어온다
-FIRE_STAND_DIST = 1.0
+THERMAL_STATES = ('normal', 'warning', 'emergency')
+THERMAL_SIZE = (0.60, 0.45)      # 사진 판 가로, 세로(m), 4:3 (소화기 · 압력계 사진 판과 같다)
+THERMAL_Z = 0.28
+THERMAL_STAND_DIST = 1.0         # 열원 확인 · 투척 때 로봇이 서는 거리(서버 설정 launch.range_m 과 같은 값)
 
 # 소화기 사진 판(인식 모델 OBJECT detector='model' 이 읽는다): 실제 현장에서 로봇 카메라로 찍은 사진을 건다.
 # 이름: (판 중심 x, y, 판이 바라보는 방향(도), 재질 이름). 재질·사진은 /sim/models/photo_panels.
@@ -152,7 +159,7 @@ def _stand(panel):
 
 
 # 점검 지점: 로봇이 서서 대상을 촬영할 위치(지도 좌표)와 방향(도). DB(inspection_point)와 같은 값이다.
-# P1 · P2 = 소화기 사진 판 앞, P3 = 비상구 표시등(C2 끝), P4 = 분전반 계기판(전기실 서쪽 벽)
+# P1 · P2 = 소화기 사진 판 앞, P3 = 비상구 표시등(C2 끝), P4 = 압력계 사진 판(전기실 서쪽 벽)
 POINTS = {'P1': _stand('photo_p1'), 'P2': _stand('photo_p2'), 'P3': (7.65, 6.1, 90), 'P4': (0.3, 4.6, 180)}
 # 비상구 점검 지점의 비상구 앞 구역 [x1, y1, x2, y2](DB inspection_point.exit_zone 과 같은 값). 로봇이 이 안에서 막히면
 # 복구 · 우회 없이 바로 진입 불가로 끝내고 목적지 쪽 사진을 올린다. P3 = 생산동 → C2 문(y 3.6) 위쪽부터 비상구 벽까지의 C2 복도.
@@ -259,8 +266,17 @@ def gauge_angle(value):
     return 225.0 - max(0.0, min(1.0, value)) * 270.0
 
 
-def gauge_model(value=None, name='target_gauge'):
-    a = math.radians(gauge_angle(GAUGE['value'] if value is None else value))
+def gauge_model(state=None, name='target_gauge'):
+    """압력계 사진 판(정상 · 주의 · 위험 사진 중 하나)."""
+    state = state or GAUGE['state']
+    if state not in GAUGE_VALUES:
+        raise ValueError(f'압력계 상태는 {tuple(GAUGE_VALUES)}')
+    return texture_panel(name, GAUGE['x'], GAUGE['y'], GAUGE['z'], GAUGE['facing'], GAUGE_SIZE, f'gauge_{state}.png')
+
+
+def gauge_color_model(value=0.8, name='target_gauge'):
+    """(옛) 파란 허브 · 빨간 바늘 색 계기판(GAUGE style 'color' 시험용). 지금 월드에는 쓰지 않는다."""
+    a = math.radians(gauge_angle(value))
     length, thick = GAUGE_NEEDLE
     v = _disc('rim', 0.003, GAUGE_RIM_R, BLACK) + _disc('face', 0.006, GAUGE_R, WHITE)
     # 바늘: 허브에서 바깥으로 뻗는 막대. 모델 x 축으로 a 만큼 돌리면 막대의 긴 축(y)이 (cos a, sin a) 방향이 된다
@@ -276,16 +292,10 @@ def lamp_model(color=None, name='target_lamp'):
     return _visual_model(name, LAMP['x'], LAMP['y'], LAMP['z'], 0, v)
 
 
-def thermal_model(spot, variant='emergency', name=None):
-    """열화상 인쇄물: 진보라 판 위 가운데에 주황 → 노랑 → 흰색 원을 겹친다(뜨거운 부분 = 주황 원 전체)."""
-    x, y, facing = FIRE_SPOTS[spot]
-    w, h = THERMAL_SIZE
-    v = _visual('sheet', '0.003 0 0 0 0 0', f'<box><size>0.004 {w} {h}</size></box>', THERMAL_BG)
-    r = math.sqrt(THERMAL_HOT_RATIO[variant] * w * h / math.pi)
-    if r > 0:
-        for i, (scale, rgb) in enumerate(zip((1.0, 0.65, 0.3), THERMAL_HOT)):
-            v += _disc(f'hot{i}', 0.006 + 0.003 * i, r * scale, rgb)
-    return _visual_model(name or f'fire_{spot}', x, y, FIRE_Z, facing, v)
+def thermal_model(spot, state='normal', name=None):
+    """열화상 사진 판: 그 자리에 thermal_{state}.png(demo_images.py 가 만든다)를 입힌다."""
+    x, y, facing = THERMAL_SPOTS[spot]
+    return texture_panel(name or f'thermal_{spot}', x, y, THERMAL_Z, facing, THERMAL_SIZE, f'thermal_{state}.png')
 
 
 def photo_panel_model(panel, name=None, material=None, x=None, y=None):
@@ -293,23 +303,29 @@ def photo_panel_model(panel, name=None, material=None, x=None, y=None):
     material·x·y 를 주면 그 값으로 바꿔 만든다(target.py 가 소화기를 치우거나 옮길 때)."""
     px, py, facing, base = PHOTO_PANELS[panel]
     x, y, material = px if x is None else x, py if y is None else y, material or base
-    w, h = PHOTO_SIZE
+    return texture_panel(name or panel, x, y, PHOTO_Z, facing, PHOTO_SIZE, material)
+
+
+def texture_panel(name, x, y, z, facing, size, texture):
+    """사진 판 하나: 얇은 상자 앞면에 PHOTO_MATERIALS/textures/texture 를 입힌다(충돌체 없음 → 지도 · 주행에 영향 없음).
+    소화기 · 압력계 · 열화상 사진 판이 함께 쓴다."""
+    w, h = size
     v = (f'        <visual name="photo"><pose>0.003 0 0 0 0 0</pose><cast_shadows>false</cast_shadows>'
          f'<geometry><box><size>0.004 {w} {h}</size></box></geometry>'
          # Gazebo Harmonic: 사진을 색(albedo)과 발광(emissive)으로 같이 입혀 조명과 무관하게 사진 색 그대로 보이게 한다
          f'<material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular>'
-         f'<pbr><metal><albedo_map>{PHOTO_MATERIALS}/textures/{material}</albedo_map>'
-         f'<emissive_map>{PHOTO_MATERIALS}/textures/{material}</emissive_map>'
+         f'<pbr><metal><albedo_map>{PHOTO_MATERIALS}/textures/{texture}</albedo_map>'
+         f'<emissive_map>{PHOTO_MATERIALS}/textures/{texture}</emissive_map>'
          f'<metalness>0</metalness><roughness>1</roughness></metal></pbr></material></visual>\n')
-    return _visual_model(name or panel, x, y, PHOTO_Z, facing, v)
+    return _visual_model(name, x, y, z, facing, v)
 
 
-def fire_stand(spot):
+def thermal_stand(spot):
     """그 자리의 판을 정면으로 보는 로봇 자세 (x, y, yaw 도)."""
-    x, y, facing = FIRE_SPOTS[spot]
+    x, y, facing = THERMAL_SPOTS[spot]
     a = math.radians(facing)
     yaw = (facing + 180) % 360
-    return (round(x + FIRE_STAND_DIST * math.cos(a), 3), round(y + FIRE_STAND_DIST * math.sin(a), 3),
+    return (round(x + THERMAL_STAND_DIST * math.cos(a), 3), round(y + THERMAL_STAND_DIST * math.sin(a), 3),
             yaw - 360 if yaw > 180 else yaw)
 
 
@@ -323,8 +339,9 @@ def world():
     m = ''.join(box_model(n, x, y, sx, sy, WALL_H, (0.78, 0.78, 0.8)) for n, x, y, sx, sy in WALLS)
     m += ''.join(box_model(n, x, y, sx, sy, h, rgb) for n, x, y, sx, sy, h, rgb in FIXTURES)
     m += ''.join(target_box_model(n) for n, *_ in TARGETS if n != 'target_red')   # 소화기는 사진 판(P1)으로 대신한다
-    m += gauge_model() + lamp_model()            # 처음 상태: 계기판 0.8, 표시등 초록 (열화상 인쇄물은 fire.py 로만 세운다)
+    m += gauge_model() + lamp_model()            # 처음 상태: 압력계 정상 사진, 표시등 초록
     m += ''.join(photo_panel_model(p) for p in PHOTO_PANELS)
+    m += ''.join(thermal_model(s) for s in THERMAL_SPOTS)   # 열화상 사진 판(처음은 꺼짐 = 정상 사진)
     return f'''<?xml version="1.0"?>
 <!-- world_spec.py 로 생성. 직접 고치지 말고 world_spec.py 를 고친 뒤 다시 생성한다. -->
 <sdf version="1.8">

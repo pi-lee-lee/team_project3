@@ -103,6 +103,23 @@ public class InternalController {
                 Math.max(1, b.path("max").asInt(8))));
     }
 
+    /**
+     * 지도 위 한 점에서 한 방향으로 처음 만나는 벽 · 설비의 자리. body: {"x", "y", "angleRad", "maxM"}
+     * → {"hit": {"x", "y", "distanceM"} 또는 null}. 순찰 감시(inspection-service PatrolWatchService)가 쓴다.
+     */
+    @PostMapping("/robots/{id}/raycast")
+    public Map<String, Object> raycast(@PathVariable long id, @RequestBody JsonNode b) {
+        var grid = registry.adapter(id).grid();
+        if (grid == null) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,
+                    "지도를 아직 받지 못했습니다");
+        }
+        Map<String, Object> out = new HashMap<>();
+        out.put("hit", Standoff.ray(grid, b.path("x").asDouble(), b.path("y").asDouble(), b.path("angleRad").asDouble(),
+                b.path("maxM").asDouble(6.0)));
+        return out;
+    }
+
     @GetMapping("/robots/{id}")
     public Map<String, Object> robot(@PathVariable long id) {
         return robots.status(id);
